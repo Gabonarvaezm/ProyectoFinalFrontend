@@ -1,27 +1,28 @@
-<div class="landing-container">
-  <header class="navbar">
-    <div class="nav-brand">
-      <div class="brand-icon">
-        <i class="bi bi-robot"></i>
-      </div>
-      <span class="brand-title">DiscerIA</span>
-    </div>
+<nav class="navbar">
+  <div class="brand">
+    <span class="material-symbols-outlined brand-icon">psychology</span>
+    <span class="brand-title">DiscerIA</span>
+  </div>
 
-    <nav class="nav-menu">
-      <a href="#plataforma" class="nav-link">Plataforma</a>
-      <a href="#caracteristicas" class="nav-link">Características</a>
-      <a href="#testimonios" class="nav-link">Testimonios</a>
-    </nav>
+  <div class="nav-menu">
+    <a href="#" class="nav-link">Plataforma</a>
+    <a href="#" class="nav-link">Características</a>
+    <a href="#" class="nav-link">Testimonios</a>
+    <button class="btn-login">Iniciar Sesión</button>
+  </div>
 
-    <div class="nav-actions">
-      <a routerLink="/login" class="btn-login">Iniciar Sesión</a>
-    </div>
-  </header>
+  <button class="btn-mobile-menu">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+</nav>
 
-  <main class="hero-section">
+<main class="hero-section">
+  <div class="tech-glow"></div>
+
+  <div class="hero-container">
     <div class="badge-pill">
-      <i class="bi bi-stars"></i>
-      <span>El futuro del aprendizaje guiado por IA</span>
+      <span class="material-symbols-outlined badge-icon">auto_awesome</span>
+      <span class="badge-text">El futuro del aprendizaje guiado por IA</span>
     </div>
 
     <h1 class="hero-title">
@@ -29,33 +30,76 @@
       <span class="highlight-text">Inteligencia Artificial</span>
     </h1>
 
-    <p class="hero-description">
+    <p class="hero-subtitle">
       DiscerIA combina una biblioteca digital exhaustiva con un tutor de IA avanzado para crear una experiencia de aprendizaje personalizada, profesional y altamente eficiente.
     </p>
 
-    <div class="hero-buttons">
-      <button type="button" class="btn-primary">
+    <div class="cta-buttons">
+      <button class="btn-primary">
         <span>Comenzar Gratis</span>
-        <i class="bi bi-arrow-right"></i>
+        <span class="material-symbols-outlined">arrow_forward</span>
       </button>
 
-      <button type="button" class="btn-secondary">
-        <i class="bi bi-play-circle"></i>
+      <button class="btn-secondary">
+        <span class="material-symbols-outlined">play_circle</span>
         <span>Ver Demo</span>
       </button>
     </div>
+  </div>
 
-    <div class="preview-container">
-      <div class="window-header">
-        <div class="window-dots">
-          <span class="dot red"></span>
-          <span class="dot yellow"></span>
-          <span class="dot green"></span>
+  <div class="preview-glassmorphism">
+    <div class="window-header">
+      <div class="window-dot"></div>
+      <div class="window-dot"></div>
+      <div class="window-dot"></div>
+    </div>
+    <img
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtMAhK_i9xDaB3LubbfgQjiZbH23BQj9Xn5ugdCkHeTe-5W6x1j5Bk_35ZQ1jr7UTKGT2k2j3sxKigDW7PTEqbTwHn2RCqd5Y1TK_hxgsTkS_HhdW5lRa6DjcAN8fhprxStIwZuSpneM6QH_Cu78VdthZ4FBzXIOYyZnGD647N_A__PnmZ5liJSO4BOFf4mFSBM8EfwX2IcCUbW92YtxDWAc4JOGzTeiRxmjycOYFIPj2CRoXz0A"
+      alt="DiscerIA Dashboard Preview"
+      class="dashboard-image"
+    />
+  </div>
+</main>
+
+<section class="features-section">
+  <div class="features-container">
+    <div class="features-header">
+      <h2 class="features-title">Arquitectura Cognitiva Avanzada</h2>
+      <p class="features-subtitle">
+        Diseñado para sesiones de estudio profundas, minimizando la fatiga visual mientras maximiza la retención de conocimiento.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon-wrapper bg-blue">
+          <span class="material-symbols-outlined icon-blue">menu_book</span>
         </div>
+        <h3 class="card-title">Biblioteca Exhaustiva</h3>
+        <p class="card-text">
+          Acceso estructurado a miles de recursos académicos organizados semánticamente para un descubrimiento rápido.
+        </p>
       </div>
-      <div class="window-body">
-        <img src="assets/dashboard-preview.png" alt="DiscerIA Dashboard Preview" class="dashboard-img" />
+
+      <div class="feature-card">
+        <div class="icon-wrapper bg-teal">
+          <span class="material-symbols-outlined icon-teal">smart_toy</span>
+        </div>
+        <h3 class="card-title">Tutor IA Contextual</h3>
+        <p class="card-text">
+          Generación de resúmenes, resolución de dudas complejas y creación de exámenes de práctica en tiempo real.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon-wrapper bg-indigo">
+          <span class="material-symbols-outlined icon-indigo">leaderboard</span>
+        </div>
+        <h3 class="card-title">Análisis de Progreso</h3>
+        <p class="card-text">
+          Métricas detalladas sobre tu rendimiento, áreas de mejora y proyección de aprendizaje basada en datos.
+        </p>
       </div>
     </div>
-  </main>
-</div>
+  </div>
+</section>
