@@ -1,0 +1,347 @@
+<div class="register-wrapper">
+  <!-- Panel Lateral / Hero -->
+  <aside class="hero-section">
+    <div class="hero-content">
+      <a routerLink="/" class="brand-header" title="Ir a la página principal">
+        <div class="brand-logo-icon" aria-hidden="true">
+          <i class="bi bi-robot"></i>
+        </div>
+        <span class="brand-title">DiscerIA</span>
+      </a>
+
+      <h1 class="hero-title">
+        Únete a la nueva era del aprendizaje universitario.
+      </h1>
+
+      <p class="hero-description">
+        Crea tu cuenta institucional y accede al tutor de inteligencia artificial, resúmenes automáticos y miles de fuentes académicas verificadas.
+      </p>
+
+      <div class="hero-benefits">
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="bi bi-lightning-charge-fill"></i>
+          </div>
+          <div class="benefit-text">
+            <strong>Tutor IA Disponible 24/7</strong>
+            <span>Resuelve dudas complejas con explicaciones paso a paso.</span>
+          </div>
+        </div>
+
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <div class="benefit-text">
+            <strong>Fuentes Académicas Verificadas</strong>
+            <span>Bibliografía y artículos científicos con citas rigurosas.</span>
+          </div>
+        </div>
+
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <div class="benefit-text">
+            <strong>Seguimiento de Progreso</strong>
+            <span>Mide tu retención y organiza tus planes de estudio.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Panel del Formulario -->
+  <main class="form-section">
+    <div class="card-register">
+      <div class="form-header">
+        <h2 class="form-title">Crear Cuenta Institucional</h2>
+        <p class="form-subtitle">Regístrate gratis con tus datos académicos.</p>
+      </div>
+
+      <!-- Alertas de Estado -->
+      @if (errorMessage()) {
+        <div class="alert alert-danger" role="alert" aria-live="assertive">
+          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success" role="alert" aria-live="polite">
+          <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <!-- Botón Google Institucional -->
+      <button
+        type="button"
+        class="btn-google"
+        (click)="onGoogleRegister()"
+        [disabled]="isLoading() || isGoogleLoading()"
+      >
+        @if (isGoogleLoading()) {
+          <span class="btn-spinner dark" aria-hidden="true"></span>
+          <span>Registrando con Google...</span>
+        } @else {
+          <svg class="google-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.13C3.26 21.3 7.31 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.63H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.37l3.99-3.13z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.63l3.99 3.13c.95-2.85 3.6-4.96 6.72-4.96z"/>
+          </svg>
+          <span>Registrarse con Google Institucional</span>
+        }
+      </button>
+
+      <div class="divider">
+        <span class="divider-line"></span>
+        <span class="divider-dot">o regístrate con tu correo</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- Formulario Reactivo de Registro -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form" novalidate>
+        
+        <!-- Nombre Completo -->
+        <div class="form-group">
+          <label for="fullName" class="form-label">Nombre Completo</label>
+          <div class="input-wrapper" [class.has-error]="isFieldInvalid('fullName')">
+            <span class="input-icon" aria-hidden="true">
+              <i class="bi bi-person"></i>
+            </span>
+            <input
+              type="text"
+              id="fullName"
+              formControlName="fullName"
+              class="form-input"
+              [class.is-invalid]="isFieldInvalid('fullName')"
+              placeholder="Ej: Gabriel Narváez"
+              autocomplete="name"
+              [attr.aria-invalid]="isFieldInvalid('fullName')"
+              [attr.aria-describedby]="isFieldInvalid('fullName') ? 'fullName-error' : null"
+              required
+            />
+          </div>
+          @if (isFieldInvalid('fullName')) {
+            <span id="fullName-error" class="field-error" role="alert">
+              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              {{ getFieldError('fullName') }}
+            </span>
+          }
+        </div>
+
+        <!-- Correo Institucional -->
+        <div class="form-group">
+          <label for="email" class="form-label">Correo Institucional</label>
+          <div class="input-wrapper" [class.has-error]="isFieldInvalid('email')">
+            <span class="input-icon" aria-hidden="true">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-input"
+              [class.is-invalid]="isFieldInvalid('email')"
+              placeholder="estudiante@universidad.edu"
+              autocomplete="email"
+              [attr.aria-invalid]="isFieldInvalid('email')"
+              [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
+              required
+            />
+          </div>
+          @if (isFieldInvalid('email')) {
+            <span id="email-error" class="field-error" role="alert">
+              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              {{ getFieldError('email') }}
+            </span>
+          }
+        </div>
+
+        <!-- Universidad / Institución y Rol en dos columnas -->
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="institution" class="form-label">Universidad / Institución</label>
+            <div class="input-wrapper" [class.has-error]="isFieldInvalid('institution')">
+              <span class="input-icon" aria-hidden="true">
+                <i class="bi bi-building"></i>
+              </span>
+              <input
+                type="text"
+                id="institution"
+                formControlName="institution"
+                class="form-input"
+                [class.is-invalid]="isFieldInvalid('institution')"
+                placeholder="Ej: Universidad Nacional"
+                [attr.aria-invalid]="isFieldInvalid('institution')"
+                [attr.aria-describedby]="isFieldInvalid('institution') ? 'institution-error' : null"
+                required
+              />
+            </div>
+            @if (isFieldInvalid('institution')) {
+              <span id="institution-error" class="field-error" role="alert">
+                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                {{ getFieldError('institution') }}
+              </span>
+            }
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="role" class="form-label">Perfil Académico</label>
+            <div class="input-wrapper">
+              <span class="input-icon" aria-hidden="true">
+                <i class="bi bi-mortarboard"></i>
+              </span>
+              <select id="role" formControlName="role" class="form-input form-select">
+                <option value="student">Estudiante</option>
+                <option value="professor">Docente / Investigador</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-wrapper" [class.has-error]="isFieldInvalid('password')">
+            <span class="input-icon" aria-hidden="true">
+              <i class="bi bi-lock"></i>
+            </span>
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              class="form-input"
+              [class.is-invalid]="isFieldInvalid('password')"
+              placeholder="Mínimo 8 caracteres (letras y números)"
+              autocomplete="new-password"
+              [attr.aria-invalid]="isFieldInvalid('password')"
+              [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"
+              required
+            />
+            <button
+              type="button"
+              class="btn-toggle-password"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Ver contraseña'"
+            >
+              <i
+                class="bi"
+                [class.bi-eye]="showPassword()"
+                [class.bi-eye-slash]="!showPassword()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+          @if (isFieldInvalid('password')) {
+            <span id="password-error" class="field-error" role="alert">
+              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              {{ getFieldError('password') }}
+            </span>
+          }
+        </div>
+
+        <!-- Confirmar Contraseña -->
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+          <div class="input-wrapper" [class.has-error]="isFieldInvalid('confirmPassword')">
+            <span class="input-icon" aria-hidden="true">
+              <i class="bi bi-shield-lock"></i>
+            </span>
+            <input
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              class="form-input"
+              [class.is-invalid]="isFieldInvalid('confirmPassword')"
+              placeholder="Repite tu contraseña"
+              autocomplete="new-password"
+              [attr.aria-invalid]="isFieldInvalid('confirmPassword')"
+              [attr.aria-describedby]="isFieldInvalid('confirmPassword') ? 'confirmPassword-error' : null"
+              required
+            />
+            <button
+              type="button"
+              class="btn-toggle-password"
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="showConfirmPassword() ? 'Ocultar contraseña' : 'Ver contraseña'"
+            >
+              <i
+                class="bi"
+                [class.bi-eye]="showConfirmPassword()"
+                [class.bi-eye-slash]="!showConfirmPassword()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+          @if (isFieldInvalid('confirmPassword')) {
+            <span id="confirmPassword-error" class="field-error" role="alert">
+              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              {{ getFieldError('confirmPassword') }}
+            </span>
+          }
+        </div>
+
+        <!-- Indicador visual de fortaleza de contraseña -->
+        @if (passwordControl?.value) {
+          <div class="strength-meter-container">
+            <div class="strength-label">
+              <span>Seguridad:</span>
+              <strong [class]="passwordStrength().colorClass">{{ passwordStrength().text }}</strong>
+            </div>
+            <div class="strength-bars">
+              <div class="bar" [class.active]="passwordStrength().level >= 1" [class]="passwordStrength().colorClass"></div>
+              <div class="bar" [class.active]="passwordStrength().level >= 2" [class]="passwordStrength().colorClass"></div>
+              <div class="bar" [class.active]="passwordStrength().level >= 3" [class]="passwordStrength().colorClass"></div>
+            </div>
+          </div>
+        }
+
+        <!-- Aceptar Términos y Condiciones -->
+        <div class="terms-group">
+          <label class="checkbox-label" for="acceptTerms">
+            <input
+              type="checkbox"
+              id="acceptTerms"
+              formControlName="acceptTerms"
+              class="checkbox-input"
+              [class.is-invalid]="isFieldInvalid('acceptTerms')"
+            />
+            <span class="checkbox-text">
+              Acepto los <a href="#" class="terms-link">Términos de Servicio</a> y la <a href="#" class="terms-link">Política de Privacidad</a> de DiscerIA.
+            </span>
+          </label>
+          @if (isFieldInvalid('acceptTerms')) {
+            <span class="field-error" role="alert">
+              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              {{ getFieldError('acceptTerms') }}
+            </span>
+          }
+        </div>
+
+        <!-- Botón de Registro -->
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="isLoading() || isGoogleLoading()"
+        >
+          @if (isLoading()) {
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span>Creando tu cuenta...</span>
+          } @else {
+            <span>Crear mi Cuenta Universitaria</span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Pie del Formulario -->
+    <div class="form-footer">
+      <span>¿Ya tienes una cuenta registrada? </span>
+      <a routerLink="/login" class="login-link">Iniciar sesión</a>
+    </div>
+  </main>
+</div>

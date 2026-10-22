@@ -6,12 +6,15 @@ import { PaginaPrincipal } from './pagina-principal/pagina-principal';
 
 export const routes: Routes = [
     {
-        path:'login',
+        path: 'login',
         component: Login
     },
-    
     {
-        path:'',
+        path: 'register',
+        loadComponent: () => import('./register/register').then((m) => m.Register),
+    },
+    {
+        path: '',
         component: PaginaPrincipal
     }
 ];
