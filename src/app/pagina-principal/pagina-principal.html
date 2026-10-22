@@ -1,60 +1,148 @@
 <div class="landing-container">
+  <!-- Navegación Superior -->
   <header class="navbar">
     <div class="nav-brand">
-      <div class="brand-icon">
+      <div class="brand-icon" aria-hidden="true">
         <i class="bi bi-robot"></i>
       </div>
       <span class="brand-title">DiscerIA</span>
     </div>
 
-    <nav class="nav-menu">
+    <nav class="nav-menu" aria-label="Navegación principal">
       <a href="#plataforma" class="nav-link">Plataforma</a>
       <a href="#caracteristicas" class="nav-link">Características</a>
       <a href="#testimonios" class="nav-link">Testimonios</a>
     </nav>
 
     <div class="nav-actions">
-      <a routerLink="/login" class="btn-login">Iniciar Sesión</a>
+      <a routerLink="/login" class="btn-login">
+        <span>Iniciar Sesión</span>
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+      </a>
     </div>
   </header>
 
+  <!-- Sección Hero -->
   <main class="hero-section">
+    <!-- Badge Píldora -->
     <div class="badge-pill">
-      <i class="bi bi-stars"></i>
+      <i class="bi bi-stars" aria-hidden="true"></i>
       <span>El futuro del aprendizaje guiado por IA</span>
     </div>
 
+    <!-- Título Principal -->
     <h1 class="hero-title">
       Potencia tu Mente con <br />
       <span class="highlight-text">Inteligencia Artificial</span>
     </h1>
 
+    <!-- Descripción -->
     <p class="hero-description">
       DiscerIA combina una biblioteca digital exhaustiva con un tutor de IA avanzado para crear una experiencia de aprendizaje personalizada, profesional y altamente eficiente.
     </p>
 
+    <!-- Botones de Acción -->
     <div class="hero-buttons">
-      <button type="button" class="btn-primary">
+      <a routerLink="/login" class="btn-primary">
         <span>Comenzar Gratis</span>
-        <i class="bi bi-arrow-right"></i>
-      </button>
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+      </a>
 
-      <button type="button" class="btn-secondary">
-        <i class="bi bi-play-circle"></i>
+      <a href="#demo" class="btn-secondary">
+        <i class="bi bi-play-circle" aria-hidden="true"></i>
         <span>Ver Demo</span>
-      </button>
+      </a>
     </div>
 
-    <div class="preview-container">
+    <!-- Ventana de Previsualización de la Plataforma -->
+    <div class="preview-container" id="demo">
       <div class="window-header">
-        <div class="window-dots">
+        <div class="window-dots" aria-hidden="true">
           <span class="dot red"></span>
           <span class="dot yellow"></span>
           <span class="dot green"></span>
         </div>
+        <div class="window-search-bar" aria-hidden="true">
+          <i class="bi bi-lock-fill"></i>
+          <span>app.disceria.edu/dashboard/tutor-ia</span>
+        </div>
       </div>
+
       <div class="window-body">
-        <img src="assets/dashboard-preview.png" alt="DiscerIA Dashboard Preview" class="dashboard-img" />
+        <!-- Mockup Visual Dinámico del Dashboard de DiscerIA -->
+        <div class="dashboard-mockup">
+          <!-- Sidebar del Mockup -->
+          <aside class="mockup-sidebar">
+            <div class="sidebar-item active">
+              <i class="bi bi-chat-square-text-fill"></i>
+              <span>Tutor Activo</span>
+            </div>
+            <div class="sidebar-item">
+              <i class="bi bi-journal-bookmark-fill"></i>
+              <span>Biblioteca Digital</span>
+            </div>
+            <div class="sidebar-item">
+              <i class="bi bi-bar-chart-line-fill"></i>
+              <span>Progreso de Estudio</span>
+            </div>
+            <div class="sidebar-item">
+              <i class="bi bi-mortarboard-fill"></i>
+              <span>Mis Cursos</span>
+            </div>
+          </aside>
+
+          <!-- Contenido Principal del Mockup -->
+          <section class="mockup-content">
+            <!-- Header del Chat -->
+            <div class="chat-header">
+              <div class="tutor-avatar">
+                <i class="bi bi-cpu-fill"></i>
+              </div>
+              <div class="tutor-info">
+                <span class="tutor-name">Tutor DiscerIA • Algoritmos y Datos</span>
+                <span class="tutor-status"><span class="status-dot"></span> En línea para ayudarte</span>
+              </div>
+            </div>
+
+            <!-- Conversación Mockup -->
+            <div class="chat-messages">
+              <div class="message user-msg">
+                <span class="msg-bubble">
+                  ¿Cómo funciona el algoritmo de Dijkstra y cuál es su complejidad temporal?
+                </span>
+              </div>
+
+              <div class="message ai-msg">
+                <div class="ai-avatar">
+                  <i class="bi bi-robot"></i>
+                </div>
+                <div class="msg-bubble">
+                  <p class="summary">
+                    El algoritmo de <strong>Dijkstra</strong> encuentra la ruta más corta desde un nodo origen a todos los demás en un grafo con pesos no negativos.
+                  </p>
+                  <div class="code-preview">
+                    <code>Complejidad con Min-Heap: O((V + E) log V)</code>
+                  </div>
+                  <div class="source-tag">
+                    <i class="bi bi-book-half"></i>
+                    <span>Fuente: Introducción a los Algoritmos (CLRS), Cap. 24</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Barra de Pregunta Mockup -->
+            <div class="chat-input-bar">
+              <div class="input-fake">
+                <i class="bi bi-stars"></i>
+                <span>Pregunta cualquier tema de tu bibliografía académica...</span>
+              </div>
+              <button type="button" class="btn-fake-send" aria-label="Enviar pregunta">
+                <i class="bi bi-arrow-up-circle-fill"></i>
+              </button>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   </main>

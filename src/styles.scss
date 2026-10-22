@@ -16,12 +16,28 @@
   --color-success: #10b981;
 }
 
-body {
+html, body {
+  min-height: 100%;
   margin: 0;
   padding: 0;
+}
+
+body {
   font-family: var(--font-family-base);
   color: var(--color-text-main);
   background-color: #f8fafc;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
 }
