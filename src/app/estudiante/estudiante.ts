@@ -1,14 +1,23 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, computed, inject, PLATFORM_ID, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  PLATFORM_ID,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import {
+  ChatMessage,
+  NavItem,
+  QuickAction,
+  STORAGE_KEYS,
+} from '../core/models/auth.model';
 
-export interface NavItem {
-  id: string;
-  label: string;
-  icon: string;
-}
+export type { ChatMessage, NavItem, QuickAction };
 
 export interface LibrarySubject {
   id: string;
@@ -34,19 +43,6 @@ export interface ForumQuestion {
   initials: string;
 }
 
-export interface ChatMessage {
-  id: string;
-  sender: 'user' | 'ai';
-  text: string;
-  timestamp: Date;
-}
-
-export interface QuickAction {
-  id: string;
-  label: string;
-  icon: string;
-}
-
 @Component({
   imports: [RouterLink, FormsModule],
   selector: 'app-estudiante',
@@ -57,6 +53,9 @@ export class Estudiante {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private timerIds: ReturnType<typeof setTimeout>[] = [];
 
   // ── Navegación Lateral ───────────────────────────────────────────────────
   public readonly activeNav = signal<string>('dashboard');
@@ -91,7 +90,7 @@ export class Estudiante {
     category: 'CONTINUAR APRENDIENDO',
     title: 'Biología Celular - Mitosis y Meiosis',
     progress: 85,
-    icon: 'bi bi-virus', // o matraz / beaker
+    icon: 'bi bi-virus',
   });
 
   // ── Biblioteca Digital ───────────────────────────────────────────────────
@@ -218,6 +217,10 @@ export class Estudiante {
 
   constructor() {
     this.initializeUserData();
+
+    this.destroyRef.onDestroy(() => {
+      this.timerIds.forEach((id) => clearTimeout(id));
+    });
   }
 
   /**
@@ -242,7 +245,7 @@ export class Estudiante {
     // 2. Recuperación persistente SSR-safe desde localStorage
     if (isPlatformBrowser(this.platformId)) {
       try {
-        const storedUser = localStorage.getItem('disceria_registered_user');
+        const storedUser = localStorage.getItem(STORAGE_KEYS.REGISTERED_USER);
         if (storedUser) {
           const parsed = JSON.parse(storedUser) as {
             fullName?: string;
@@ -283,9 +286,10 @@ export class Estudiante {
   public onLogout(): void {
     this.authService.logout();
     this.showToast('Cerrando sesión. Redirigiendo al inicio de sesión...');
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       this.router.navigate(['/login']);
     }, 800);
+    this.timerIds.push(timer);
   }
 
   public onContinueCourse(): void {
@@ -344,7 +348,7 @@ export class Estudiante {
     this.aiInputText.set('');
     this.isAiThinking.set(true);
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       let reply = 'He analizado tu consulta con base en la biblioteca académica de DiscerIA.';
       const lower = promptText.toLowerCase();
 
@@ -372,6 +376,8 @@ export class Estudiante {
       this.chatMessages.update((prev) => [...prev, aiMsg]);
       this.isAiThinking.set(false);
     }, 600);
+
+    this.timerIds.push(timer);
   }
 
   public isAvatarBroken(id: string): boolean {
@@ -384,8 +390,9 @@ export class Estudiante {
 
   public showToast(msg: string): void {
     this.toastMessage.set(msg);
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       this.toastMessage.set(null);
     }, 3000);
+    this.timerIds.push(timer);
   }
 }

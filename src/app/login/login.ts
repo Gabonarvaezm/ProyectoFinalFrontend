@@ -1,5 +1,5 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,7 +23,10 @@ export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
-  private readonly platformId = inject(PLATFORM_ID);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Identificador de timeout activo para cancelación defensiva */
+  private redirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   // Estados reactivos con Signals
   public readonly isLoading = signal<boolean>(false);
@@ -50,6 +53,14 @@ export class Login {
     ],
     rememberMe: [false],
   });
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.redirectTimeoutId) {
+        clearTimeout(this.redirectTimeoutId);
+      }
+    });
+  }
 
   // Getters para acceso limpio a controles
   public get emailControl(): AbstractControl | null {
@@ -120,34 +131,37 @@ export class Login {
     this.isLoading.set(true);
     const { email, password, rememberMe } = this.loginForm.value;
 
-    // Buscar datos del usuario registrado en localStorage
-    const registeredRole = this.getRegisteredUserRole(email);
+    // Buscar rol registrado a través del servicio centralizado
+    const registeredRole = this.authService.getRegisteredUserRole(email);
 
-    this.authService.login({ email, password, rememberMe }).subscribe({
-      next: (response) => {
-        this.isLoading.set(false);
+    this.authService
+      .login({ email, password, rememberMe })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.isLoading.set(false);
 
-        // Determinar la ruta de destino y mensaje de feedback según el rol
-        const role = registeredRole ?? response.user.role;
-        const targetRoute =
-          role === 'professor' ? '/profesor' : role === 'student' ? '/estudiante' : '/';
+          // Determinar la ruta de destino y mensaje de feedback según el rol
+          const role = registeredRole ?? response.user.role;
+          const targetRoute =
+            role === 'professor' ? '/profesor' : role === 'student' ? '/estudiante' : '/';
 
-        const successText =
-          role === 'professor'
-            ? '¡Acceso concedido! Redirigiendo a tu panel docente...'
-            : '¡Acceso concedido! Redirigiendo a tu espacio de estudio...';
+          const successText =
+            role === 'professor'
+              ? '¡Acceso concedido! Redirigiendo a tu panel docente...'
+              : '¡Acceso concedido! Redirigiendo a tu espacio de estudio...';
 
-        this.successMessage.set(successText);
+          this.successMessage.set(successText);
 
-        setTimeout(() => {
-          this.router.navigate([targetRoute]);
-        }, 1200);
-      },
-      error: (err: Error) => {
-        this.isLoading.set(false);
-        this.errorMessage.set(err.message || 'Credenciales no válidas o usuario no registrado.');
-      },
-    });
+          this.redirectTimeoutId = setTimeout(() => {
+            this.router.navigate([targetRoute]);
+          }, 1200);
+        },
+        error: (err: Error) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(err.message || 'Credenciales no válidas o usuario no registrado.');
+        },
+      });
   }
 
   /**
@@ -162,28 +176,5 @@ export class Login {
       this.errorMessage.set('Ingresa tu correo en el formulario para solicitar la recuperación.');
       this.emailControl?.markAsTouched();
     }
-  }
-
-  /**
-   * Obtiene el rol del usuario registrado desde localStorage.
-   * Esto permite que cuando un usuario se registra (profesor o estudiante) y luego inicia sesión,
-   * se redirija correctamente a su dashboard correspondiente.
-   */
-  private getRegisteredUserRole(email: string): string | null {
-    if (!isPlatformBrowser(this.platformId)) return null;
-
-    try {
-      const stored = localStorage.getItem('disceria_registered_user');
-      if (!stored) return null;
-
-      const userData = JSON.parse(stored) as { email: string; role: string };
-      if (userData.email === email.toLowerCase()) {
-        return userData.role;
-      }
-    } catch {
-      // Si hay error al parsear, se ignora silenciosamente
-    }
-
-    return null;
   }
 }

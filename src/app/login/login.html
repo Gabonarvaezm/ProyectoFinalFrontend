@@ -90,9 +90,7 @@
         <div class="form-group">
           <div class="label-row">
             <label for="password" class="form-label">Contraseña</label>
-            <a href="#" (click)="onForgotPassword($event)" class="forgot-password">
-              ¿Olvidaste tu contraseña?
-            </a>
+            <button type="button" (click)="onForgotPassword($event)" class="forgot-password">¿Olvidaste tu contraseña?</button>
           </div>
           <div class="input-wrapper" [class.has-error]="isFieldInvalid('password')">
             <span class="input-icon" aria-hidden="true">

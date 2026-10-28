@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { STORAGE_KEYS } from '../models/auth.model';
 import {
   CreateStudentDto,
   KpiMetric,
@@ -8,8 +9,8 @@ import {
   StudentStatus,
 } from '../../profesor/models/profesor.model';
 
-const STORAGE_KEY_STUDENTS = 'disceria_profesor_students';
-const STORAGE_KEY_REGISTERED_USER = 'disceria_registered_user';
+// Claves centralizadas en STORAGE_KEYS
+
 
 @Injectable({
   providedIn: 'root',
@@ -236,7 +237,7 @@ export class ProfesorService {
     }
 
     // Carga desde localStorage si existe
-    const stored = localStorage.getItem(STORAGE_KEY_STUDENTS);
+    const stored = localStorage.getItem(STORAGE_KEYS.STUDENTS);
     let loadedStudents: StudentProgress[] = initialSeed;
 
     if (stored) {
@@ -251,7 +252,7 @@ export class ProfesorService {
     }
 
     // Si algún usuario se registró previamente en la app con rol 'student', sincronizarlo
-    const registeredUserRaw = localStorage.getItem(STORAGE_KEY_REGISTERED_USER);
+    const registeredUserRaw = localStorage.getItem(STORAGE_KEYS.REGISTERED_USER);
     if (registeredUserRaw) {
       try {
         const regUser = JSON.parse(registeredUserRaw);
@@ -283,7 +284,7 @@ export class ProfesorService {
   private persistStudents(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     try {
-      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(this._students()));
+      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this._students()));
     } catch (e) {
       console.warn('[ProfesorService] No se pudo persistir estudiantes:', e);
     }

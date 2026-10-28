@@ -348,9 +348,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   @if (isRegisterModalOpen()) {
     <div
-      class="modal-backdrop"
-      (click)="closeRegisterModal()"
-      role="presentation"
+      class="modal-backdrop"`r`n      (click)="closeRegisterModal()"`r`n      (keydown.escape)="closeRegisterModal()"`r`n      role="presentation"
     >
       <div
         class="modal-dialog"
