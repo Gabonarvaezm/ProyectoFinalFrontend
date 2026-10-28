@@ -25,22 +25,22 @@ import { environment } from '../../environments/environment';
 import { LottieComponent } from '../shared/components/lottie';
 import { fadeInOut, fadeInUp } from '../shared/animations';
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-// Interfaces tipadas para Google Identity Services (GIS) Ã¢â‚¬â€ sin `any`
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// ─────────────────────────────────────────────────────────────────────────────
+// Interfaces tipadas para Google Identity Services (GIS) — sin `any`
+// ─────────────────────────────────────────────────────────────────────────────
 
 /** Respuesta del callback de Google con el JWT firmado */
 export interface GoogleCredentialResponse {
   /** JWT firmado que contiene la identidad del usuario */
   credential: string;
-  /** CÃƒÂ³mo fue seleccionada la cuenta (auto, user, etc.) */
+  /** Cómo fue seleccionada la cuenta (auto, user, etc.) */
   select_by?: string;
 }
 
 /** Payload decodificado del JWT de Google */
 export interface GoogleUserPayload {
   iss?: string;
-  /** Subject: identificador ÃƒÂºnico del usuario en Google */
+  /** Subject: identificador único del usuario en Google */
   sub?: string;
   email: string;
   email_verified?: boolean;
@@ -52,14 +52,14 @@ export interface GoogleUserPayload {
   hd?: string;
 }
 
-/** NotificaciÃƒÂ³n del estado del prompt One Tap */
+/** Notificación del estado del prompt One Tap */
 interface GooglePromptNotification {
   isNotDisplayed(): boolean;
   isSkippedMoment(): boolean;
   getMomentType(): string;
 }
 
-/** ConfiguraciÃƒÂ³n del botÃƒÂ³n renderizado por Google */
+/** Configuración del botón renderizado por Google */
 interface GoogleButtonConfig {
   type?: 'standard' | 'icon';
   theme?: 'outline' | 'filled_blue' | 'filled_black';
@@ -70,7 +70,7 @@ interface GoogleButtonConfig {
   width?: number;
 }
 
-/** ConfiguraciÃƒÂ³n de inicializaciÃƒÂ³n del cliente GIS */
+/** Configuración de inicialización del cliente GIS */
 interface GoogleIdConfig {
   client_id: string;
   callback: (response: GoogleCredentialResponse) => void;
@@ -91,20 +91,20 @@ declare const google: {
   };
 };
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-// Constantes de validaciÃƒÂ³n y configuraciÃƒÂ³n
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// ─────────────────────────────────────────────────────────────────────────────
+// Constantes de validación y configuración
+// ─────────────────────────────────────────────────────────────────────────────
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const FULL_NAME_REGEX = /^[\p{L}\s]+$/u;
-/** MÃƒÂ­nimo 8 caracteres, al menos una letra y un nÃƒÂºmero */
+/** Mínimo 8 caracteres, al menos una letra y un número */
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
 /**
- * Client ID de Google Cloud Console, leÃƒÂ­do desde el archivo de entorno.
- * - DEV:  src/environments/environment.ts       Ã¢â€ â€™ googleClientId: ''
- * - PROD: src/environments/environment.prod.ts  Ã¢â€ â€™ valor inyectado por CI/CD
+ * Client ID de Google Cloud Console, leído desde el archivo de entorno.
+ * - DEV:  src/environments/environment.ts       → googleClientId: ''
+ * - PROD: src/environments/environment.prod.ts  → valor inyectado por CI/CD
  *
- * Angular reemplaza automÃƒÂ¡ticamente el archivo de entorno al compilar
+ * Angular reemplaza automáticamente el archivo de entorno al compilar
  * con `ng build --configuration production`.
  */
 const GOOGLE_CLIENT_ID = environment.googleClientId;
@@ -121,13 +121,13 @@ export class Register implements OnInit, AfterViewInit {
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
 
-  /** Contenedor donde Google renderizarÃ¡ su botÃ³n nativo (Signal Query) */
+  /** Contenedor donde Google renderizará su botón nativo (Signal Query) */
   public readonly googleBtnContainer = viewChild<ElementRef<HTMLDivElement>>('googleBtnContainer');
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬ Estados reactivos (Signals) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+  // ── Estados reactivos (Signals) ─────────────────────────────────────────
   public readonly isLoading = signal<boolean>(false);
   public readonly isGoogleLoading = signal<boolean>(false);
-  /** true cuando el SDK de GIS estÃƒÂ¡ inicializado y listo */
+  /** true cuando el SDK de GIS está inicializado y listo */
   public readonly isGoogleSdkReady = signal<boolean>(false);
   public readonly showPassword = signal<boolean>(false);
   public readonly showConfirmPassword = signal<boolean>(false);
@@ -136,7 +136,7 @@ export class Register implements OnInit, AfterViewInit {
   /** true cuando no hay Client ID real configurado (modo desarrollo/demo) */
   public readonly isSandboxMode = signal<boolean>(GOOGLE_CLIENT_ID.includes('TU_GOOGLE_CLIENT_ID'));
 
-  // Validador personalizado para confirmaciÃƒÂ³n de contraseÃƒÂ±as
+  // Validador personalizado para confirmación de contraseñas
   private readonly passwordMatchValidator: ValidatorFn = (
     control: AbstractControl
   ): ValidationErrors | null => {
@@ -160,7 +160,7 @@ export class Register implements OnInit, AfterViewInit {
     }
   };
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬ Formulario Reactivo tipado Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+  // ── Formulario Reactivo tipado ───────────────────────────────────────────
   public readonly registerForm: FormGroup = this.fb.group(
     {
       fullName: [
@@ -198,13 +198,13 @@ export class Register implements OnInit, AfterViewInit {
     { validators: this.passwordMatchValidator }
   );
 
-  // ConexiÃƒÂ³n reactiva de valueChanges a Signal
+  // Conexión reactiva de valueChanges a Signal
   private readonly passwordSignal = toSignal(
     this.registerForm.get('password')!.valueChanges,
     { initialValue: '' }
   );
 
-  // Computed Signal para calcular la fortaleza de la contraseÃƒÂ±a
+  // Computed Signal para calcular la fortaleza de la contraseña
   public readonly passwordStrength = computed(() => {
     const pwd = this.passwordSignal() || '';
     if (!pwd) return { level: 0, text: 'No ingresada', colorClass: '' };
@@ -215,12 +215,12 @@ export class Register implements OnInit, AfterViewInit {
     if (/[0-9]/.test(pwd)) score++;
     if (/[^A-Za-z0-9]/.test(pwd)) score++;
 
-    if (score <= 1) return { level: 1, text: 'DÃƒÂ©bil', colorClass: 'weak' };
+    if (score <= 1) return { level: 1, text: 'Débil', colorClass: 'weak' };
     if (score <= 3) return { level: 2, text: 'Media', colorClass: 'medium' };
     return { level: 3, text: 'Fuerte', colorClass: 'strong' };
   });
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬ Ciclo de vida Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+  // ── Ciclo de vida ────────────────────────────────────────────────────────
 
   public ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -230,7 +230,7 @@ export class Register implements OnInit, AfterViewInit {
 
   public ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    // Intentar renderizar el botÃƒÂ³n nativo de Google si el SDK ya estaba listo
+    // Intentar renderizar el botón nativo de Google si el SDK ya estaba listo
     this.tryRenderGoogleButton();
   }
 
@@ -260,7 +260,7 @@ export class Register implements OnInit, AfterViewInit {
   }
 
   /**
-   * Determina si un campo es invÃƒÂ¡lido y fue tocado
+   * Determina si un campo es inválido y fue tocado
    */
   public isFieldInvalid(fieldName: string): boolean {
     const control = this.registerForm.get(fieldName);
@@ -281,13 +281,13 @@ export class Register implements OnInit, AfterViewInit {
         case 'email':
           return 'El correo institucional es requerido';
         case 'institution':
-          return 'La universidad o instituciÃƒÂ³n es requerida';
+          return 'La universidad o institución es requerida';
         case 'password':
-          return 'La contraseÃƒÂ±a es requerida';
+          return 'La contraseña es requerida';
         case 'confirmPassword':
-          return 'Debes confirmar tu contraseÃƒÂ±a';
+          return 'Debes confirmar tu contraseña';
         case 'acceptTerms':
-          return 'Debes aceptar los tÃƒÂ©rminos y condiciones';
+          return 'Debes aceptar los términos y condiciones';
         default:
           return 'Campo obligatorio';
       }
@@ -295,48 +295,48 @@ export class Register implements OnInit, AfterViewInit {
 
     if (control.hasError('minlength')) {
       const min = control.getError('minlength')?.requiredLength;
-      return `MÃƒÂ­nimo ${min} caracteres`;
+      return `Mínimo ${min} caracteres`;
     }
 
     if (control.hasError('pattern')) {
       if (fieldName === 'fullName') {
-        return 'Ingresa solo letras y espacios vÃƒÂ¡lidos';
+        return 'Ingresa solo letras y espacios válidos';
       }
       if (fieldName === 'email') {
-        return 'Ingresa un formato de correo vÃƒÂ¡lido (ej: usuario@universidad.edu)';
+        return 'Ingresa un formato de correo válido (ej: usuario@universidad.edu)';
       }
       if (fieldName === 'password') {
-        return 'Debe incluir al menos 8 caracteres, combinando letras y nÃƒÂºmeros';
+        return 'Debe incluir al menos 8 caracteres, combinando letras y números';
       }
     }
 
     if (control.hasError('email')) {
-      return 'Formato de correo electrÃƒÂ³nico invÃƒÂ¡lido';
+      return 'Formato de correo electrónico inválido';
     }
 
     if (control.hasError('passwordMismatch')) {
-      return 'Las contraseÃƒÂ±as no coinciden';
+      return 'Las contraseñas no coinciden';
     }
 
-    return 'Dato invÃƒÂ¡lido';
+    return 'Dato inválido';
   }
 
   /**
-   * Alterna visibilidad de contraseÃƒÂ±a
+   * Alterna visibilidad de contraseña
    */
   public togglePasswordVisibility(): void {
     this.showPassword.update((v) => !v);
   }
 
   /**
-   * Alterna visibilidad de confirmar contraseÃƒÂ±a
+   * Alterna visibilidad de confirmar contraseña
    */
   public toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword.update((v) => !v);
   }
 
   /**
-   * EnvÃƒÂ­o y procesamiento del registro reactivo manual
+   * Envío y procesamiento del registro reactivo manual
    */
   public onSubmit(): void {
     this.errorMessage.set(null);
@@ -354,11 +354,11 @@ export class Register implements OnInit, AfterViewInit {
       role: string; password: string; confirmPassword: string; acceptTerms: boolean;
     };
 
-    // SimulaciÃƒÂ³n de llamada al backend Ã¢â‚¬â€ listo para conectar con API real
+    // Simulación de llamada al backend — listo para conectar con API real
     setTimeout(() => {
       this.isLoading.set(false);
       this.successMessage.set(
-        `Ã‚Â¡Cuenta creada exitosamente para ${fullName}! Redirigiendo al inicio de sesiÃƒÂ³n...`
+        `¡Cuenta creada exitosamente para ${fullName}! Redirigiendo al inicio de sesión...`
       );
 
       if (isPlatformBrowser(this.platformId)) {
@@ -372,12 +372,12 @@ export class Register implements OnInit, AfterViewInit {
     }, 1200);
   }
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬ Google Identity Services Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+  // ── Google Identity Services ─────────────────────────────────────────────
 
   /**
    * Punto de entrada del flujo de registro con Google.
    * Prioridades:
-   *  1. Prompt One Tap de Google (si Client ID real estÃƒÂ¡ configurado).
+   *  1. Prompt One Tap de Google (si Client ID real está configurado).
    *  2. Modo sandbox para desarrollo local (cuando no hay Client ID real).
    */
   public onGoogleRegister(): void {
@@ -392,7 +392,7 @@ export class Register implements OnInit, AfterViewInit {
             this.isGoogleLoading.set(false);
             this.errorMessage.set(
               'El popup de Google fue bloqueado por el navegador. ' +
-              'Usa el botÃƒÂ³n "G" de abajo o habilita los popups para este sitio.'
+              'Usa el botón "G" de abajo o habilita los popups para este sitio.'
             );
           }
         });
@@ -408,7 +408,7 @@ export class Register implements OnInit, AfterViewInit {
 
   /**
    * Inicializa el SDK de Google Identity Services.
-   * El script ya viene en index.html; aquÃƒÂ­ esperamos a que estÃƒÂ© disponible.
+   * El script ya viene en index.html; aquí esperamos a que esté disponible.
    */
   private initializeGoogleSdk(): void {
     if (typeof google !== 'undefined' && google?.accounts?.id) {
@@ -427,7 +427,7 @@ export class Register implements OnInit, AfterViewInit {
 
   /**
    * Configura el cliente de Google Identity Services con su callback.
-   * Solo se ejecuta si el SDK estÃƒÂ¡ disponible y el Client ID es real.
+   * Solo se ejecuta si el SDK está disponible y el Client ID es real.
    */
   private setupGoogleAccountsClient(): void {
     if (typeof google === 'undefined' || !google?.accounts?.id) return;
@@ -447,16 +447,16 @@ export class Register implements OnInit, AfterViewInit {
       });
 
       this.isGoogleSdkReady.set(true);
-      // Intentar renderizar el botÃƒÂ³n nativo tras inicializaciÃƒÂ³n
+      // Intentar renderizar el botón nativo tras inicialización
       this.tryRenderGoogleButton();
     } catch (e) {
-      console.warn('[Register] Google Identity Client en modo demostraciÃƒÂ³n:', e);
+      console.warn('[Register] Google Identity Client en modo demostración:', e);
     }
   }
 
   /**
-   * Renderiza el botÃƒÂ³n oficial de Google dentro del contenedor del template.
-   * Es mÃƒÂ¡s fiable que el prompt en entornos con restricciones de popup.
+   * Renderiza el botón oficial de Google dentro del contenedor del template.
+   * Es más fiable que el prompt en entornos con restricciones de popup.
    */
   private tryRenderGoogleButton(): void {
     const containerEl = this.googleBtnContainer()?.nativeElement;
@@ -473,11 +473,11 @@ export class Register implements OnInit, AfterViewInit {
         locale: 'es',
       });
     } catch (e) {
-      console.warn('[Register] No se pudo renderizar el botÃ³n nativo de Google:', e);
+      console.warn('[Register] No se pudo renderizar el botón nativo de Google:', e);
     }
   }
 
-  /** Verifica si el SDK estÃƒÂ¡ disponible y el Client ID estÃƒÂ¡ configurado */
+  /** Verifica si el SDK está disponible y el Client ID está configurado */
   private isGoogleSdkAvailable(): boolean {
     return (
       isPlatformBrowser(this.platformId) &&
@@ -497,14 +497,14 @@ export class Register implements OnInit, AfterViewInit {
 
     if (!response?.credential) {
       this.isGoogleLoading.set(false);
-      this.errorMessage.set('No se recibiÃƒÂ³ la credencial de autenticaciÃƒÂ³n de Google. Intenta de nuevo.');
+      this.errorMessage.set('No se recibió la credencial de autenticación de Google. Intenta de nuevo.');
       return;
     }
 
     const payload = this.decodeGoogleJwt(response.credential);
     if (!payload || !payload.email) {
       this.isGoogleLoading.set(false);
-      this.errorMessage.set('No se pudo leer la informaciÃƒÂ³n de tu cuenta Google. Intenta de nuevo.');
+      this.errorMessage.set('No se pudo leer la información de tu cuenta Google. Intenta de nuevo.');
       return;
     }
 
@@ -519,7 +519,7 @@ export class Register implements OnInit, AfterViewInit {
 
   /**
    * Decodifica de forma segura el JWT firmado por Google.
-   * Nota: solo extrae el payload; la verificaciÃƒÂ³n de firma la hace el backend.
+   * Nota: solo extrae el payload; la verificación de firma la hace el backend.
    */
   private decodeGoogleJwt(token: string): GoogleUserPayload | null {
     try {
@@ -541,14 +541,14 @@ export class Register implements OnInit, AfterViewInit {
 
   /**
    * Procesa los datos del usuario autenticado por Google:
-   *  - Persiste la sesiÃƒÂ³n en localStorage.
+   *  - Persiste la sesión en localStorage.
    *  - Redirige al dashboard.
-   * En producciÃƒÂ³n, aquÃƒÂ­ se envÃƒÂ­a el token al backend para crear la sesiÃƒÂ³n.
+   * En producción, aquí se envía el token al backend para crear la sesión.
    */
   private processGoogleUser(payload: GoogleUserPayload, token: string): void {
     const institutionFromDomain = payload.hd
       ? `Universidad (${payload.hd})`
-      : 'InstituciÃƒÂ³n Universitaria';
+      : 'Institución Universitaria';
 
     const fullName =
       payload.name ||
@@ -566,13 +566,13 @@ export class Register implements OnInit, AfterViewInit {
 
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('disceria_registered_user', JSON.stringify(googleUser));
-      // El token se enviarÃƒÂ­a al backend; aquÃƒÂ­ solo se almacena para demo
+      // El token se enviaría al backend; aquí solo se almacena para demo
       localStorage.setItem('disceria_auth_token', token);
     }
 
     this.isGoogleLoading.set(false);
     this.successMessage.set(
-      `Ã‚Â¡Bienvenido ${fullName}! Ã°Å¸Å½â€° Cuenta vinculada con ${googleUser.email}. Redirigiendo a tu espacio...`
+      `¡Bienvenido ${fullName}! 🎉 Cuenta vinculada con ${googleUser.email}. Redirigiendo a tu espacio...`
     );
 
     setTimeout(() => this.router.navigate(['/']), 1800);
@@ -580,8 +580,8 @@ export class Register implements OnInit, AfterViewInit {
 
   /**
    * Modo sandbox: simula un registro con Google para desarrollo local.
-   * Se activa automÃƒÂ¡ticamente cuando GOOGLE_CLIENT_ID no estÃƒÂ¡ configurado.
-   * Reemplazar GOOGLE_CLIENT_ID con el ID real de Google Cloud Console para producciÃƒÂ³n.
+   * Se activa automáticamente cuando GOOGLE_CLIENT_ID no está configurado.
+   * Reemplazar GOOGLE_CLIENT_ID con el ID real de Google Cloud Console para producción.
    */
   private runSandboxGoogleLogin(): void {
     setTimeout(() => {
