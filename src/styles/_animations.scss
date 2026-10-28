@@ -1,0 +1,187 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA Animations — Keyframes, Utility Classes & UX Motion
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Keyframes (Movimiento Sobrio, Académico y Fluido) ────────────────────────
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleInSubtle {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Pulso refinado para insignias activas o tutor IA pensando
+@keyframes pulseGlowAi {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+    transform: scale(1.02);
+  }
+}
+
+// Efecto de brillo de carga Skeleton UX
+@keyframes shimmerSkeleton {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Levitación sutil para tarjetas hero o avatares de IA
+@keyframes floatSmooth {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+// ── Clases Utilitarias para la Interfaz ───────────────────────────────────────
+
+.anim-fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-out-expo) forwards;
+}
+
+.anim-fade-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-out-expo) forwards;
+}
+
+.anim-fade-down {
+  animation: fadeInDown var(--duration-slow) var(--ease-out-expo) forwards;
+}
+
+.anim-scale-in {
+  animation: scaleInSubtle var(--duration-normal) var(--ease-out-expo) forwards;
+}
+
+.anim-slide-right {
+  animation: slideInRight var(--duration-slow) var(--ease-out-expo) forwards;
+}
+
+.anim-pulse-ai {
+  animation: pulseGlowAi 2.4s infinite ease-in-out;
+}
+
+.anim-float {
+  animation: floatSmooth 4.5s ease-in-out infinite;
+}
+
+// Escalonamiento (Staggering) para listas y colecciones
+.anim-stagger-1 {
+  animation-delay: 60ms;
+}
+.anim-stagger-2 {
+  animation-delay: 120ms;
+}
+.anim-stagger-3 {
+  animation-delay: 180ms;
+}
+.anim-stagger-4 {
+  animation-delay: 240ms;
+}
+
+// ── Estados de Carga Skeleton (Experiencia de Usuario de Alta Calidad) ───────
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-slate-100) 0%,
+    var(--color-slate-200) 50%,
+    var(--color-slate-100) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerSkeleton 1.8s infinite ease-in-out;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+
+  &.skeleton-text {
+    height: 14px;
+    width: 100%;
+    margin-bottom: var(--space-2);
+  }
+
+  &.skeleton-title {
+    height: 22px;
+    width: 60%;
+    margin-bottom: var(--space-3);
+  }
+
+  &.skeleton-circle {
+    border-radius: var(--radius-full);
+    width: 40px;
+    height: 40px;
+  }
+
+  &.skeleton-card {
+    height: 180px;
+    width: 100%;
+    border-radius: var(--radius-lg);
+  }
+}
+
+// ── Respeto a Preferencias de Accesibilidad (WCAG AA) ────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

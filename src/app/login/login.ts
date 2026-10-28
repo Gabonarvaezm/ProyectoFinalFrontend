@@ -7,12 +7,15 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { LottieComponent } from '../shared/components/lottie';
+import { fadeInOut, fadeInUp } from '../shared/animations';
 
 @Component({
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, LottieComponent],
   selector: 'app-login',
   styleUrl: './login.scss',
   templateUrl: './login.html',
+  animations: [fadeInUp, fadeInOut],
 })
 export class Login {
   private readonly fb = inject(FormBuilder);

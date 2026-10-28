@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { PaginaPrincipal } from './pagina-principal';
 
 describe('PaginaPrincipal', () => {
@@ -9,7 +10,7 @@ describe('PaginaPrincipal', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PaginaPrincipal],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideNoopAnimations()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaginaPrincipal);

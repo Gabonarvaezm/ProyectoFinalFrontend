@@ -1,7 +1,7 @@
 <div class="register-wrapper">
   <!-- Panel Lateral / Hero -->
   <aside class="hero-section">
-    <div class="hero-content">
+    <div class="hero-content anim-fade-in">
       <a routerLink="/" class="brand-header" title="Ir a la página principal">
         <div class="brand-logo-icon" aria-hidden="true">
           <i class="bi bi-robot"></i>
@@ -9,15 +9,15 @@
         <span class="brand-title">DiscerIA</span>
       </a>
 
-      <h1 class="hero-title">
+      <h1 class="hero-title anim-fade-up">
         Únete a la nueva era del aprendizaje universitario.
       </h1>
 
-      <p class="hero-description">
+      <p class="hero-description anim-fade-up anim-stagger-1">
         Crea tu cuenta institucional y accede al tutor de inteligencia artificial, resúmenes automáticos y miles de fuentes académicas verificadas.
       </p>
 
-      <div class="hero-benefits">
+      <div class="hero-benefits anim-fade-up anim-stagger-2">
         <div class="benefit-item">
           <div class="benefit-icon">
             <i class="bi bi-lightning-charge-fill"></i>
@@ -53,28 +53,26 @@
 
   <!-- Panel del Formulario -->
   <main class="form-section">
-    <div class="card-register">
+    <div class="card-register anim-fade-up anim-stagger-1">
       <div class="form-header">
         <h2 class="form-title">Crear Cuenta Institucional</h2>
         <p class="form-subtitle">Regístrate gratis con tus datos académicos.</p>
       </div>
 
-      <!-- Alertas de Estado -->
+      <!-- Alertas de Estado con animación -->
       @if (errorMessage()) {
-        <div class="alert alert-danger" role="alert" aria-live="assertive">
+        <div @fadeInUp class="alert alert-danger" role="alert" aria-live="assertive">
           <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
           <span>{{ errorMessage() }}</span>
         </div>
       }
 
       @if (successMessage()) {
-        <div class="alert alert-success" role="alert" aria-live="polite">
-          <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+        <div @fadeInUp class="alert alert-success d-flex-center" role="alert" aria-live="polite">
+          <app-lottie name="success" width="38px" height="38px" [loop]="false" ariaLabel="Éxito"></app-lottie>
           <span>{{ successMessage() }}</span>
         </div>
       }
-
-      <!-- Botón Google Institucional -->
 
       <!-- Aviso: Modo sandbox activo (solo visible en desarrollo) -->
       @if (isSandboxMode()) {
@@ -106,7 +104,7 @@
           aria-label="Registrarse con Google Institucional"
         >
           @if (isGoogleLoading()) {
-            <span class="btn-spinner dark" aria-hidden="true"></span>
+            <app-lottie name="loading" width="20px" height="20px" ariaLabel="Cargando"></app-lottie>
             <span>Registrando con Google...</span>
           } @else {
             <svg class="google-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
@@ -122,16 +120,18 @@
 
       <div class="divider">
         <span class="divider-line"></span>
-        <span class="divider-dot">o regístrate con tu correo</span>
+        <span class="divider-text">o con tu correo institucional</span>
         <span class="divider-line"></span>
       </div>
 
       <!-- Formulario Reactivo de Registro -->
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form" novalidate>
-        
         <!-- Nombre Completo -->
         <div class="form-group">
-          <label for="fullName" class="form-label">Nombre Completo</label>
+          <label for="fullName" class="form-label">
+            Nombre Completo
+            <span class="required" aria-hidden="true">*</span>
+          </label>
           <div class="input-wrapper" [class.has-error]="isFieldInvalid('fullName')">
             <span class="input-icon" aria-hidden="true">
               <i class="bi bi-person"></i>
@@ -142,7 +142,7 @@
               formControlName="fullName"
               class="form-input"
               [class.is-invalid]="isFieldInvalid('fullName')"
-              placeholder="Ej: Gabriel Narváez"
+              placeholder="Ej. Laura Gómez Martínez"
               autocomplete="name"
               [attr.aria-invalid]="isFieldInvalid('fullName')"
               [attr.aria-describedby]="isFieldInvalid('fullName') ? 'fullName-error' : null"
@@ -159,7 +159,10 @@
 
         <!-- Correo Institucional -->
         <div class="form-group">
-          <label for="email" class="form-label">Correo Institucional</label>
+          <label for="email" class="form-label">
+            Correo Institucional (.edu)
+            <span class="required" aria-hidden="true">*</span>
+          </label>
           <div class="input-wrapper" [class.has-error]="isFieldInvalid('email')">
             <span class="input-icon" aria-hidden="true">
               <i class="bi bi-envelope"></i>
@@ -170,7 +173,7 @@
               formControlName="email"
               class="form-input"
               [class.is-invalid]="isFieldInvalid('email')"
-              placeholder="estudiante@universidad.edu"
+              placeholder="estudiante@universidad.edu.co"
               autocomplete="email"
               [attr.aria-invalid]="isFieldInvalid('email')"
               [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
@@ -185,10 +188,13 @@
           }
         </div>
 
-        <!-- Universidad / Institución y Rol en dos columnas -->
+        <!-- Universidad / Institución y Rol -->
         <div class="form-row">
           <div class="form-group flex-1">
-            <label for="institution" class="form-label">Universidad / Institución</label>
+            <label for="institution" class="form-label">
+              Universidad / Institución
+              <span class="required" aria-hidden="true">*</span>
+            </label>
             <div class="input-wrapper" [class.has-error]="isFieldInvalid('institution')">
               <span class="input-icon" aria-hidden="true">
                 <i class="bi bi-building"></i>
@@ -199,7 +205,7 @@
                 formControlName="institution"
                 class="form-input"
                 [class.is-invalid]="isFieldInvalid('institution')"
-                placeholder="Ej: Universidad Nacional"
+                placeholder="Universidad Nacional..."
                 [attr.aria-invalid]="isFieldInvalid('institution')"
                 [attr.aria-describedby]="isFieldInvalid('institution') ? 'institution-error' : null"
                 required
@@ -214,14 +220,19 @@
           </div>
 
           <div class="form-group flex-1">
-            <label for="role" class="form-label">Perfil Académico</label>
-            <div class="input-wrapper">
+            <label for="role" class="form-label">
+              Rol Principal
+              <span class="required" aria-hidden="true">*</span>
+            </label>
+            <div class="input-wrapper select-wrapper">
               <span class="input-icon" aria-hidden="true">
                 <i class="bi bi-mortarboard"></i>
               </span>
-              <select id="role" formControlName="role" class="form-input form-select">
-                <option value="student">Estudiante</option>
-                <option value="professor">Docente / Investigador</option>
+              <select id="role" formControlName="role" class="form-select" aria-label="Seleccionar rol académico">
+                <option value="student">Estudiante de Pregrado</option>
+                <option value="postgraduate">Estudiante de Posgrado</option>
+                <option value="professor">Profesor / Docente</option>
+                <option value="researcher">Investigador</option>
               </select>
             </div>
           </div>
@@ -229,7 +240,10 @@
 
         <!-- Contraseña -->
         <div class="form-group">
-          <label for="password" class="form-label">Contraseña</label>
+          <label for="password" class="form-label">
+            Contraseña Segura
+            <span class="required" aria-hidden="true">*</span>
+          </label>
           <div class="input-wrapper" [class.has-error]="isFieldInvalid('password')">
             <span class="input-icon" aria-hidden="true">
               <i class="bi bi-lock"></i>
@@ -248,16 +262,11 @@
             />
             <button
               type="button"
-              class="btn-toggle-password"
+              class="password-toggle-btn"
               (click)="togglePasswordVisibility()"
               [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Ver contraseña'"
             >
-              <i
-                class="bi"
-                [class.bi-eye]="showPassword()"
-                [class.bi-eye-slash]="!showPassword()"
-                aria-hidden="true"
-              ></i>
+              <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
             </button>
           </div>
           @if (isFieldInvalid('password')) {
@@ -270,7 +279,10 @@
 
         <!-- Confirmar Contraseña -->
         <div class="form-group">
-          <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+          <label for="confirmPassword" class="form-label">
+            Confirmar Contraseña
+            <span class="required" aria-hidden="true">*</span>
+          </label>
           <div class="input-wrapper" [class.has-error]="isFieldInvalid('confirmPassword')">
             <span class="input-icon" aria-hidden="true">
               <i class="bi bi-shield-lock"></i>
@@ -289,16 +301,11 @@
             />
             <button
               type="button"
-              class="btn-toggle-password"
+              class="password-toggle-btn"
               (click)="toggleConfirmPasswordVisibility()"
-              [attr.aria-label]="showConfirmPassword() ? 'Ocultar contraseña' : 'Ver contraseña'"
+              [attr.aria-label]="showConfirmPassword() ? 'Ocultar confirmación' : 'Ver confirmación'"
             >
-              <i
-                class="bi"
-                [class.bi-eye]="showConfirmPassword()"
-                [class.bi-eye-slash]="!showConfirmPassword()"
-                aria-hidden="true"
-              ></i>
+              <i class="bi" [class.bi-eye]="!showConfirmPassword()" [class.bi-eye-slash]="showConfirmPassword()"></i>
             </button>
           </div>
           @if (isFieldInvalid('confirmPassword')) {
@@ -353,7 +360,7 @@
           [disabled]="isLoading() || isGoogleLoading()"
         >
           @if (isLoading()) {
-            <span class="btn-spinner" aria-hidden="true"></span>
+            <app-lottie name="loading" width="22px" height="22px" ariaLabel="Cargando"></app-lottie>
             <span>Creando tu cuenta...</span>
           } @else {
             <span>Crear mi Cuenta Universitaria</span>
