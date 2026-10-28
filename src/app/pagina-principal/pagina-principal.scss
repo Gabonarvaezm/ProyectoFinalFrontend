@@ -1,85 +1,130 @@
-$font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
-// Variables de diseño
-$color-primary: #1d4ed8;
-$color-primary-hover: #1e40af;
-$color-text-dark: #0f172a;
-$color-text-muted: #64748b;
-$color-border: #e2e8f0;
-$color-bg-page: #f8fafc;
-$color-teal: #0d9488;
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA Landing Page Stylesheet
+// ─────────────────────────────────────────────────────────────────────────────
 
 :host {
   display: block;
-  min-height: 100vh;
   width: 100%;
-  font-family: $font-family;
-  background-color: $color-bg-page;
-  color: $color-text-dark;
+  font-family: var(--font-family-base, 'Plus Jakarta Sans', sans-serif);
+  background-color: #ffffff;
+  color: #0f172a;
+  overflow-x: hidden;
 }
 
-.landing-container {
+// Variables locales sincronizadas con el Design System DiscerIA
+$color-dark: #0f172a;
+$color-blue-primary: #1d4ed8;       // Color principal DiscerIA (Login / Buttons)
+$color-blue-hover: #1e40af;         // Hover de botones primarios
+$color-blue-vibrant: #2563eb;       // Acento vibrante y bordes activos
+$color-blue-light: #3b82f6;         // Gradientes e iconos
+$color-cyan-accent: #0284c7;        // Acento complementario de IA / Biblioteca
+$color-cyan-light: #38bdf8;         // Checkmarks e iluminación
+$color-muted: #64748b;
+$color-border-subtle: #f1f5f9;
+
+// Gradientes institucionales DiscerIA
+$gradient-ribbon: linear-gradient(90deg, #1e3a8a 0%, #1d4ed8 35%, #2563eb 70%, #0284c7 100%);
+$gradient-blue-section: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #1d4ed8 100%);
+$gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+$gradient-teacher-arch: linear-gradient(145deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%);
+
+.landing-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   width: 100%;
 }
 
 // ============================================
-// NAVBAR
+// 1. NAVBAR
 // ============================================
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.15rem 4rem;
-  background-color: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid $color-border;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  padding: 1.15rem 0;
 
-  .nav-brand {
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: space-between;
+  }
 
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      color: #ffffff;
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+
+    .brand-robot-icon {
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
+      background: linear-gradient(135deg, $color-blue-light 0%, $color-blue-primary 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.15rem;
-      box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
+      color: #ffffff;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
+      transition: transform 0.2s ease;
     }
 
-    .brand-title {
-      font-size: 1.45rem;
+    &:hover .brand-robot-icon {
+      transform: scale(1.05);
+    }
+
+    .brand-name {
+      font-size: 1.65rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
-      color: $color-text-dark;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .brand-dot {
+      color: $color-blue-primary;
     }
   }
 
-  .nav-menu {
+  .nav-links {
     display: flex;
     align-items: center;
-    gap: 2.25rem;
+    gap: 2rem;
 
-    .nav-link {
-      color: $color-text-muted;
-      font-size: 0.9rem;
+    @media (max-width: 900px) {
+      display: none;
+    }
+
+    .nav-dropdown {
+      position: relative;
+    }
+
+    .nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.925rem;
       font-weight: 500;
+      color: #334155;
+      text-decoration: none;
       transition: color 0.2s ease;
-      cursor: pointer;
+
+      .nav-chevron {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        transition: transform 0.2s ease;
+      }
 
       &:hover {
-        color: $color-primary;
+        color: $color-blue-primary;
+        .nav-chevron {
+          transform: translateY(1px);
+        }
       }
     }
   }
@@ -87,454 +132,1364 @@ $color-teal: #0d9488;
   .nav-actions {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
 
-    .btn-login {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      color: $color-text-dark;
-      padding: 0.55rem 1.1rem;
-      border-radius: 9px;
-      font-size: 0.88rem;
+    .btn-signin {
+      font-size: 0.925rem;
       font-weight: 600;
+      color: #334155;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
       transition: all 0.2s ease;
 
       &:hover {
-        color: $color-primary;
+        color: $color-blue-primary;
         background-color: #f1f5f9;
       }
     }
 
-    .btn-register {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background-color: $color-primary;
-      color: #ffffff;
-      padding: 0.6rem 1.35rem;
-      border-radius: 9px;
-      font-size: 0.88rem;
+    .btn-freetrial {
+      font-size: 0.925rem;
       font-weight: 600;
-      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.22);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #ffffff;
+      background: $color-blue-primary;
+      text-decoration: none;
+      padding: 0.625rem 1.4rem;
+      border-radius: 9999px;
+      box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
+      transition: all 0.2s ease;
 
       &:hover {
-        background-color: $color-primary-hover;
-        box-shadow: 0 6px 16px rgba(29, 78, 216, 0.32);
+        background: $color-blue-hover;
+        box-shadow: 0 6px 18px rgba(29, 78, 216, 0.4);
         transform: translateY(-1px);
+      }
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      font-size: 1.5rem;
+      color: #0f172a;
+      cursor: pointer;
+      padding: 0.25rem;
+
+      @media (max-width: 900px) {
+        display: block;
       }
     }
   }
 
-  @media (max-width: 860px) {
-    padding: 1rem 1.5rem;
+  .mobile-dropdown {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.5rem 1.5rem;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    gap: 0.75rem;
 
-    .nav-menu {
-      display: none;
+    .mobile-link {
+      color: #334155;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 0;
+      text-decoration: none;
+
+      &:hover {
+        color: $color-blue-primary;
+      }
+    }
+
+    .mobile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+
+      .w-full {
+        width: 100%;
+        text-align: center;
+      }
     }
   }
 }
 
 // ============================================
-// HERO SECTION
+// 2. HERO SECTION
 // ============================================
 .hero-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 4.5rem 1.5rem 3rem 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+  padding: 4.5rem 0 3.5rem;
+  background: radial-gradient(circle at 85% 20%, rgba(37, 99, 235, 0.08) 0%, rgba(255, 255, 255, 0) 60%),
+              radial-gradient(circle at 10% 70%, rgba(2, 132, 199, 0.06) 0%, rgba(255, 255, 255, 0) 50%);
 
-  .badge-pill {
-    display: inline-flex;
+  .hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 4rem;
     align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #eff6ff 0%, #f0fdfa 100%);
-    border: 1px solid #bfdbfe;
-    border-radius: 9999px;
-    padding: 0.45rem 1.15rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: $color-primary;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 6px rgba(29, 78, 216, 0.06);
 
-    i {
-      color: #3b82f6;
-      font-size: 0.95rem;
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 3.5rem;
+    }
+  }
+
+  .hero-text-col {
+    max-width: 580px;
+
+    @media (max-width: 960px) {
+      margin: 0 auto;
     }
   }
 
   .hero-title {
-    font-size: clamp(2.35rem, 5vw, 3.85rem);
+    font-size: 3.4rem;
     font-weight: 800;
-    line-height: 1.18;
-    letter-spacing: -0.035em;
-    color: $color-text-dark;
-    margin: 0 0 1.5rem 0;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: #0f172a;
+    margin-bottom: 1.5rem;
 
-    .highlight-text {
-      background: linear-gradient(135deg, #1d4ed8 0%, #0d9488 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
+    @media (max-width: 640px) {
+      font-size: 2.35rem;
     }
   }
 
   .hero-description {
-    max-width: 720px;
-    font-size: 1.125rem;
+    font-size: 1.05rem;
     line-height: 1.65;
-    color: $color-text-muted;
-    margin: 0 0 2.5rem 0;
+    color: $color-muted;
+    margin-bottom: 2.25rem;
+    max-width: 520px;
+
+    @media (max-width: 960px) {
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 
   .hero-buttons {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 1.15rem;
-    margin-bottom: 4rem;
+    gap: 1.5rem;
 
-    .btn-primary {
-      height: 48px;
-      padding: 0 1.75rem;
-      background-color: $color-primary;
-      color: #ffffff;
-      border-radius: 10px;
-      font-size: 0.94rem;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      box-shadow: 0 6px 18px rgba(29, 78, 216, 0.28);
-      transition: all 0.2s ease;
-
-      &:hover {
-        background-color: $color-primary-hover;
-        box-shadow: 0 8px 22px rgba(29, 78, 216, 0.38);
-        transform: translateY(-1px);
-      }
+    @media (max-width: 960px) {
+      justify-content: center;
     }
 
-    .btn-secondary {
-      height: 48px;
-      padding: 0 1.5rem;
-      background-color: #ffffff;
-      color: $color-text-dark;
-      border: 1.5px solid $color-border;
-      border-radius: 10px;
-      font-size: 0.94rem;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-      transition: all 0.2s ease;
-
-      &:hover {
-        background-color: #f1f5f9;
-        border-color: #cbd5e1;
-      }
-    }
-
-    @media (max-width: 580px) {
+    @media (max-width: 500px) {
       flex-direction: column;
-      width: 100%;
+      gap: 1rem;
+    }
 
-      .btn-primary, .btn-secondary {
-        width: 100%;
+    .btn-enroll {
+      background: $color-blue-primary;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.875rem 2rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(29, 78, 216, 0.32);
+      transition: all 0.25s ease;
+
+      &:hover {
+        background: $color-blue-hover;
+        box-shadow: 0 12px 26px rgba(29, 78, 216, 0.42);
+        transform: translateY(-2px);
+      }
+    }
+
+    .btn-whatis {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #0f172a;
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      .play-icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: $color-blue-primary;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        font-size: 1.25rem;
+        transition: all 0.25s ease;
+      }
+
+      &:hover {
+        color: $color-blue-primary;
+        .play-icon-wrap {
+          background: $color-blue-primary;
+          color: #ffffff;
+          transform: scale(1.08);
+          box-shadow: 0 4px 14px rgba(29, 78, 216, 0.35);
+        }
       }
     }
   }
 
-  // ============================================
-  // PREVIEW CONTAINER & MOCKUP
-  // ============================================
-  .preview-container {
-    width: 100%;
-    max-width: 1040px;
-    background-color: #ffffff;
-    border: 1px solid $color-border;
-    border-radius: 18px;
-    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 10px 20px -5px rgba(15, 23, 42, 0.04);
-    overflow: hidden;
-    text-align: left;
-    transition: transform 0.3s ease;
+  // Visual Arco Estudiante + Badges
+  .hero-visual-col {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
 
-    .window-header {
+  .hero-arch-card {
+    position: relative;
+    width: 380px;
+    height: 490px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    @media (max-width: 480px) {
+      width: 300px;
+      height: 410px;
+    }
+
+    .arch-bg {
+      position: absolute;
+      inset: 0;
+      background: $gradient-hero-arch;
+      border-radius: 190px 190px 32px 32px;
+      z-index: 1;
+      box-shadow: 0 20px 45px rgba(29, 78, 216, 0.28);
+    }
+
+    .student-photo {
+      position: relative;
+      z-index: 2;
+      width: 95%;
+      height: 96%;
+      object-fit: cover;
+      border-radius: 180px 180px 28px 28px;
+    }
+
+    // Badges Flotantes
+    .floating-badge {
+      position: absolute;
+      z-index: 3;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 18px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0.85rem 1.25rem;
-      background-color: #f8fafc;
-      border-bottom: 1px solid $color-border;
+    }
 
-      .window-dots {
+    // Badge 1: Libros y Recursos (Superior Izquierda)
+    .badge-courses {
+      top: 15%;
+      left: -12%;
+      padding: 0.65rem 1rem;
+      gap: 0.65rem;
+
+      @media (max-width: 640px) {
+        left: -4%;
+        top: 8%;
+      }
+
+      .badge-icon-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
         display: flex;
-        gap: 0.45rem;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
 
-        .dot {
-          width: 11px;
-          height: 11px;
-          border-radius: 50%;
-
-          &.red { background-color: #ef4444; }
-          &.yellow { background-color: #f59e0b; }
-          &.green { background-color: #10b981; }
+        &.blue,
+        &.purple {
+          background: #eff6ff;
+          color: $color-blue-primary;
         }
       }
 
-      .window-search-bar {
+      .badge-text-group {
         display: flex;
-        align-items: center;
-        gap: 0.45rem;
-        background-color: #ffffff;
-        border: 1px solid $color-border;
-        border-radius: 6px;
-        padding: 0.25rem 0.85rem;
-        font-size: 0.76rem;
-        color: $color-text-muted;
-        font-family: monospace;
+        flex-direction: column;
+        line-height: 1.2;
 
-        i {
-          color: #10b981;
-          font-size: 0.75rem;
+        .badge-val {
+          font-weight: 800;
+          font-size: 0.95rem;
+          color: #0f172a;
+        }
+
+        .badge-lbl {
+          font-size: 0.725rem;
+          color: $color-muted;
+          font-weight: 500;
         }
       }
     }
 
-    .window-body {
-      background-color: #ffffff;
+    // Badge 2: Instituciones Públicas (Superior Derecha)
+    .badge-students {
+      top: 25%;
+      right: -14%;
+      padding: 0.65rem 1rem;
+      gap: 0.75rem;
+
+      @media (max-width: 640px) {
+        right: -4%;
+        top: 18%;
+      }
+
+      .badge-text-group {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+
+        .badge-val {
+          font-weight: 800;
+          font-size: 0.95rem;
+          color: #0f172a;
+        }
+
+        .badge-lbl {
+          font-size: 0.725rem;
+          color: $color-muted;
+          font-weight: 500;
+        }
+      }
+
+      .avatars-cluster {
+        display: flex;
+
+        img {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          border: 2px solid #ffffff;
+          margin-left: -8px;
+          object-fit: cover;
+
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+      }
+    }
+
+    // Badge 3: Chatbot con IA Activo (Inferior Izquierda)
+    .badge-class {
+      bottom: 6%;
+      left: -8%;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0.85rem 1rem;
+      gap: 0.65rem;
+      min-width: 175px;
+
+      @media (max-width: 640px) {
+        left: -2%;
+        bottom: 2%;
+      }
+
+      .class-badge-header {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+      }
+
+      .class-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .class-info {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+
+        .class-title {
+          font-size: 0.8rem;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 2px;
+        }
+
+        .class-stars {
+          display: flex;
+          gap: 2px;
+          color: #f59e0b;
+          font-size: 0.7rem;
+        }
+      }
+
+      .btn-join-now {
+        background: $color-blue-primary;
+        color: #ffffff;
+        text-align: center;
+        font-size: 0.725rem;
+        font-weight: 700;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: $color-blue-hover;
+        }
+      }
     }
   }
 }
 
 // ============================================
-// DASHBOARD MOCKUP
+// 3. RIBBON DE EDUCACIÓN PÚBLICA
 // ============================================
-.dashboard-mockup {
-  display: flex;
-  min-height: 440px;
+.partners-ribbon {
+  background: $gradient-ribbon;
+  padding: 1.5rem 0;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.25);
 
-  .mockup-sidebar {
-    width: 210px;
-    background-color: #f8fafc;
-    border-right: 1px solid $color-border;
-    padding: 1.25rem 0.85rem;
+  .partners-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
 
-    .sidebar-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.65rem 0.85rem;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: $color-text-muted;
-      cursor: pointer;
-      transition: all 0.2s ease;
+  .partner-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    opacity: 0.95;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 
-      i {
-        font-size: 0.95rem;
-      }
-
-      &.active {
-        background-color: #eff6ff;
-        color: $color-primary;
-      }
-
-      &:hover:not(.active) {
-        background-color: #f1f5f9;
-        color: $color-text-dark;
-      }
+    i {
+      font-size: 1.25rem;
     }
 
-    @media (max-width: 768px) {
-      display: none;
+    &:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// ============================================
+// 4. BUSCADOR DE LA BIBLIOTECA VIRTUAL
+// ============================================
+.search-section {
+  padding: 4.5rem 0 3rem;
+  background-color: #ffffff;
+
+  .search-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+
+  .search-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+
+    @media (max-width: 640px) {
+      font-size: 1.75rem;
     }
   }
 
-  .mockup-content {
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    padding: 0.4rem 0.5rem 0.4rem 1.4rem;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+    transition: all 0.25s ease;
+
+    &:focus-within {
+      border-color: $color-blue-primary;
+      box-shadow: 0 8px 24px rgba(29, 78, 216, 0.15);
+    }
+
+    @media (max-width: 540px) {
+      flex-direction: column;
+      border-radius: 18px;
+      padding: 0.75rem;
+    }
+  }
+
+  .search-input-wrapper {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    background-color: #ffffff;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
 
-    .chat-header {
+    .search-icon {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+
+    .search-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #0f172a;
+      background: transparent;
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+    }
+  }
+
+  .btn-search {
+    background: $color-blue-primary;
+    color: #ffffff;
+    font-size: 0.925rem;
+    font-weight: 600;
+    padding: 0.75rem 1.75rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.28);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $color-blue-hover;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 540px) {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================
+// 5. BENEFICIOS PARA DOCENTES Y ESTUDIANTES
+// ============================================
+.benefits-section {
+  padding: 4.5rem 0 5.5rem;
+  background-color: #ffffff;
+
+  .benefits-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 4.5rem;
+    align-items: center;
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+      gap: 3.5rem;
+    }
+  }
+
+  // Cuadrante 2x2 de Estudiantes
+  .quadrant-card-wrapper {
+    position: relative;
+    max-width: 440px;
+    margin: 0 auto;
+    border-radius: 36px;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(29, 78, 216, 0.05) 0%, rgba(2, 132, 199, 0.05) 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+
+    .quadrant-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .quadrant-item {
+      aspect-ratio: 1;
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover img {
+        transform: scale(1.05);
+      }
+
+      &.quadrant-1 {
+        background-color: #eff6ff; // Soft Blue
+      }
+      &.quadrant-2 {
+        background-color: #f0fdf4; // Soft Mint
+      }
+      &.quadrant-3 {
+        background-color: #f0f9ff; // Soft Sky
+      }
+      &.quadrant-4 {
+        background-color: #f8fafc; // Soft Slate
+      }
+    }
+  }
+
+  // Columna de Beneficios
+  .benefits-info-col {
+    .benefits-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 2.25rem;
+
+      @media (max-width: 640px) {
+        font-size: 2.15rem;
+      }
+
+      .highlight-primary,
+      .highlight-pink {
+        color: $color-blue-primary;
+      }
+    }
+
+    .benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    .benefit-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+
+      &.blue-soft,
+      &.purple-soft {
+        background: #eff6ff;
+        color: $color-blue-primary;
+      }
+
+      &.cyan-soft,
+      &.pink-soft {
+        background: #f0f9ff;
+        color: $color-cyan-accent;
+      }
+    }
+
+    .benefit-content {
+      .benefit-item-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.35rem;
+      }
+
+      .benefit-item-desc {
+        font-size: 0.925rem;
+        line-height: 1.6;
+        color: $color-muted;
+        margin: 0;
+      }
+    }
+  }
+}
+
+// ============================================
+// 6. COLECCIONES DESTACADAS DE LA BIBLIOTECA
+// ============================================
+.popular-courses-section {
+  background: $gradient-blue-section;
+  padding: 5.5rem 0;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -15%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 70%);
+    pointer-events: none;
+  }
+
+  .popular-courses-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-header-center {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 3.5rem;
+
+    .popular-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+
+      @media (max-width: 640px) {
+        font-size: 2.15rem;
+      }
+    }
+
+    .popular-subtitle {
+      font-size: 1rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.88);
+      margin: 0;
+    }
+  }
+
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+
+    @media (max-width: 960px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Tarjeta de Recurso Académico
+  .course-card {
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 42px rgba(0, 0, 0, 0.22);
+    }
+
+    .course-img-wrap {
+      width: 100%;
+      height: 190px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+      }
+    }
+
+    &:hover .course-img-wrap img {
+      transform: scale(1.06);
+    }
+
+    .course-body {
+      padding: 1.35rem 1.35rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .course-tags-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.85rem;
+
+      .course-badge {
+        background: #eff6ff;
+        color: $color-blue-primary;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+      }
+
+      .course-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #f59e0b;
+        font-size: 0.825rem;
+        font-weight: 700;
+      }
+    }
+
+    .course-card-title {
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.35;
+      margin-bottom: 0.85rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.7rem;
+    }
+
+    .course-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-size: 0.825rem;
+      color: #64748b;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.15rem;
+      border-bottom: 1px solid #f1f5f9;
+
+      .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+
+        i {
+          color: $color-blue-primary;
+        }
+      }
+    }
+
+    .course-footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+
+      .course-price {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #16a34a; // Verde para Acceso Libre
+      }
+
+      .instructor-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+
+        img {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+
+        .instructor-name {
+          font-size: 0.825rem;
+          font-weight: 600;
+          color: #334155;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// 7. SECCIÓN PARA DOCENTES DE INSTITUCIONES PÚBLICAS
+// ============================================
+.instructor-section {
+  padding: 5.5rem 0;
+  background-color: #ffffff;
+
+  .instructor-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4.5rem;
+    align-items: center;
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 3.5rem;
+    }
+  }
+
+  .instructor-title {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+
+    @media (max-width: 640px) {
+      font-size: 2.15rem;
+    }
+
+    .highlight-primary,
+    .highlight-purple {
+      color: $color-blue-primary;
+    }
+  }
+
+  .instructor-desc {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: $color-muted;
+    max-width: 540px;
+    margin-bottom: 2rem;
+
+    @media (max-width: 960px) {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .perks-heading {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 1.25rem;
+  }
+
+  .perks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    text-align: left;
+
+    @media (max-width: 540px) {
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+  }
+
+  .perks-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .perk-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.925rem;
+    color: #334155;
+    font-weight: 500;
+
+    .perk-bullet {
+      color: $color-blue-primary;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+  }
+
+  .btn-instructor {
+    display: inline-block;
+    background: $color-blue-primary;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.875rem 2.25rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(29, 78, 216, 0.3);
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: $color-blue-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(29, 78, 216, 0.4);
+    }
+  }
+
+  // Visual Profesora con Marco Punteado y Arco
+  .instructor-visual-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  .teacher-arch-wrapper {
+    position: relative;
+    width: 380px;
+    height: 480px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    @media (max-width: 480px) {
+      width: 290px;
+      height: 390px;
+    }
+
+    .dashed-border-frame {
+      position: absolute;
+      inset: -14px;
+      border: 2px dashed #93c5fd;
+      border-radius: 200px 200px 38px 38px;
+      pointer-events: none;
+    }
+
+    .teacher-arch-bg {
+      position: absolute;
+      inset: 0;
+      background: $gradient-teacher-arch;
+      border-radius: 190px 190px 30px 30px;
+      z-index: 1;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+    }
+
+    .teacher-photo {
+      position: relative;
+      z-index: 2;
+      width: 95%;
+      height: 96%;
+      object-fit: cover;
+      border-radius: 180px 180px 26px 26px;
+    }
+  }
+}
+
+// ============================================
+// 8. TESTIMONIOS (STUDENT'S TESTIMONIALS)
+// ============================================
+.testimonials-section {
+  background: $gradient-blue-section;
+  padding: 5.5rem 0;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -15%;
+    left: -10%;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0) 70%);
+    pointer-events: none;
+  }
+
+  .testimonials-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-header-center {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 3.5rem;
+
+    .testimonials-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+
+      @media (max-width: 640px) {
+        font-size: 2.15rem;
+      }
+    }
+
+    .testimonials-subtitle {
+      font-size: 1rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.88);
+      margin: 0;
+    }
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+
+    @media (max-width: 960px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .testimonial-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    transition: transform 0.25s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+
+    .testimonial-header {
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      padding-bottom: 1.15rem;
-      border-bottom: 1px solid $color-border;
-      margin-bottom: 1.25rem;
+      margin-bottom: 0.85rem;
 
-      .tutor-avatar {
-        width: 38px;
-        height: 38px;
-        background: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
-        color: #ffffff;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
+      .testimonial-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
       }
 
-      .tutor-info {
-        display: flex;
-        flex-direction: column;
+      .testimonial-author-meta {
+        line-height: 1.2;
 
-        .tutor-name {
-          font-size: 0.9rem;
+        .author-name {
+          font-size: 0.975rem;
           font-weight: 700;
-          color: $color-text-dark;
+          color: #0f172a;
+          margin: 0 0 0.15rem 0;
         }
 
-        .tutor-status {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.35rem;
-          font-size: 0.75rem;
-          color: #059669;
-
-          .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background-color: #10b981;
-          }
+        .author-role {
+          font-size: 0.775rem;
+          color: #64748b;
+          font-weight: 500;
         }
       }
     }
 
-    .chat-messages {
-      flex: 1;
+    .testimonial-stars {
       display: flex;
-      flex-direction: column;
-      gap: 1.15rem;
-      margin-bottom: 1.5rem;
-
-      .message {
-        display: flex;
-        gap: 0.75rem;
-
-        &.user-msg {
-          justify-content: flex-end;
-
-          .msg-bubble {
-            background-color: $color-primary;
-            color: #ffffff;
-            border-radius: 14px 14px 2px 14px;
-            max-width: 480px;
-            font-size: 0.86rem;
-            padding: 0.75rem 1.1rem;
-            line-height: 1.5;
-            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.2);
-          }
-        }
-
-        &.ai-msg {
-          align-items: flex-start;
-
-          .ai-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: #ffffff;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
-            margin-top: 0.2rem;
-          }
-
-          .msg-bubble {
-            background-color: #f8fafc;
-            border: 1px solid $color-border;
-            border-radius: 14px 14px 14px 2px;
-            max-width: 540px;
-            padding: 0.95rem 1.15rem;
-            font-size: 0.86rem;
-            line-height: 1.55;
-            color: $color-text-dark;
-
-            .summary {
-              margin: 0 0 0.65rem 0;
-            }
-
-            .code-preview {
-              background-color: #0f172a;
-              color: #38bdf8;
-              padding: 0.5rem 0.85rem;
-              border-radius: 6px;
-              font-family: monospace;
-              font-size: 0.78rem;
-              margin-bottom: 0.65rem;
-            }
-
-            .source-tag {
-              display: inline-flex;
-              align-items: center;
-              gap: 0.4rem;
-              font-size: 0.725rem;
-              font-weight: 600;
-              color: $color-teal;
-              background-color: #f0fdfa;
-              border: 1px solid #ccfbf1;
-              padding: 0.25rem 0.55rem;
-              border-radius: 5px;
-            }
-          }
-        }
-      }
+      gap: 3px;
+      color: #f59e0b;
+      font-size: 0.85rem;
+      margin-bottom: 0.85rem;
     }
 
-    .chat-input-bar {
+    .testimonial-text {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #475569;
+      margin: 0;
+      font-style: normal;
+    }
+  }
+
+  // Paginación del Carrusel
+  .carousel-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+
+    .page-arrow {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      background-color: #f8fafc;
-      border: 1px solid $color-border;
-      border-radius: 12px;
-      padding: 0.5rem 0.85rem;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
 
-      .input-fake {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: 0.55rem;
-        font-size: 0.82rem;
-        color: $color-text-muted;
-
-        i {
-          color: #3b82f6;
-        }
-      }
-
-      .btn-fake-send {
-        color: $color-primary;
-        font-size: 1.4rem;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        transition: transform 0.15s ease;
-
-        &:hover {
-          transform: scale(1.08);
-        }
+      &:hover {
+        background: #ffffff;
+        color: $color-blue-primary;
       }
     }
+
+    .page-indicator {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.05em;
+    }
+  }
+}
+
+// ============================================
+// 9. FOOTER
+// ============================================
+.site-footer {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 4.5rem 0 2rem;
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+    gap: 3rem;
+    margin-bottom: 3.5rem;
+
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .footer-logo {
+    color: #ffffff;
+    font-size: 1.75rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+    text-decoration: none;
+
+    .footer-robot-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, $color-blue-light 0%, $color-blue-primary 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
+    }
+
+    .brand-dot {
+      color: $color-blue-light;
+    }
+  }
+
+  .footer-desc {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 320px;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 1rem;
+
+    a {
+      color: #94a3b8;
+      font-size: 1.25rem;
+      transition: color 0.2s ease, transform 0.2s ease;
+
+      &:hover {
+        color: $color-blue-light;
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  .footer-heading {
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+  }
+
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: #ffffff;
+      }
+    }
+  }
+
+  .footer-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+
+    i {
+      color: $color-blue-light;
+    }
+  }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+    text-align: center;
+    font-size: 0.825rem;
   }
 }

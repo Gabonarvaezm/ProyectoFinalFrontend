@@ -1,152 +1,581 @@
-<div class="landing-container">
-  <!-- Navegación Superior -->
-  <header class="navbar anim-fade-in">
-    <div class="nav-brand">
-      <div class="brand-icon" aria-hidden="true">
-        <i class="bi bi-robot"></i>
+<div class="landing-page">
+  <!-- ============================================
+       1. HEADER / NAVBAR
+       ============================================ -->
+  <header class="navbar">
+    <div class="nav-container">
+      <!-- Logo de Marca con Icono Robot DiscerIA -->
+      <a routerLink="/" class="brand-logo" aria-label="DiscerIA - Biblioteca Virtual para Instituciones Públicas">
+        <div class="brand-robot-icon" aria-hidden="true">
+          <i class="bi bi-robot"></i>
+        </div>
+        <span class="brand-name">Discer<span class="brand-dot">IA</span></span>
+      </a>
+
+      <!-- Menú de Navegación Desktop -->
+      <nav class="nav-links" aria-label="Navegación principal">
+        <div class="nav-dropdown">
+          <a href="#biblioteca" class="nav-item">
+            <span>Biblioteca</span>
+            <i class="bi bi-chevron-down nav-chevron" aria-hidden="true"></i>
+          </a>
+        </div>
+        <div class="nav-dropdown">
+          <a href="#docentes" class="nav-item">
+            <span>Docentes</span>
+            <i class="bi bi-chevron-down nav-chevron" aria-hidden="true"></i>
+          </a>
+        </div>
+        <div class="nav-dropdown">
+          <a href="#beneficios" class="nav-item">
+            <span>Beneficios</span>
+            <i class="bi bi-chevron-down nav-chevron" aria-hidden="true"></i>
+          </a>
+        </div>
+        <a href="#contacto" class="nav-item">Contacto</a>
+      </nav>
+
+      <!-- Botones de Acción Desktop -->
+      <div class="nav-actions">
+        <a routerLink="/login" class="btn-signin">Iniciar Sesión</a>
+        <a routerLink="/register" class="btn-freetrial">Acceso Institucional</a>
+
+        <!-- Botón Hamburguesa Móvil Accesible -->
+        <button
+          type="button"
+          class="mobile-menu-toggle"
+          (click)="toggleMobileMenu()"
+          [attr.aria-expanded]="mobileMenuOpen()"
+          [attr.aria-label]="mobileMenuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'"
+        >
+          <i class="bi" [class.bi-list]="!mobileMenuOpen()" [class.bi-x-lg]="mobileMenuOpen()"></i>
+        </button>
       </div>
-      <span class="brand-title">DiscerIA</span>
     </div>
 
-    <nav class="nav-menu" aria-label="Navegación principal">
-      <a href="#plataforma" class="nav-link">Plataforma</a>
-      <a href="#caracteristicas" class="nav-link">Características</a>
-      <a href="#testimonios" class="nav-link">Testimonios</a>
-    </nav>
-
-    <div class="nav-actions">
-      <a routerLink="/login" class="btn-login">
-        <span>Iniciar Sesión</span>
-      </a>
-      <a routerLink="/register" class="btn-register">
-        <span>Registrarse</span>
-        <i class="bi bi-arrow-right" aria-hidden="true"></i>
-      </a>
-    </div>
+    <!-- Menú Desplegable Móvil -->
+    @if (mobileMenuOpen()) {
+      <nav class="mobile-dropdown anim-fade-down" aria-label="Menú móvil">
+        <a href="#biblioteca" class="mobile-link" (click)="closeMobileMenu()">Biblioteca</a>
+        <a href="#docentes" class="mobile-link" (click)="closeMobileMenu()">Docentes</a>
+        <a href="#beneficios" class="mobile-link" (click)="closeMobileMenu()">Beneficios</a>
+        <a href="#contacto" class="mobile-link" (click)="closeMobileMenu()">Contacto</a>
+        <div class="mobile-actions">
+          <a routerLink="/login" class="btn-signin w-full" (click)="closeMobileMenu()">Iniciar Sesión</a>
+          <a routerLink="/register" class="btn-freetrial w-full" (click)="closeMobileMenu()">Acceso Institucional</a>
+        </div>
+      </nav>
+    }
   </header>
 
-  <!-- Sección Hero -->
-  <main class="hero-section">
-    <!-- Badge Píldora -->
-    <div class="badge-pill anim-fade-up">
-      <i class="bi bi-stars" aria-hidden="true"></i>
-      <span>El futuro del aprendizaje guiado por IA</span>
-    </div>
+  <!-- ============================================
+       2. HERO SECTION
+       ============================================ -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <!-- Columna Izquierda: Textos y CTAs -->
+      <div class="hero-text-col">
+        <h1 class="hero-title anim-fade-up">
+          Biblioteca Virtual y<br />
+          Chatbot con IA para<br />
+          Instituciones Públicas
+        </h1>
 
-    <!-- Título Principal -->
-    <h1 class="hero-title anim-fade-up anim-stagger-1">
-      Potencia tu Mente con <br />
-      <span class="highlight-text">Inteligencia Artificial</span>
-    </h1>
+        <p class="hero-description anim-fade-up anim-stagger-1">
+          DiscerIA es la plataforma de biblioteca virtual diseñada especialmente para docentes
+          y estudiantes de colegios y universidades públicas. Accede a miles de libros y guías
+          pedagógicas de libre acceso, y resuelve consultas académicas al instante con nuestro
+          chatbot con inteligencia artificial fundamentado en fuentes confiables.
+        </p>
 
-    <!-- Descripción -->
-    <p class="hero-description anim-fade-up anim-stagger-2">
-      DiscerIA combina una biblioteca digital exhaustiva con un tutor de IA avanzado para crear una experiencia de aprendizaje personalizada, profesional y altamente eficiente.
-    </p>
-
-    <!-- Botones de Acción -->
-    <div class="hero-buttons anim-fade-up anim-stagger-3">
-      <a routerLink="/login" class="btn-primary">
-        <span>Comenzar Gratis</span>
-        <i class="bi bi-arrow-right" aria-hidden="true"></i>
-      </a>
-
-      <a href="#demo" class="btn-secondary">
-        <i class="bi bi-play-circle" aria-hidden="true"></i>
-        <span>Ver Demo</span>
-      </a>
-    </div>
-
-    <!-- Ventana de Previsualización de la Plataforma -->
-    <div class="preview-container anim-fade-up anim-stagger-4" id="demo">
-      <div class="window-header">
-        <div class="window-dots" aria-hidden="true">
-          <span class="dot red"></span>
-          <span class="dot yellow"></span>
-          <span class="dot green"></span>
-        </div>
-        <div class="window-search-bar" aria-hidden="true">
-          <i class="bi bi-lock-fill"></i>
-          <span>app.disceria.edu/dashboard/tutor-ia</span>
+        <div class="hero-buttons anim-fade-up anim-stagger-2">
+          <a routerLink="/register" class="btn-enroll">Explorar Biblioteca</a>
+          <a href="#beneficios" class="btn-whatis">
+            <span class="play-icon-wrap" aria-hidden="true">
+              <i class="bi bi-robot"></i>
+            </span>
+            <span>Conocer el Chatbot IA</span>
+          </a>
         </div>
       </div>
 
-      <div class="window-body">
-        <!-- Mockup Visual Dinámico del Dashboard de DiscerIA -->
-        <div class="dashboard-mockup">
-          <!-- Sidebar del Mockup -->
-          <aside class="mockup-sidebar">
-            <div class="sidebar-item active">
-              <i class="bi bi-chat-square-text-fill"></i>
-              <span>Tutor Activo</span>
-            </div>
-            <div class="sidebar-item">
+      <!-- Columna Derecha: Estudiante en Arco con Badges Flotantes -->
+      <div class="hero-visual-col anim-fade-up anim-stagger-2">
+        <div class="hero-arch-card">
+          <!-- Fondo en Arco Estilizado -->
+          <div class="arch-bg" aria-hidden="true"></div>
+
+          <!-- Imagen Principal de Estudiante de Institución Pública -->
+          <img
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=80"
+            alt="Estudiante universitaria en biblioteca virtual con material de estudio"
+            class="student-photo"
+            loading="eager"
+          />
+
+          <!-- Badge Flotante 1: Libros y Recursos (Superior Izquierda) -->
+          <div class="floating-badge badge-courses anim-float">
+            <div class="badge-icon-circle blue" aria-hidden="true">
               <i class="bi bi-journal-bookmark-fill"></i>
-              <span>Biblioteca Digital</span>
             </div>
-            <div class="sidebar-item">
-              <i class="bi bi-bar-chart-line-fill"></i>
-              <span>Progreso de Estudio</span>
+            <div class="badge-text-group">
+              <span class="badge-val">+50k</span>
+              <span class="badge-lbl">Libros y Recursos</span>
             </div>
-            <div class="sidebar-item">
-              <i class="bi bi-mortarboard-fill"></i>
-              <span>Mis Cursos</span>
-            </div>
-          </aside>
+          </div>
 
-          <!-- Contenido Principal del Mockup -->
-          <section class="mockup-content">
-            <!-- Header del Chat con Animación de Tutor IA -->
-            <div class="chat-header">
-              <div class="tutor-avatar">
-                <app-lottie name="ai-thinking" width="38px" height="38px" ariaLabel="Tutor IA activo"></app-lottie>
+          <!-- Badge Flotante 2: Instituciones Públicas (Superior Derecha) -->
+          <div class="floating-badge badge-students anim-float anim-stagger-2">
+            <div class="badge-text-group">
+              <span class="badge-val">+100</span>
+              <span class="badge-lbl">Instituciones Públicas</span>
+            </div>
+            <div class="avatars-cluster" aria-hidden="true">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=60&q=80" alt="" />
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=60&q=80" alt="" />
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=60&q=80" alt="" />
+            </div>
+          </div>
+
+          <!-- Badge Flotante 3: Chatbot con IA Activo (Inferior Izquierda) -->
+          <div class="floating-badge badge-class anim-scale-in anim-stagger-3">
+            <div class="class-badge-header">
+              <div class="class-avatar" aria-hidden="true">
+                <app-lottie name="ai-thinking" width="34px" height="34px" ariaLabel="Chatbot con IA activo"></app-lottie>
               </div>
-              <div class="tutor-info">
-                <span class="tutor-name">Tutor DiscerIA • Algoritmos y Datos</span>
-                <span class="tutor-status"><span class="status-dot anim-pulse-ai"></span> En línea para ayudarte</span>
+              <div class="class-info">
+                <span class="class-title">Chatbot con IA Activo</span>
+                <div class="class-stars" aria-label="Calificación 5 estrellas">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
               </div>
             </div>
+            <a routerLink="/register" class="btn-join-now">Consultar IA</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            <!-- Conversación Mockup -->
-            <div class="chat-messages">
-              <div class="message user-msg">
-                <span class="msg-bubble">
-                  ¿Cómo funciona el algoritmo de Dijkstra y cuál es su complejidad temporal?
+  <!-- ============================================
+       3. RIBBON DE EDUCACIÓN PÚBLICA
+       ============================================ -->
+  <section class="partners-ribbon" aria-label="Compromiso con la educación e investigación pública">
+    <div class="partners-container">
+      <div class="partner-item">
+        <i class="bi bi-buildings-fill" aria-hidden="true"></i>
+        <span>Instituciones Públicas</span>
+      </div>
+      <div class="partner-item">
+        <i class="bi bi-book-half" aria-hidden="true"></i>
+        <span>Bibliotecas Abiertas</span>
+      </div>
+      <div class="partner-item">
+        <i class="bi bi-robot" aria-hidden="true"></i>
+        <span>Chatbot con IA</span>
+      </div>
+      <div class="partner-item">
+        <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+        <span>Red Docente Nacional</span>
+      </div>
+      <div class="partner-item">
+        <i class="bi bi-award-fill" aria-hidden="true"></i>
+        <span>Educación Inclusiva</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       4. BUSCADOR DE LA BIBLIOTECA VIRTUAL
+       ============================================ -->
+  <section class="search-section" id="biblioteca">
+    <div class="search-container">
+      <h2 class="search-title">Buscador de la Biblioteca Virtual</h2>
+
+      <form class="search-form" (submit)="onSearch($event)" role="search">
+        <div class="search-input-wrapper">
+          <i class="bi bi-search search-icon" aria-hidden="true"></i>
+          <input
+            #searchInput
+            type="search"
+            class="search-input"
+            placeholder="Buscar libros, artículos, guías pedagógicas o temas de estudio..."
+            [value]="searchQuery()"
+            (input)="searchQuery.set(searchInput.value)"
+            aria-label="Buscar en la biblioteca virtual"
+          />
+        </div>
+        <button type="submit" class="btn-search">Buscar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============================================
+       5. BENEFICIOS PARA DOCENTES Y ESTUDIANTES PÚBLICOS
+       ============================================ -->
+  <section class="benefits-section" id="beneficios">
+    <div class="benefits-container">
+      <!-- Lado Izquierdo: Cuadrante de 4 Docentes y Estudiantes -->
+      <div class="benefits-grid-col anim-fade-up">
+        <div class="quadrant-card-wrapper">
+          <div class="quadrant-grid">
+            <div class="quadrant-item quadrant-1">
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
+                alt="Estudiante pública consultando bibliografía digital"
+              />
+            </div>
+            <div class="quadrant-item quadrant-2">
+              <img
+                src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80"
+                alt="Docente preparando material pedagógico"
+              />
+            </div>
+            <div class="quadrant-item quadrant-3">
+              <img
+                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80"
+                alt="Estudiante interactuando con el chatbot de IA"
+              />
+            </div>
+            <div class="quadrant-item quadrant-4">
+              <img
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80"
+                alt="Estudiante universitario investigando en el repositorio"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lado Derecho: Lista de Beneficios del Aplicativo -->
+      <div class="benefits-info-col anim-fade-up anim-stagger-1">
+        <h2 class="benefits-title">
+          <span class="highlight-primary">Beneficios</span> Para la Comunidad<br />
+          Educativa Pública
+        </h2>
+
+        <div class="benefits-list">
+          <!-- Beneficio 1: Acceso Libre y Equitativo -->
+          <div class="benefit-item">
+            <div class="benefit-icon-circle blue-soft" aria-hidden="true">
+              <i class="bi bi-unlock-fill"></i>
+            </div>
+            <div class="benefit-content">
+              <h3 class="benefit-item-title">Acceso Libre y Equitativo</h3>
+              <p class="benefit-item-desc">
+                Biblioteca digital de libre acceso con libros de texto, papers y manuales para colegios y universidades públicas de todo el país.
+              </p>
+            </div>
+          </div>
+
+          <!-- Beneficio 2: Chatbot con IA -->
+          <div class="benefit-item">
+            <div class="benefit-icon-circle cyan-soft" aria-hidden="true">
+              <i class="bi bi-robot"></i>
+            </div>
+            <div class="benefit-content">
+              <h3 class="benefit-item-title">Chatbot con IA Pedagógico</h3>
+              <p class="benefit-item-desc">
+                Resuelve dudas académicas al instante con un chatbot inteligente que explica conceptos y cita fuentes exactas de la biblioteca.
+              </p>
+            </div>
+          </div>
+
+          <!-- Beneficio 3: Herramientas para Docentes -->
+          <div class="benefit-item">
+            <div class="benefit-icon-circle blue-soft" aria-hidden="true">
+              <i class="bi bi-person-workspace"></i>
+            </div>
+            <div class="benefit-content">
+              <h3 class="benefit-item-title">Herramientas de Apoyo Docente</h3>
+              <p class="benefit-item-desc">
+                Permite a los profesores planificar clases, encontrar ejercicios didácticos y generar talleres académicos de forma ágil.
+              </p>
+            </div>
+          </div>
+
+          <!-- Beneficio 4: Catálogo Exhaustivo de Recursos -->
+          <div class="benefit-item">
+            <div class="benefit-icon-circle cyan-soft" aria-hidden="true">
+              <i class="bi bi-journal-check"></i>
+            </div>
+            <div class="benefit-content">
+              <h3 class="benefit-item-title">+1.5k Guías, Libros y Artículos</h3>
+              <p class="benefit-item-desc">
+                Repositorio verificado en ciencias exactas, sociales, tecnología y humanidades al alcance de estudiantes y profesores.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       6. COLECCIONES DESTACADAS DE LA BIBLIOTECA
+       ============================================ -->
+  <section class="popular-courses-section">
+    <div class="popular-courses-container">
+      <div class="section-header-center">
+        <h2 class="popular-title">Colecciones Destacadas de la Biblioteca</h2>
+        <p class="popular-subtitle">
+          Explora los recursos y guías pedagógicas más consultados por docentes y estudiantes de instituciones públicas,
+          con asistencia del chatbot con IA para resolver cualquier interrogante temática.
+        </p>
+      </div>
+
+      <!-- Tarjetas de Recursos de la Biblioteca -->
+      <div class="courses-grid">
+        @for (course of courses(); track course.id) {
+          <article class="course-card anim-fade-up">
+            <!-- Imagen del Recurso -->
+            <div class="course-img-wrap">
+              <img [src]="course.image" [alt]="course.title" loading="lazy" />
+            </div>
+
+            <div class="course-body">
+              <!-- Categoría y Rating -->
+              <div class="course-tags-row">
+                <span class="course-badge">{{ course.category }}</span>
+                <span class="course-rating">
+                  <i class="bi bi-star-fill" aria-hidden="true"></i>
+                  <span>{{ course.rating }}</span>
                 </span>
               </div>
 
-              <div class="message ai-msg">
-                <div class="ai-avatar">
-                  <i class="bi bi-robot"></i>
-                </div>
-                <div class="msg-bubble">
-                  <p class="summary">
-                    El algoritmo de <strong>Dijkstra</strong> encuentra la ruta más corta desde un nodo origen a todos los demás en un grafo con pesos no negativos.
-                  </p>
-                  <div class="code-preview">
-                    <code>Complejidad con Min-Heap: O((V + E) log V)</code>
-                  </div>
-                  <div class="source-tag">
-                    <i class="bi bi-book-half"></i>
-                    <span>Fuente: Introducción a los Algoritmos (CLRS), Cap. 24</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <!-- Título del Recurso -->
+              <h3 class="course-card-title">{{ course.title }}</h3>
 
-            <!-- Barra de Pregunta Mockup -->
-            <div class="chat-input-bar">
-              <div class="input-fake">
-                <i class="bi bi-stars"></i>
-                <span>Pregunta cualquier tema de tu bibliografía académica...</span>
+              <!-- Meta: Capítulos y Consultas -->
+              <div class="course-meta-row">
+                <span class="meta-item">
+                  <i class="bi bi-book" aria-hidden="true"></i>
+                  <span>{{ course.classesCount }} Capítulos</span>
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-eye" aria-hidden="true"></i>
+                  <span>{{ course.studentsCount }} Consultas</span>
+                </span>
               </div>
-              <button type="button" class="btn-fake-send" aria-label="Enviar pregunta">
-                <i class="bi bi-arrow-up-circle-fill"></i>
-              </button>
+
+              <!-- Estado de Acceso e Institución/Docente -->
+              <div class="course-footer-row">
+                <span class="course-price">{{ course.price }}</span>
+                <div class="instructor-pill">
+                  <img [src]="course.instructorAvatar" [alt]="course.instructorName" width="28" height="28" loading="lazy" />
+                  <span class="instructor-name">{{ course.instructorName }}</span>
+                </div>
+              </div>
             </div>
-          </section>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       7. SECCIÓN PARA DOCENTES DE INSTITUCIONES PÚBLICAS
+       ============================================ -->
+  <section class="instructor-section" id="docentes">
+    <div class="instructor-container">
+      <!-- Columna Izquierda: Información para Docentes -->
+      <div class="instructor-info-col anim-fade-up">
+        <h2 class="instructor-title">
+          Si Eres Docente de una Institución Pública<br />
+          Entonces <span class="highlight-primary">Potencia tu Aula con DiscerIA</span>
+        </h2>
+
+        <p class="instructor-desc">
+          DiscerIA está diseñada para apoyar de manera directa a los docentes del sector educativo público.
+          Accede a lecturas académicas oficiales, estructura guías de clase para tus estudiantes y apóyate en el
+          chatbot con IA para resolver inquietudes didácticas y enriquecer la experiencia en el aula.
+        </p>
+
+        <h3 class="perks-heading">Herramientas para Docentes</h3>
+
+        <div class="perks-grid">
+          <div class="perks-col">
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>Acceso Total a la Biblioteca</span>
+            </div>
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>Chatbot IA para Planear Clases</span>
+            </div>
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>Material Académico Verificado</span>
+            </div>
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>100% Gratuito para el Sector Público</span>
+            </div>
+          </div>
+
+          <div class="perks-col">
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>Libertad de Cátedra y Recursos</span>
+            </div>
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>Talleres y Ejercicios Listos</span>
+            </div>
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>Red de Cooperación Docente</span>
+            </div>
+            <div class="perk-item">
+              <span class="perk-bullet">•</span>
+              <span>Actualización Curricular Continua</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="instructor-cta-wrap">
+          <a routerLink="/register" class="btn-instructor">Ingreso para Docentes</a>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Foto de Docente con Arco y Marco Punteado -->
+      <div class="instructor-visual-col anim-fade-up anim-stagger-1">
+        <div class="teacher-arch-wrapper">
+          <div class="dashed-border-frame" aria-hidden="true"></div>
+          <div class="teacher-arch-bg" aria-hidden="true"></div>
+          <img
+            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80"
+            alt="Docente de institución pública con carpeta de trabajo y libros"
+            class="teacher-photo"
+            loading="lazy"
+          />
         </div>
       </div>
     </div>
-  </main>
+  </section>
+
+  <!-- ============================================
+       8. TESTIMONIOS DE LA COMUNIDAD EDUCATIVA PÚBLICA
+       ============================================ -->
+  <section class="testimonials-section">
+    <div class="testimonials-container">
+      <div class="section-header-center">
+        <h2 class="testimonials-title">Testimonios de Docentes y Estudiantes</h2>
+        <p class="testimonials-subtitle">
+          Experiencias reales de la comunidad educativa pública que fortalece su enseñanza, estudio e investigación
+          gracias a la biblioteca virtual y el chatbot con inteligencia artificial de DiscerIA.
+        </p>
+      </div>
+
+      <!-- Grid de Tarjetas de Testimonio -->
+      <div class="testimonials-grid">
+        @for (testimonial of testimonials(); track testimonial.id) {
+          <div class="testimonial-card anim-fade-up">
+            <div class="testimonial-header">
+              <img [src]="testimonial.avatar" [alt]="testimonial.name" class="testimonial-avatar" width="44" height="44" loading="lazy" />
+              <div class="testimonial-author-meta">
+                <h4 class="author-name">{{ testimonial.name }}</h4>
+                <span class="author-role">{{ testimonial.role }}</span>
+              </div>
+            </div>
+
+            <div class="testimonial-stars" aria-label="Calificación 5 estrellas">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+            </div>
+
+            <p class="testimonial-text">
+              "{{ testimonial.text }}"
+            </p>
+          </div>
+        }
+      </div>
+
+      <!-- Paginación del Carrusel -->
+      <div class="carousel-pagination">
+        <button
+          type="button"
+          class="page-arrow"
+          (click)="prevTestimonial()"
+          aria-label="Testimonios anteriores"
+        >
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <span class="page-indicator">
+          {{ currentTestimonialPage() < 10 ? '0' + currentTestimonialPage() : currentTestimonialPage() }} / {{ totalTestimonialPages }}
+        </span>
+        <button
+          type="button"
+          class="page-arrow"
+          (click)="nextTestimonial()"
+          aria-label="Testimonios siguientes"
+        >
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       9. FOOTER
+       ============================================ -->
+  <footer class="site-footer" id="contacto">
+    <div class="footer-container">
+      <div class="footer-col brand-col">
+        <a routerLink="/" class="brand-logo footer-logo" aria-label="DiscerIA Página Principal">
+          <div class="footer-robot-icon" aria-hidden="true">
+            <i class="bi bi-robot"></i>
+          </div>
+          <span class="brand-name">Discer<span class="brand-dot">IA</span></span>
+        </a>
+        <p class="footer-desc">
+          Biblioteca virtual y chatbot con inteligencia artificial al servicio de docentes y estudiantes de instituciones públicas, garantizando acceso libre y equitativo a la educación de calidad.
+        </p>
+        <div class="social-links">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook de DiscerIA"><i class="bi bi-facebook"></i></a>
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter de DiscerIA"><i class="bi bi-twitter-x"></i></a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de DiscerIA"><i class="bi bi-linkedin"></i></a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram de DiscerIA"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">Biblioteca Virtual</h4>
+        <ul class="footer-links">
+          <li><a href="#biblioteca">Ciencia y Tecnología</a></li>
+          <li><a href="#biblioteca">Matemáticas y Lógica</a></li>
+          <li><a href="#biblioteca">Lenguaje y Humanidades</a></li>
+          <li><a href="#biblioteca">Guías Pedagógicas</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">Institucional</h4>
+        <ul class="footer-links">
+          <li><a href="#beneficios">Beneficios</a></li>
+          <li><a href="#docentes">Docentes Públicos</a></li>
+          <li><a routerLink="/login">Iniciar Sesión</a></li>
+          <li><a routerLink="/register">Registro Institucional</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">Contacto</h4>
+        <a href="mailto:contacto@disceria.edu" class="footer-contact-item"><i class="bi bi-envelope"></i> contacto&#64;disceria.edu</a>
+        <p class="footer-contact-item"><i class="bi bi-buildings"></i> Red de Instituciones Públicas</p>
+        <a href="tel:+18002345678" class="footer-contact-item"><i class="bi bi-telephone"></i> +1 (800) 234-5678</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 DiscerIA - Biblioteca Virtual y Chatbot con IA para Instituciones Públicas. Todos los derechos reservados.</p>
+    </div>
+  </footer>
 </div>
