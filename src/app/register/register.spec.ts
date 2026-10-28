@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Register } from './register';
 
@@ -86,5 +86,18 @@ describe('Register Component', () => {
     expect(component.registerForm.touched).toBe(true);
     expect(component.errorMessage()).toBeTruthy();
     expect(component.isLoading()).toBe(false);
+  });
+
+  it('debe activar el estado de carga y procesar el registro con Google', () => {
+    vi.useFakeTimers();
+    expect(component.isGoogleLoading()).toBe(false);
+    component.onGoogleRegister();
+    expect(component.isGoogleLoading()).toBe(true);
+
+    vi.advanceTimersByTime(1300);
+    expect(component.isGoogleLoading()).toBe(false);
+    expect(component.successMessage()).toContain('vinculada con');
+
+    vi.useRealTimers();
   });
 });
