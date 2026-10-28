@@ -43,24 +43,17 @@ describe('AuthService', () => {
     expect(service.currentUser()?.role).toBe('student');
   });
 
-  it('debe autenticar mediante Google Institucional', async () => {
-    vi.useFakeTimers();
-
-    const googleLoginPromise = firstValueFrom(service.loginWithGoogle());
-    await vi.advanceTimersByTimeAsync(1200);
-
-    const res = await googleLoginPromise;
-    expect(res).toBeTruthy();
-    expect(service.isAuthenticated()).toBe(true);
-    expect(service.currentUser()?.fullName).toBe('Estudiante Institucional');
-  });
-
   it('debe cerrar sesión y reiniciar el estado reactivo', async () => {
     vi.useFakeTimers();
 
-    const googleLoginPromise = firstValueFrom(service.loginWithGoogle());
-    await vi.advanceTimersByTimeAsync(1200);
-    await googleLoginPromise;
+    const loginPromise = firstValueFrom(
+      service.login({
+        email: 'docente.test@universidad.edu',
+        password: 'password123',
+      })
+    );
+    await vi.advanceTimersByTimeAsync(1000);
+    await loginPromise;
 
     expect(service.isAuthenticated()).toBe(true);
 

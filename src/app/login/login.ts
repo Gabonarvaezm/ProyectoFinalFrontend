@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -9,6 +10,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { LottieComponent } from '../shared/components/lottie';
 import { fadeInOut, fadeInUp } from '../shared/animations';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   imports: [ReactiveFormsModule, RouterLink, LottieComponent],
@@ -20,10 +22,11 @@ import { fadeInOut, fadeInUp } from '../shared/animations';
 export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   // Estados reactivos con Signals
   public readonly isLoading = signal<boolean>(false);
-  public readonly isGoogleLoading = signal<boolean>(false);
   public readonly showPassword = signal<boolean>(false);
   public readonly errorMessage = signal<string | null>(null);
   public readonly successMessage = signal<string | null>(null);
@@ -98,7 +101,10 @@ export class Login {
   }
 
   /**
-   * Procesamiento y validación del formulario de inicio de sesión
+   * Procesamiento y validación del formulario de inicio de sesión.
+   * Usa AuthService para autenticar y redirige según el rol del usuario:
+   *  - Profesor → /profesor (dashboard del profesor)
+   *  - Otros roles → / (página principal, por ahora sin dashboard específico)
    */
   public onSubmit(): void {
     this.errorMessage.set(null);
@@ -113,47 +119,27 @@ export class Login {
     this.isLoading.set(true);
     const { email, password, rememberMe } = this.loginForm.value;
 
-    // Simulación de procesamiento de login (listo para conectar con backend/API)
-    setTimeout(() => {
-      // Simulación de validación institucional
-      const isInstitutional = email.toLowerCase().includes('uni') || 
-                              email.toLowerCase().includes('edu') || 
-                              email.toLowerCase().includes('@');
+    // Buscar datos del usuario registrado en localStorage
+    const registeredRole = this.getRegisteredUserRole(email);
 
-      if (isInstitutional && password.length >= 6) {
+    this.authService.login({ email, password, rememberMe }).subscribe({
+      next: (response) => {
         this.isLoading.set(false);
         this.successMessage.set('¡Acceso concedido! Redirigiendo a tu espacio de estudio...');
-        
-        if (rememberMe && typeof window !== 'undefined') {
-          localStorage.setItem('disceria_remembered_email', email);
-        }
 
-        // Redirección hacia la vista principal
+        // Determinar la ruta de destino según el rol
+        const role = registeredRole ?? response.user.role;
+        const targetRoute = role === 'professor' ? '/profesor' : '/';
+
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate([targetRoute]);
         }, 1200);
-      } else {
+      },
+      error: (err: Error) => {
         this.isLoading.set(false);
-        this.errorMessage.set('Credenciales no válidas o usuario no registrado.');
-      }
-    }, 1000);
-  }
-
-  /**
-   * Manejador de inicio de sesión institucional con Google
-   */
-  public onGoogleLogin(): void {
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
-    this.isGoogleLoading.set(true);
-
-    setTimeout(() => {
-      this.isGoogleLoading.set(false);
-      this.successMessage.set('Autenticado con Google Institucional. Redirigiendo...');
-      setTimeout(() => {
-        this.router.navigate(['/']);
-      }, 1000);
-    }, 1200);
+        this.errorMessage.set(err.message || 'Credenciales no válidas o usuario no registrado.');
+      },
+    });
   }
 
   /**
@@ -171,10 +157,25 @@ export class Login {
   }
 
   /**
-   * Solicitud de acceso / Registro
+   * Obtiene el rol del usuario registrado desde localStorage.
+   * Esto permite que cuando un profesor se registra y luego inicia sesión,
+   * se redirija correctamente al dashboard de profesor.
    */
-  public onRequestAccess(event: Event): void {
-    event.preventDefault();
-    this.successMessage.set('Solicitud recibida. Tu institución educativa validará tu acceso.');
+  private getRegisteredUserRole(email: string): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+
+    try {
+      const stored = localStorage.getItem('disceria_registered_user');
+      if (!stored) return null;
+
+      const userData = JSON.parse(stored) as { email: string; role: string };
+      if (userData.email === email.toLowerCase()) {
+        return userData.role;
+      }
+    } catch {
+      // Si hay error al parsear, se ignora silenciosamente
+    }
+
+    return null;
   }
 }
