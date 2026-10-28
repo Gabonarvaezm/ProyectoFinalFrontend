@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, computed, inject, PLATFORM_ID, signal } from '@angular/core';
 import { Observable, delay, of, throwError, tap } from 'rxjs';
 import { AuthResponse, LoginCredentials, User } from '../models/auth.model';
 
@@ -6,68 +7,47 @@ import { AuthResponse, LoginCredentials, User } from '../models/auth.model';
   providedIn: 'root',
 })
 export class AuthService {
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly _currentUser = signal<User | null>(null);
 
   public readonly currentUser = this._currentUser.asReadonly();
   public readonly isAuthenticated = computed(() => this._currentUser() !== null);
 
   /**
-   * Autenticación con credenciales institucionales
+   * Autenticación con credenciales institucionales.
+   * Lee los datos del usuario registrado desde localStorage para
+   * asignar correctamente el rol y nombre al usuario autenticado.
    */
   public login(credentials: LoginCredentials): Observable<AuthResponse> {
     const { email, password } = credentials;
 
-    // Validación simulada (preparada para integrarse a backend real)
     if (!email || !password) {
       return throwError(() => new Error('Credenciales incompletas.'));
     }
 
-    // Simulación de respuesta exitosa
-    const mockUser: User = {
-      id: 'usr-101',
+    // Intentar obtener datos del registro previo
+    const registeredData = this.getRegisteredUserData(email);
+
+    const user: User = {
+      id: `usr-${Date.now()}`,
       email: email.toLowerCase(),
-      fullName: this.extractNameFromEmail(email),
-      role: 'student',
-      institution: 'Universidad Tecnológica',
+      fullName: registeredData?.fullName ?? this.extractNameFromEmail(email),
+      role: (registeredData?.role as User['role']) ?? 'student',
+      institution: registeredData?.institution ?? 'Universidad Tecnológica',
     };
 
-    const mockResponse: AuthResponse = {
-      user: mockUser,
-      token: 'jwt-simulated-token-disceria',
+    const response: AuthResponse = {
+      user,
+      token: `jwt-simulated-token-${Date.now()}`,
     };
 
-    return of(mockResponse).pipe(
+    return of(response).pipe(
       delay(900),
-      tap((response) => {
-        this._currentUser.set(response.user);
-        if (credentials.rememberMe && typeof window !== 'undefined') {
+      tap((res) => {
+        this._currentUser.set(res.user);
+        if (credentials.rememberMe && isPlatformBrowser(this.platformId)) {
           localStorage.setItem('disceria_user_email', email);
         }
-      })
-    );
-  }
-
-  /**
-   * Autenticación mediante Google Institucional
-   */
-  public loginWithGoogle(): Observable<AuthResponse> {
-    const mockUser: User = {
-      id: 'usr-google-202',
-      email: 'estudiante.google@universidad.edu',
-      fullName: 'Estudiante Institucional',
-      role: 'student',
-      institution: 'Universidad Institucional Google Workspace',
-    };
-
-    const mockResponse: AuthResponse = {
-      user: mockUser,
-      token: 'jwt-google-auth-token',
-    };
-
-    return of(mockResponse).pipe(
-      delay(1100),
-      tap((response) => {
-        this._currentUser.set(response.user);
       })
     );
   }
@@ -77,9 +57,43 @@ export class AuthService {
    */
   public logout(): void {
     this._currentUser.set(null);
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('disceria_user_email');
     }
+  }
+
+  /**
+   * Lee los datos del usuario registrado desde localStorage.
+   * Esto permite que el servicio conozca el rol, nombre e institución
+   * del usuario que se registró previamente.
+   */
+  private getRegisteredUserData(email: string): {
+    fullName: string;
+    email: string;
+    institution: string;
+    role: string;
+  } | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+
+    try {
+      const stored = localStorage.getItem('disceria_registered_user');
+      if (!stored) return null;
+
+      const data = JSON.parse(stored) as {
+        fullName: string;
+        email: string;
+        institution: string;
+        role: string;
+      };
+
+      if (data.email === email.toLowerCase()) {
+        return data;
+      }
+    } catch {
+      // Si hay error al parsear, se ignora silenciosamente
+    }
+
+    return null;
   }
 
   private extractNameFromEmail(email: string): string {

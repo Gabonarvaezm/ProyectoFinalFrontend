@@ -87,12 +87,24 @@ describe('Register Component', () => {
     expect(component.errorMessage()).toContain('completa correctamente');
   });
 
-  it('debe activar el estado de carga y procesar el registro con Google', () => {
+  it('debe procesar el registro cuando el formulario es válido', () => {
     vi.useFakeTimers();
-    component.onGoogleRegister();
-    expect(component.isGoogleLoading()).toBe(true);
+
+    component.registerForm.setValue({
+      fullName: 'Carlos Docente',
+      email: 'carlos@universidad.edu',
+      institution: 'Universidad Nacional',
+      role: 'professor',
+      password: 'Password123',
+      confirmPassword: 'Password123',
+      acceptTerms: true,
+    });
+
+    component.onSubmit();
+    expect(component.isLoading()).toBe(true);
+
     vi.advanceTimersByTime(1200);
-    expect(component.isGoogleLoading()).toBe(false);
-    expect(component.successMessage()).toContain('Cuenta vinculada');
+    expect(component.isLoading()).toBe(false);
+    expect(component.successMessage()).toContain('¡Cuenta creada exitosamente');
   });
 });
