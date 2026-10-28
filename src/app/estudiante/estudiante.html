@@ -33,12 +33,21 @@
       </ul>
     </nav>
 
-    <!-- Indicador inferior de Institución Pública -->
+    <!-- Indicador inferior de Institución y Cierre de Sesión -->
     <div class="sidebar-footer">
-      <div class="institution-badge">
+      <div class="institution-badge" [title]="studentInstitution()">
         <i class="bi bi-building"></i>
-        <span>Institución Pública</span>
+        <span>{{ studentInstitution() }}</span>
       </div>
+      <button
+        type="button"
+        class="nav-btn nav-btn-logout"
+        (click)="onLogout()"
+        aria-label="Cerrar sesión"
+      >
+        <i class="bi bi-box-arrow-right nav-icon"></i>
+        <span class="nav-label">Cerrar Sesión</span>
+      </button>
     </div>
   </aside>
 
@@ -67,11 +76,11 @@
           }
         </button>
 
-        <div class="user-avatar-wrap">
+        <div class="user-avatar-wrap" [title]="studentName() + ' (' + studentInstitution() + ')'">
           @if (!isAvatarBroken('user-header')) {
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-              alt="Foto de perfil de Alejandro"
+              [alt]="'Foto de perfil de ' + studentName()"
               class="user-avatar"
               width="40"
               height="40"
@@ -79,10 +88,20 @@
             />
           } @else {
             <div class="header-avatar-fallback" aria-hidden="true">
-              <span>AL</span>
+              <span>{{ userInitials() }}</span>
             </div>
           }
         </div>
+
+        <button
+          type="button"
+          class="btn-icon-badge btn-icon-logout"
+          (click)="onLogout()"
+          title="Cerrar sesión"
+          aria-label="Cerrar sesión"
+        >
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
       </div>
     </header>
 
