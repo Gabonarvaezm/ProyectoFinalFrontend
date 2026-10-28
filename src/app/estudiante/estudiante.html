@@ -1,6 +1,6 @@
 <div class="student-dashboard-layout">
   <!-- ── 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN) ── -->
-  <aside class="sidebar">
+  <aside class="sidebar" aria-label="Panel lateral de navegación">
     <div class="sidebar-header">
       <a routerLink="/" class="brand-link" aria-label="Ir a inicio de DiscerIA">
         <div class="brand-logo-wrap">
@@ -154,6 +154,7 @@
               class="subject-card"
               (click)="onSelectSubject(subject)"
               (keydown.enter)="onSelectSubject(subject)"
+              (keydown.space)="$event.preventDefault(); onSelectSubject(subject)"
               tabindex="0"
               role="button"
               [attr.aria-label]="subject.name + ': ' + subject.topic"

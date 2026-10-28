@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -27,6 +27,9 @@ import {
 export class Profesor {
   private readonly profesorService = inject(ProfesorService);
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private timerIds: ReturnType<typeof setTimeout>[] = [];
 
   // ── Navegación Lateral ───────────────────────────────────────────────────
   public readonly activeNav = signal<string>('dashboard');
@@ -110,6 +113,12 @@ export class Profesor {
 
   // Notificación tipo toast para feedback
   public readonly actionNotification = signal<string | null>(null);
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.timerIds.forEach((id) => clearTimeout(id));
+    });
+  }
 
   // ── Métodos de Interacción del Dashboard ─────────────────────────────────
 
@@ -205,7 +214,7 @@ export class Profesor {
     this.aiInputText.set('');
     this.isAiThinking.set(true);
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       const currentStudents = this.students();
       let responseText = 'He procesado tu consulta. Puedo preparar una rúbrica o resumen pedagógico.';
 
@@ -243,12 +252,15 @@ export class Profesor {
       this.chatMessages.update((prev) => [...prev, aiMsg]);
       this.isAiThinking.set(false);
     }, 600);
+
+    this.timerIds.push(timer);
   }
 
   private showToast(msg: string): void {
     this.actionNotification.set(msg);
-    setTimeout(() => {
+    const toastTimer = setTimeout(() => {
       this.actionNotification.set(null);
     }, 3200);
+    this.timerIds.push(toastTimer);
   }
 }

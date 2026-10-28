@@ -2,6 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   computed,
+  DestroyRef,
   inject,
   PLATFORM_ID,
   signal,
@@ -19,6 +20,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { LottieComponent } from '../shared/components/lottie';
 import { fadeInOut, fadeInUp } from '../shared/animations';
+import { STORAGE_KEYS } from '../core/models/auth.model';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constantes de validación
@@ -39,6 +41,9 @@ export class Register {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private timerIds: ReturnType<typeof setTimeout>[] = [];
 
   // ── Estados reactivos (Signals) ─────────────────────────────────────────
   public readonly isLoading = signal<boolean>(false);
@@ -111,7 +116,7 @@ export class Register {
 
   // Conexión reactiva de valueChanges a Signal
   private readonly passwordSignal = toSignal(
-    this.registerForm.get('password')!.valueChanges,
+    this.registerForm.controls['password'].valueChanges,
     { initialValue: '' }
   );
 
@@ -130,6 +135,12 @@ export class Register {
     if (score <= 3) return { level: 2, text: 'Media', colorClass: 'medium' };
     return { level: 3, text: 'Fuerte', colorClass: 'strong' };
   });
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.timerIds.forEach((id) => clearTimeout(id));
+    });
+  }
 
   // Getters para controles
   public get fullNameControl(): AbstractControl | null {
@@ -249,12 +260,14 @@ export class Register {
 
     this.isLoading.set(true);
     const { fullName, email, institution, role } = this.registerForm.value as {
-      fullName: string; email: string; institution: string;
-      role: string; password: string; confirmPassword: string; acceptTerms: boolean;
+      fullName: string;
+      email: string;
+      institution: string;
+      role: 'student' | 'professor' | 'admin';
     };
 
     // Simulación de llamada al backend — listo para conectar con API real
-    setTimeout(() => {
+    const submitTimer = setTimeout(() => {
       this.isLoading.set(false);
       this.successMessage.set(
         `¡Cuenta creada exitosamente para ${fullName}! Redirigiendo al inicio de sesión...`
@@ -262,12 +275,15 @@ export class Register {
 
       if (isPlatformBrowser(this.platformId)) {
         localStorage.setItem(
-          'disceria_registered_user',
+          STORAGE_KEYS.REGISTERED_USER,
           JSON.stringify({ fullName, email: email.toLowerCase(), institution, role })
         );
       }
 
-      setTimeout(() => this.router.navigate(['/login']), 1500);
+      const navTimer = setTimeout(() => this.router.navigate(['/login']), 1500);
+      this.timerIds.push(navTimer);
     }, 1200);
+
+    this.timerIds.push(submitTimer);
   }
 }

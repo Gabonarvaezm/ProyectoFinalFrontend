@@ -1,3 +1,11 @@
+import type {
+  ChatMessage,
+  NavItem,
+  QuickAction,
+} from '../../core/models/auth.model';
+
+export type { ChatMessage, NavItem, QuickAction };
+
 export type StudentStatus = 'active' | 'needs-attention' | 'completed';
 
 export interface StudentProgress {
@@ -36,30 +44,9 @@ export interface RecentActivity {
   iconType: 'blue' | 'purple';
 }
 
-export interface QuickAction {
-  id: string;
-  label: string;
-  icon: string;
-  primary?: boolean;
-}
-
 export interface AiSuggestion {
   id: string;
   label: string;
   icon: string;
   prompt: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  sender: 'ai' | 'user';
-  text: string;
-  timestamp: Date;
-}
-
-export interface NavItem {
-  id: string;
-  label: string;
-  icon: string;
-  route?: string;
 }

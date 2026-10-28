@@ -1,7 +1,13 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, computed, inject, PLATFORM_ID, signal } from '@angular/core';
 import { Observable, delay, of, throwError, tap } from 'rxjs';
-import { AuthResponse, LoginCredentials, User } from '../models/auth.model';
+import {
+  AuthResponse,
+  LoginCredentials,
+  RegisteredUserData,
+  STORAGE_KEYS,
+  User,
+} from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +21,8 @@ export class AuthService {
 
   /**
    * Autenticación con credenciales institucionales.
-   * Lee los datos del usuario registrado desde localStorage para
-   * asignar correctamente el rol y nombre al usuario autenticado.
+   * Valida integridad básica y lee los datos del usuario registrado desde localStorage
+   * para asignar el rol institucional ('student' | 'professor' | 'admin').
    */
   public login(credentials: LoginCredentials): Observable<AuthResponse> {
     const { email, password } = credentials;
@@ -25,13 +31,20 @@ export class AuthService {
       return throwError(() => new Error('Credenciales incompletas.'));
     }
 
-    // Intentar obtener datos del registro previo
-    const registeredData = this.getRegisteredUserData(email);
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail.includes('@') || password.length < 6) {
+      return throwError(
+        () => new Error('Credenciales no válidas o contraseña inferior a 6 caracteres.')
+      );
+    }
+
+    // Obtener datos del registro previo si existen
+    const registeredData = this.getRegisteredUserData(trimmedEmail);
 
     const user: User = {
       id: `usr-${Date.now()}`,
-      email: email.toLowerCase(),
-      fullName: registeredData?.fullName ?? this.extractNameFromEmail(email),
+      email: trimmedEmail,
+      fullName: registeredData?.fullName ?? this.extractNameFromEmail(trimmedEmail),
       role: (registeredData?.role as User['role']) ?? 'student',
       institution: registeredData?.institution ?? 'Universidad Tecnológica',
     };
@@ -46,54 +59,49 @@ export class AuthService {
       tap((res) => {
         this._currentUser.set(res.user);
         if (credentials.rememberMe && isPlatformBrowser(this.platformId)) {
-          localStorage.setItem('disceria_user_email', email);
+          localStorage.setItem(STORAGE_KEYS.USER_EMAIL, trimmedEmail);
         }
       })
     );
   }
 
   /**
-   * Cierre de sesión
+   * Cierre de sesión y limpieza reactiva
    */
   public logout(): void {
     this._currentUser.set(null);
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('disceria_user_email');
+      localStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
     }
   }
 
   /**
-   * Lee los datos del usuario registrado desde localStorage.
-   * Esto permite que el servicio conozca el rol, nombre e institución
-   * del usuario que se registró previamente.
+   * Lee de forma segura los datos del usuario registrado desde localStorage
    */
-  private getRegisteredUserData(email: string): {
-    fullName: string;
-    email: string;
-    institution: string;
-    role: string;
-  } | null {
+  public getRegisteredUserData(email: string): RegisteredUserData | null {
     if (!isPlatformBrowser(this.platformId)) return null;
 
     try {
-      const stored = localStorage.getItem('disceria_registered_user');
+      const stored = localStorage.getItem(STORAGE_KEYS.REGISTERED_USER);
       if (!stored) return null;
 
-      const data = JSON.parse(stored) as {
-        fullName: string;
-        email: string;
-        institution: string;
-        role: string;
-      };
-
-      if (data.email === email.toLowerCase()) {
+      const data = JSON.parse(stored) as RegisteredUserData;
+      if (data?.email && data.email.toLowerCase() === email.trim().toLowerCase()) {
         return data;
       }
-    } catch {
-      // Si hay error al parsear, se ignora silenciosamente
+    } catch (e) {
+      console.warn('[AuthService] Error al leer usuario registrado de storage:', e);
     }
 
     return null;
+  }
+
+  /**
+   * Obtiene el rol del usuario registrado para un correo específico
+   */
+  public getRegisteredUserRole(email: string): string | null {
+    const data = this.getRegisteredUserData(email);
+    return data?.role ?? null;
   }
 
   private extractNameFromEmail(email: string): string {
