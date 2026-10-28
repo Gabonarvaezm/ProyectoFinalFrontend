@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Login } from './login';
 
 describe('Login Component', () => {
@@ -9,7 +10,7 @@ describe('Login Component', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Login],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideNoopAnimations()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Login);

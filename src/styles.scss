@@ -1,22 +1,26 @@
-@import 'bootstrap-icons/font/bootstrap-icons.css';
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA Root Stylesheet
+// ─────────────────────────────────────────────────────────────────────────────
 
-*, *::before, *::after {
+@use 'bootstrap-icons/font/bootstrap-icons.css';
+@use './styles/tokens' as *;
+@use './styles/animations' as *;
+@use './styles/components' as *;
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-:root {
-  --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --color-primary: #1d4ed8;
-  --color-primary-hover: #1e40af;
-  --color-primary-light: #eff6ff;
-  --color-text-main: #0f172a;
-  --color-text-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-danger: #ef4444;
-  --color-success: #10b981;
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
 }
 
-html, body {
+html,
+body {
   min-height: 100%;
   margin: 0;
   padding: 0;
@@ -24,20 +28,72 @@ html, body {
 
 body {
   font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
   color: var(--color-text-main);
-  background-color: #f8fafc;
+  background-color: var(--color-bg-app);
+  line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
+}
+
+// ── Tipografía Base ──────────────────────────────────────────────────────────
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: var(--space-3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-slate-900);
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-secondary);
 }
 
 a {
-  color: inherit;
+  color: var(--color-primary-700);
   text-decoration: none;
+  transition: var(--transition-fast);
+
+  &:hover {
+    color: var(--color-primary-800);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-xs);
+  }
 }
+
+// ── Elementos Interactivos Nativos ───────────────────────────────────────────
 
 button {
   font-family: inherit;
   border: none;
   background: none;
+  padding: 0;
+}
+
+// Barra de Scroll Elegante y Fina
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-slate-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate-300);
+  border-radius: var(--radius-full);
+
+  &:hover {
+    background: var(--color-slate-400);
+  }
 }

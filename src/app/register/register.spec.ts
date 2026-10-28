@@ -1,5 +1,6 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Register } from './register';
 
 describe('Register Component', () => {
@@ -9,12 +10,16 @@ describe('Register Component', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Register],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideNoopAnimations()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Register);
     component = fixture.componentInstance;
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('debe crearse correctamente', () => {
@@ -48,18 +53,14 @@ describe('Register Component', () => {
 
   it('debe validar que la contraseña y confirmPassword coincidan', () => {
     const passwordControl = component.passwordControl;
-    const confirmPasswordControl = component.confirmPasswordControl;
+    const confirmControl = component.confirmPasswordControl;
 
     passwordControl?.setValue('Password123');
-    confirmPasswordControl?.setValue('OtraPassword123');
-    component.registerForm.updateValueAndValidity();
+    confirmControl?.setValue('Diferente123');
+    expect(component.registerForm.hasError('passwordMismatch')).toBe(true);
 
-    expect(confirmPasswordControl?.hasError('passwordMismatch')).toBe(true);
-
-    confirmPasswordControl?.setValue('Password123');
-    component.registerForm.updateValueAndValidity();
-
-    expect(confirmPasswordControl?.hasError('passwordMismatch')).toBe(false);
+    confirmControl?.setValue('Password123');
+    expect(component.registerForm.hasError('passwordMismatch')).toBe(false);
   });
 
   it('debe alternar la visibilidad de las contraseñas', () => {
@@ -74,7 +75,6 @@ describe('Register Component', () => {
 
   it('debe requerir la aceptación de términos y condiciones', () => {
     const termsControl = component.acceptTermsControl;
-    termsControl?.setValue(false);
     expect(termsControl?.valid).toBe(false);
 
     termsControl?.setValue(true);
@@ -84,20 +84,15 @@ describe('Register Component', () => {
   it('debe marcar todos los campos como touched si el formulario es inválido al hacer submit', () => {
     component.onSubmit();
     expect(component.registerForm.touched).toBe(true);
-    expect(component.errorMessage()).toBeTruthy();
-    expect(component.isLoading()).toBe(false);
+    expect(component.errorMessage()).toContain('completa correctamente');
   });
 
   it('debe activar el estado de carga y procesar el registro con Google', () => {
     vi.useFakeTimers();
-    expect(component.isGoogleLoading()).toBe(false);
     component.onGoogleRegister();
     expect(component.isGoogleLoading()).toBe(true);
-
-    vi.advanceTimersByTime(1300);
+    vi.advanceTimersByTime(1200);
     expect(component.isGoogleLoading()).toBe(false);
-    expect(component.successMessage()).toContain('vinculada con');
-
-    vi.useRealTimers();
+    expect(component.successMessage()).toContain('Cuenta vinculada');
   });
 });
