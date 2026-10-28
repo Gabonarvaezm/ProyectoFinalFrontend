@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { Estudiante } from './estudiante';
+import { AuthService } from '../core/services/auth.service';
 
 describe('Estudiante', () => {
   let component: Estudiante;
   let fixture: ComponentFixture<Estudiante>;
+  let authService: AuthService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -12,6 +14,7 @@ describe('Estudiante', () => {
       providers: [provideRouter([])],
     }).compileComponents();
 
+    authService = TestBed.inject(AuthService);
     fixture = TestBed.createComponent(Estudiante);
     component = fixture.componentInstance;
     await fixture.whenStable();
@@ -31,6 +34,38 @@ describe('Estudiante', () => {
     component.selectNav('biblioteca');
     expect(component.activeNav()).toBe('biblioteca');
     expect(component.toastMessage()).toContain('biblioteca');
+  });
+
+  it('debe mostrar mensaje contextual con nombre e institución al seleccionar perfil', () => {
+    component.selectNav('perfil');
+    expect(component.activeNav()).toBe('perfil');
+    expect(component.toastMessage()).toContain('Perfil de Alejandro');
+  });
+
+  it('debe calcular dinámicamente las iniciales del estudiante (userInitials)', () => {
+    expect(component.userInitials()).toBe('AL');
+
+    component.studentName.set('Camila Torres');
+    expect(component.userInitials()).toBe('CT');
+
+    component.studentName.set('Juan');
+    expect(component.userInitials()).toBe('JU');
+  });
+
+  it('debe permitir cerrar sesión con onLogout y redirigir a /login', async () => {
+    vi.useFakeTimers();
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const logoutSpy = vi.spyOn(authService, 'logout');
+
+    component.onLogout();
+    expect(logoutSpy).toHaveBeenCalled();
+    expect(component.toastMessage()).toContain('Cerrando sesión');
+
+    vi.advanceTimersByTime(850);
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+
+    vi.useRealTimers();
   });
 
   it('debe filtrar materias de la biblioteca digital según searchQuery', () => {

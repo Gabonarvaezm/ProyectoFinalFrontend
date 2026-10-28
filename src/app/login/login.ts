@@ -104,7 +104,8 @@ export class Login {
    * Procesamiento y validación del formulario de inicio de sesión.
    * Usa AuthService para autenticar y redirige según el rol del usuario:
    *  - Profesor → /profesor (dashboard del profesor)
-   *  - Otros roles → / (página principal, por ahora sin dashboard específico)
+   *  - Estudiante → /estudiante (dashboard del estudiante)
+   *  - Otros roles → / (página principal)
    */
   public onSubmit(): void {
     this.errorMessage.set(null);
@@ -125,11 +126,18 @@ export class Login {
     this.authService.login({ email, password, rememberMe }).subscribe({
       next: (response) => {
         this.isLoading.set(false);
-        this.successMessage.set('¡Acceso concedido! Redirigiendo a tu espacio de estudio...');
 
-        // Determinar la ruta de destino según el rol
+        // Determinar la ruta de destino y mensaje de feedback según el rol
         const role = registeredRole ?? response.user.role;
-        const targetRoute = role === 'professor' ? '/profesor' : '/';
+        const targetRoute =
+          role === 'professor' ? '/profesor' : role === 'student' ? '/estudiante' : '/';
+
+        const successText =
+          role === 'professor'
+            ? '¡Acceso concedido! Redirigiendo a tu panel docente...'
+            : '¡Acceso concedido! Redirigiendo a tu espacio de estudio...';
+
+        this.successMessage.set(successText);
 
         setTimeout(() => {
           this.router.navigate([targetRoute]);
@@ -158,8 +166,8 @@ export class Login {
 
   /**
    * Obtiene el rol del usuario registrado desde localStorage.
-   * Esto permite que cuando un profesor se registra y luego inicia sesión,
-   * se redirija correctamente al dashboard de profesor.
+   * Esto permite que cuando un usuario se registra (profesor o estudiante) y luego inicia sesión,
+   * se redirija correctamente a su dashboard correspondiente.
    */
   private getRegisteredUserRole(email: string): string | null {
     if (!isPlatformBrowser(this.platformId)) return null;

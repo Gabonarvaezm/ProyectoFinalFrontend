@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Login } from './login';
 
@@ -60,5 +60,65 @@ describe('Login Component', () => {
     expect(component.loginForm.touched).toBe(true);
     expect(component.errorMessage()).toBeTruthy();
     expect(component.isLoading()).toBe(false);
+  });
+
+  it('debe redirigir a /estudiante tras un login exitoso de estudiante', async () => {
+    vi.useFakeTimers();
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.loginForm.setValue({
+      email: 'estudiante.test@universidad.edu',
+      password: 'password123',
+      rememberMe: false,
+    });
+
+    component.onSubmit();
+    expect(component.isLoading()).toBe(true);
+
+    // Avanza el delay del AuthService (900ms)
+    await vi.advanceTimersByTimeAsync(950);
+    expect(component.isLoading()).toBe(false);
+    expect(component.successMessage()).toContain('espacio de estudio');
+
+    // Avanza el setTimeout de navegación (1200ms)
+    await vi.advanceTimersByTimeAsync(1250);
+    expect(navigateSpy).toHaveBeenCalledWith(['/estudiante']);
+
+    vi.useRealTimers();
+  });
+
+  it('debe redirigir a /profesor tras un login exitoso con rol de profesor', async () => {
+    vi.useFakeTimers();
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    // Simular registro previo de profesor en localStorage
+    localStorage.setItem(
+      'disceria_registered_user',
+      JSON.stringify({
+        email: 'profesor.test@universidad.edu',
+        fullName: 'Profesor Test',
+        role: 'professor',
+      })
+    );
+
+    component.loginForm.setValue({
+      email: 'profesor.test@universidad.edu',
+      password: 'password123',
+      rememberMe: false,
+    });
+
+    component.onSubmit();
+    expect(component.isLoading()).toBe(true);
+
+    await vi.advanceTimersByTimeAsync(950);
+    expect(component.successMessage()).toContain('panel docente');
+
+    await vi.advanceTimersByTimeAsync(1250);
+    expect(navigateSpy).toHaveBeenCalledWith(['/profesor']);
+
+    localStorage.removeItem('disceria_registered_user');
+    vi.useRealTimers();
   });
 });

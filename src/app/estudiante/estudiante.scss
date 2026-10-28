@@ -180,6 +180,9 @@ $color-text-light: #94a3b8;
 .sidebar-footer {
   padding-top: 1rem;
   border-top: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
   @media (max-width: 1200px) {
     display: none;
@@ -198,6 +201,23 @@ $color-text-light: #94a3b8;
     border-radius: 9999px;
     width: 100%;
     justify-content: center;
+  }
+
+  .nav-btn-logout {
+    color: #ef4444;
+
+    .nav-icon {
+      color: #ef4444;
+    }
+
+    &:hover {
+      background-color: #fef2f2;
+      color: #dc2626;
+
+      .nav-icon {
+        color: #dc2626;
+      }
+    }
   }
 }
 
@@ -296,6 +316,14 @@ $color-text-light: #94a3b8;
         border-radius: 50%;
         background-color: #ef4444;
         border: 2px solid #ffffff;
+      }
+    }
+
+    .btn-icon-logout {
+      &:hover {
+        background-color: #fef2f2;
+        color: #ef4444;
+        border-color: #fecaca;
       }
     }
 

@@ -1,6 +1,8 @@
-import { Component, computed, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, computed, inject, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../core/services/auth.service';
 
 export interface NavItem {
   id: string;
@@ -52,6 +54,10 @@ export interface QuickAction {
   templateUrl: './estudiante.html',
 })
 export class Estudiante {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID);
+
   // ── Navegación Lateral ───────────────────────────────────────────────────
   public readonly activeNav = signal<string>('dashboard');
 
@@ -66,8 +72,19 @@ export class Estudiante {
 
   // ── Usuario y Búsqueda ───────────────────────────────────────────────────
   public readonly studentName = signal<string>('Alejandro');
+  public readonly studentEmail = signal<string>('');
+  public readonly studentInstitution = signal<string>('Institución Pública');
   public readonly searchQuery = signal<string>('');
   public readonly notificationsCount = signal<number>(2);
+
+  /** Iniciales calculadas dinámicamente para el avatar fallback */
+  public readonly userInitials = computed(() => {
+    const name = this.studentName().trim();
+    if (!name) return 'ES';
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  });
 
   // ── Curso Activo / Continuar Aprendiendo ─────────────────────────────────
   public readonly currentCourse = signal({
@@ -196,11 +213,79 @@ export class Estudiante {
   // ── Feedback / Toast ─────────────────────────────────────────────────────
   public readonly toastMessage = signal<string | null>(null);
 
+  // ── Control de Fallback de Avatares ─────────────────────────────────────
+  public readonly avatarErrors = signal<Set<string>>(new Set());
+
+  constructor() {
+    this.initializeUserData();
+  }
+
+  /**
+   * Sincroniza la información del estudiante desde AuthService o localStorage
+   */
+  private initializeUserData(): void {
+    // 1. Verificar si hay un usuario activo en memoria en AuthService
+    const currentUser = this.authService.currentUser();
+    if (currentUser) {
+      if (currentUser.fullName) {
+        this.studentName.set(currentUser.fullName);
+      }
+      if (currentUser.email) {
+        this.studentEmail.set(currentUser.email);
+      }
+      if (currentUser.institution) {
+        this.studentInstitution.set(currentUser.institution);
+      }
+      return;
+    }
+
+    // 2. Recuperación persistente SSR-safe desde localStorage
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const storedUser = localStorage.getItem('disceria_registered_user');
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser) as {
+            fullName?: string;
+            email?: string;
+            institution?: string;
+            role?: string;
+          };
+          if (parsed?.fullName) {
+            this.studentName.set(parsed.fullName);
+          }
+          if (parsed?.email) {
+            this.studentEmail.set(parsed.email);
+          }
+          if (parsed?.institution) {
+            this.studentInstitution.set(parsed.institution);
+          }
+        }
+      } catch {
+        // En caso de error de lectura, mantiene los valores predeterminados
+      }
+    }
+  }
+
   // ── Métodos de Interacción ───────────────────────────────────────────────
 
   public selectNav(id: string): void {
     this.activeNav.set(id);
-    this.showToast(`Navegando a: ${id}`);
+    if (id === 'perfil') {
+      this.showToast(`Perfil de ${this.studentName()} • ${this.studentInstitution()}`);
+    } else {
+      this.showToast(`Navegando a: ${id}`);
+    }
+  }
+
+  /**
+   * Cierre de sesión seguro y redirección al Login
+   */
+  public onLogout(): void {
+    this.authService.logout();
+    this.showToast('Cerrando sesión. Redirigiendo al inicio de sesión...');
+    setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 800);
   }
 
   public onContinueCourse(): void {
@@ -288,9 +373,6 @@ export class Estudiante {
       this.isAiThinking.set(false);
     }, 600);
   }
-
-  // ── Control de Fallback de Avatares ─────────────────────────────────────
-  public readonly avatarErrors = signal<Set<string>>(new Set());
 
   public isAvatarBroken(id: string): boolean {
     return this.avatarErrors().has(id);
