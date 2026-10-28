@@ -593,3 +593,44 @@ $color-success-border: #bbf7d0;
     transform: rotate(360deg);
   }
 }
+
+// ── Sandbox mode badge ────────────────────────────────────────────────────────
+.sandbox-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  margin-bottom: 0.75rem;
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #92400e;
+  animation: slideDown 0.25s ease;
+
+  i {
+    margin-top: 1px;
+    color: #f59e0b;
+    flex-shrink: 0;
+  }
+
+  code {
+    font-family: 'Courier New', monospace;
+    background: rgba(245, 158, 11, 0.15);
+    padding: 0 0.25rem;
+    border-radius: 3px;
+  }
+}
+
+// ── Native Google button container (SDK renderButton) ────────────────────────
+.google-native-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+
+  // Ensure the iframe rendered by Google SDK adapts to the container
+  iframe {
+    border-radius: 8px !important;
+  }
+}
