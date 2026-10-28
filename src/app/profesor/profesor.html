@@ -1,0 +1,473 @@
+<div class="dashboard-layout">
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN)                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar" aria-label="Navegación principal">
+    <div class="sidebar-header">
+      <a routerLink="/" class="brand-link" title="Ir a la página principal">
+        <span class="brand-title">DiscerIA</span>
+        <span class="brand-subtitle">Academic Research</span>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+        @for (item of navItems(); track item.id) {
+          <li class="nav-item">
+            <button
+              type="button"
+              class="nav-button"
+              [class.active]="activeNav() === item.id"
+              (click)="selectNav(item.id)"
+              [attr.aria-current]="activeNav() === item.id ? 'page' : null"
+            >
+              <i [class]="item.icon" aria-hidden="true"></i>
+              <span>{{ item.label }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button
+        type="button"
+        class="btn-new-analysis"
+        (click)="onNewAnalysis()"
+        aria-label="Iniciar nuevo análisis académico"
+      >
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        <span>New Analysis</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 2. CONTENIDO PRINCIPAL (HEADER + KPIS + TABLA + ACTIVIDAD)            -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="main-wrapper">
+    <!-- Barra superior de búsqueda y perfil -->
+    <header class="top-header">
+      <div class="search-box">
+        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search students, exams..."
+          [value]="searchQuery()"
+          (input)="onSearchChange($event)"
+          aria-label="Buscar estudiantes o exámenes"
+        />
+      </div>
+
+      <div class="header-actions">
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Notificaciones"
+          title="Notificaciones"
+        >
+          <i class="bi bi-bell"></i>
+          <span class="notification-indicator"></span>
+        </button>
+
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Configuración"
+          title="Configuración"
+        >
+          <i class="bi bi-gear"></i>
+        </button>
+
+        <div class="user-profile-badge" title="Prof. García">
+          <div class="avatar-circle">
+            <span class="avatar-initials">PG</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Scrollable / Dashboard Canvas -->
+    <main class="dashboard-canvas">
+      <!-- Banner de Bienvenida -->
+      <section class="welcome-card" aria-label="Bienvenida al docente">
+        <h1 class="welcome-title">¡Hola, Prof. García!</h1>
+        <p class="welcome-subtitle">
+          Tus alumnos han avanzado un <strong class="stat-highlight">12%</strong> más esta semana.
+        </p>
+      </section>
+
+      <!-- Tarjetas de Métricas (KPIs Dinámicos) -->
+      <section class="kpi-section" aria-label="Métricas generales calculadas">
+        @for (kpi of kpiMetrics(); track kpi.id) {
+          <div class="kpi-card" [class]="'variant-' + kpi.variant">
+            <div class="kpi-header">
+              <span class="kpi-label">{{ kpi.label }}</span>
+              <div class="kpi-icon-pill" [class]="kpi.variant">
+                <i [class]="kpi.icon" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="kpi-value">{{ kpi.value }}</div>
+          </div>
+        }
+      </section>
+
+      <!-- Cuadrícula de Contenido: Student Progress + Actividad & Acciones -->
+      <div class="content-split-grid">
+        <!-- Columna Izquierda: Student Progress Table -->
+        <section class="card-section progress-card" aria-labelledby="heading-student-progress">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2 id="heading-student-progress" class="card-title">Student Progress</h2>
+              <span class="students-count-badge">{{ filteredStudents().length }} alumnos</span>
+            </div>
+            <div class="card-header-actions">
+              <button
+                type="button"
+                class="btn-add-student"
+                (click)="openRegisterModal()"
+                title="Registrar nuevo estudiante"
+              >
+                <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
+                <span>Registrar Alumno</span>
+              </button>
+              <button type="button" class="btn-link-action">View All</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="progress-table">
+              <thead>
+                <tr>
+                  <th scope="col">Student</th>
+                  <th scope="col">Topic</th>
+                  <th scope="col">Score</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="th-actions"><span class="sr-only">Acciones</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (student of filteredStudents(); track student.id) {
+                  <tr>
+                    <td class="student-name">
+                      <div class="student-name-cell">
+                        <span>{{ student.studentName }}</span>
+                        @if (student.email) {
+                          <span class="student-email-sub">{{ student.email }}</span>
+                        }
+                      </div>
+                    </td>
+                    <td class="student-topic">{{ student.topic }}</td>
+                    <td class="student-score">
+                      <div class="score-container">
+                        <div
+                          class="progress-bar-track"
+                          role="progressbar"
+                          [attr.aria-valuenow]="student.score"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          <div
+                            class="progress-bar-fill"
+                            [class]="student.status"
+                            [style.width.%]="student.score"
+                          ></div>
+                        </div>
+                        <span class="score-label">{{ student.score }}%</span>
+                      </div>
+                    </td>
+                    <td class="student-status">
+                      <span class="status-badge" [class]="student.status">
+                        {{ student.statusLabel }}
+                      </span>
+                    </td>
+                    <td class="td-actions">
+                      <button
+                        type="button"
+                        class="btn-delete-student"
+                        (click)="onDeleteStudent(student, $event)"
+                        [attr.aria-label]="'Eliminar ' + student.studentName"
+                        title="Eliminar de la cohorte"
+                      >
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="empty-state">
+                      <div class="empty-state-content">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                        <p>No hay estudiantes que coincidan con la búsqueda.</p>
+                        <button
+                          type="button"
+                          class="btn-primary-sm"
+                          (click)="openRegisterModal()"
+                        >
+                          <i class="bi bi-person-plus-fill"></i>
+                          <span>Crear / Registrar Estudiante</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Columna Derecha: Recent Activity + Quick Actions -->
+        <div class="side-column">
+          <!-- Recent Activity -->
+          <section class="card-section activity-card" aria-labelledby="heading-recent-activity">
+            <div class="card-header">
+              <h2 id="heading-recent-activity" class="card-title">Recent Activity</h2>
+            </div>
+
+            <ul class="activity-list">
+              @for (act of recentActivities(); track act.id) {
+                <li class="activity-item">
+                  <div class="activity-icon-badge" [class]="act.iconType">
+                    <i [class]="act.icon" aria-hidden="true"></i>
+                  </div>
+                  <div class="activity-details">
+                    <p class="activity-desc">{{ act.description }}</p>
+                    <span class="activity-time">{{ act.timeAgo }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+
+          <!-- Quick Actions -->
+          <section class="card-section quick-actions-card" aria-label="Acciones rápidas">
+            <h3 class="quick-actions-title">QUICK ACTIONS</h3>
+            <div class="actions-stack">
+              @for (action of quickActions(); track action.id) {
+                <button
+                  type="button"
+                  class="btn-quick-action"
+                  [class.primary]="action.primary"
+                  (click)="triggerQuickAction(action)"
+                >
+                  <i [class]="action.icon" aria-hidden="true"></i>
+                  <span>{{ action.label }}</span>
+                </button>
+              }
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 3. PANEL LATERAL DERECHO (ASISTENTE DEL PROFESOR / AI SUPPORT)        -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <aside class="ai-assistant-panel" aria-label="Asistente de Inteligencia Artificial">
+    <div class="ai-header">
+      <div class="ai-icon-box">
+        <i class="bi bi-robot" aria-hidden="true"></i>
+      </div>
+      <div class="ai-title-wrapper">
+        <h2 class="ai-title">Asistente del Profesor</h2>
+        <span class="ai-subtitle">AI Support</span>
+      </div>
+    </div>
+
+    <div class="ai-body">
+      <!-- Tarjeta de Sugerencias Rápidas -->
+      <div class="suggestions-card">
+        <h3 class="suggestions-prompt">How can I help you today?</h3>
+
+        <div class="suggestions-list">
+          @for (sug of aiSuggestions(); track sug.id) {
+            <button
+              type="button"
+              class="btn-suggestion"
+              (click)="selectSuggestion(sug)"
+              [disabled]="isAiThinking()"
+            >
+              <i [class]="sug.icon" aria-hidden="true"></i>
+              <span>{{ sug.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Historial de Conversación con el Asistente -->
+      <div class="chat-thread" aria-live="polite">
+        @for (msg of chatMessages(); track msg.id) {
+          <div class="chat-bubble" [class]="msg.sender">
+            <div class="bubble-sender-name">
+              {{ msg.sender === 'user' ? 'Tú' : 'Asistente IA' }}
+            </div>
+            <p class="bubble-text">{{ msg.text }}</p>
+          </div>
+        }
+
+        @if (isAiThinking()) {
+          <div class="chat-bubble ai thinking" aria-label="El asistente está redactando una respuesta">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Barra de Entrada del Chat con IA -->
+    <div class="ai-footer">
+      <form class="ai-input-form" (ngSubmit)="submitAiMessage()">
+        <input
+          type="text"
+          class="ai-input"
+          placeholder="Ask AI..."
+          [(ngModel)]="aiInputText"
+          name="aiInputText"
+          [disabled]="isAiThinking()"
+          aria-label="Pregunta al Asistente del Profesor"
+          autocomplete="off"
+        />
+        <button
+          type="submit"
+          class="btn-ai-send"
+          [disabled]="!aiInputText() || isAiThinking()"
+          aria-label="Enviar mensaje a la IA"
+          title="Enviar"
+        >
+          <i class="bi bi-send" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 4. MODAL ACCESIBLE: REGISTRAR / CREAR ESTUDIANTE                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (isRegisterModalOpen()) {
+    <div
+      class="modal-backdrop"
+      (click)="closeRegisterModal()"
+      role="presentation"
+    >
+      <div
+        class="modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-register-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div class="modal-icon-badge">
+            <i class="bi bi-person-plus-fill"></i>
+          </div>
+          <div class="modal-title-wrapper">
+            <h2 id="modal-register-title" class="modal-title">Registrar Nuevo Estudiante</h2>
+            <p class="modal-subtitle">Añade a un alumno a tu cohorte para seguimiento en el dashboard.</p>
+          </div>
+          <button
+            type="button"
+            class="btn-close-modal"
+            (click)="closeRegisterModal()"
+            aria-label="Cerrar ventana"
+          >
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="studentForm" (ngSubmit)="onRegisterStudentSubmit()" class="modal-form" novalidate>
+          <div class="form-group">
+            <label for="studentName" class="form-label">Nombre Completo *</label>
+            <input
+              type="text"
+              id="studentName"
+              formControlName="studentName"
+              class="form-control"
+              placeholder="Ej: Andrés Narváez"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="studentEmail" class="form-label">Correo Institucional *</label>
+            <input
+              type="email"
+              id="studentEmail"
+              formControlName="email"
+              class="form-control"
+              placeholder="alumno@universidad.edu"
+              required
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="studentTopic" class="form-label">Asignatura / Módulo *</label>
+              <input
+                type="text"
+                id="studentTopic"
+                formControlName="topic"
+                class="form-control"
+                placeholder="Ej: Biología: Mitosis"
+                required
+              />
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="studentStatus" class="form-label">Estado Inicial *</label>
+              <select id="studentStatus" formControlName="status" class="form-control">
+                <option value="active">Active (Activo)</option>
+                <option value="needs-attention">Needs Attention (Atención)</option>
+                <option value="completed">Completed (Completado)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="studentScore" class="form-label">Puntaje / Progreso Inicial (%)</label>
+              <span class="score-display-pill">{{ studentForm.get('score')?.value }}%</span>
+            </div>
+            <input
+              type="range"
+              id="studentScore"
+              formControlName="score"
+              class="form-range"
+              min="0"
+              max="100"
+              step="5"
+            />
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeRegisterModal()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn-submit"
+              [disabled]="isSubmittingStudent()"
+            >
+              <i class="bi bi-check-lg" aria-hidden="true"></i>
+              <span>Registrar Estudiante</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Toast Notification para Interacciones Rápidas -->
+  @if (actionNotification()) {
+    <div class="toast-feedback" role="status" aria-live="polite">
+      <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+      <span>{{ actionNotification() }}</span>
+    </div>
+  }
+</div>
