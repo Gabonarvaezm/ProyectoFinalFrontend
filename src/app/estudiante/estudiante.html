@@ -1,0 +1,355 @@
+<div class="student-dashboard-layout">
+  <!-- ── 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN) ── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a routerLink="/" class="brand-link" aria-label="Ir a inicio de DiscerIA">
+        <div class="brand-logo-wrap">
+          <div class="brand-icon">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">DiscerIA</span>
+            <span class="brand-sub">Plataforma Educativa</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navegación del estudiante">
+      <ul class="nav-list">
+        @for (item of navItems(); track item.id) {
+          <li class="nav-item">
+            <button
+              type="button"
+              class="nav-btn"
+              [class.active]="activeNav() === item.id"
+              (click)="selectNav(item.id)"
+            >
+              <i [class]="item.icon + ' nav-icon'"></i>
+              <span class="nav-label">{{ item.label }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <!-- Indicador inferior de Institución Pública -->
+    <div class="sidebar-footer">
+      <div class="institution-badge">
+        <i class="bi bi-building"></i>
+        <span>Institución Pública</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── 2. ÁREA CENTRAL DE CONTENIDO (DASHBOARD) ── -->
+  <main class="main-content">
+    <!-- Header Superior con Buscador y Notificaciones -->
+    <header class="top-header">
+      <div class="search-bar-wrap">
+        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+        <input
+          #searchInput
+          type="search"
+          class="search-input"
+          placeholder="Buscar en la biblioteca..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set(searchInput.value)"
+          aria-label="Buscar recursos en la biblioteca"
+        />
+      </div>
+
+      <div class="header-user-actions">
+        <button type="button" class="btn-icon-badge" aria-label="Ver notificaciones">
+          <i class="bi bi-bell"></i>
+          @if (notificationsCount() > 0) {
+            <span class="notification-dot" aria-hidden="true"></span>
+          }
+        </button>
+
+        <div class="user-avatar-wrap">
+          @if (!isAvatarBroken('user-header')) {
+            <img
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+              alt="Foto de perfil de Alejandro"
+              class="user-avatar"
+              width="40"
+              height="40"
+              (error)="onAvatarError('user-header')"
+            />
+          } @else {
+            <div class="header-avatar-fallback" aria-hidden="true">
+              <span>AL</span>
+            </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- Saludo y Bienvenida -->
+    <section class="welcome-section">
+      <h1 class="welcome-title">¡Hola, {{ studentName() }}!</h1>
+      <p class="welcome-subtitle">
+        Tienes un <strong>85% de progreso</strong> en Biología esta semana. ¡Sigue así!
+      </p>
+    </section>
+
+    <!-- Tarjeta Destacada: Continuar Aprendiendo -->
+    <section class="continue-learning-card">
+      <div class="course-icon-box">
+        <i class="bi bi-radioactive"></i>
+      </div>
+
+      <div class="course-info-box">
+        <span class="course-category-tag">{{ currentCourse().category }}</span>
+        <h2 class="course-title">{{ currentCourse().title }}</h2>
+        <div class="progress-bar-container">
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="currentCourse().progress"></div>
+          </div>
+          <span class="progress-label">{{ currentCourse().progress }}% completado</span>
+        </div>
+      </div>
+
+      <div class="course-action-box">
+        <button type="button" class="btn-continue" (click)="onContinueCourse()">
+          Continuar
+        </button>
+      </div>
+    </section>
+
+    <!-- Sección Intermedia: Biblioteca Digital + Examen y Progreso Semanal -->
+    <div class="middle-grid">
+      <!-- Columna Izquierda: Cuadrícula de Biblioteca Digital -->
+      <section class="library-section">
+        <div class="section-title-row">
+          <h2 class="section-heading">Biblioteca Digital</h2>
+          <button type="button" class="btn-link-action" (click)="onViewAllLibrary()">
+            Ver todo
+          </button>
+        </div>
+
+        <div class="subjects-grid">
+          @for (subject of filteredSubjects(); track subject.id) {
+            <div
+              class="subject-card"
+              (click)="onSelectSubject(subject)"
+              (keydown.enter)="onSelectSubject(subject)"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="subject.name + ': ' + subject.topic"
+            >
+              <div
+                class="subject-icon-wrap"
+                [style.background-color]="subject.badgeBg"
+                [style.color]="subject.iconColor"
+              >
+                <i [class]="subject.icon"></i>
+              </div>
+              <div class="subject-info">
+                <h3 class="subject-name">{{ subject.name }}</h3>
+                <span class="subject-topic">{{ subject.topic }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Columna Derecha: Examen de Práctica + Progreso Semanal -->
+      <div class="side-cards-col">
+        <!-- Tarjeta: Examen de Práctica -->
+        <div class="practice-exam-card">
+          <h3 class="exam-title">{{ practiceExam().title }}</h3>
+          <h4 class="exam-subtitle">{{ practiceExam().topic }}</h4>
+
+          <div class="exam-meta-row">
+            <span class="exam-meta-item">
+              <i class="bi bi-list-task"></i>
+              <span>{{ practiceExam().questionsCount }} Preguntas</span>
+            </span>
+            <span class="exam-meta-item">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dificultad: {{ practiceExam().difficulty }}</span>
+            </span>
+          </div>
+
+          <button type="button" class="btn-start-exam" (click)="onStartExam()">
+            Iniciar Examen
+          </button>
+        </div>
+
+        <!-- Tarjeta: Progreso Semanal -->
+        <div class="weekly-progress-card">
+          <h3 class="progress-card-title">Progreso Semanal</h3>
+          <div class="chart-mockup">
+            <div class="chart-y-axis">
+              <span>100%</span>
+              <span>50%</span>
+              <span>0%</span>
+            </div>
+            <div class="chart-bars-wrap">
+              @for (item of weeklyProgress(); track item.subject) {
+                <div class="bar-col">
+                  <div class="bar-track">
+                    <div class="bar-fill" [style.height.%]="item.percentage"></div>
+                  </div>
+                  <span class="bar-label">{{ item.subject }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección Inferior: Preguntas Recientes en Foros -->
+    <section class="forums-section">
+      <div class="section-title-row">
+        <h2 class="section-heading">Preguntas Recientes en Foros</h2>
+        <button type="button" class="btn-link-action" (click)="onViewAllForums()">
+          Ir a Foros
+        </button>
+      </div>
+
+      <div class="forum-questions-list">
+        @for (q of forumQuestions(); track q.id) {
+          <div class="forum-item-card">
+            <div class="forum-author-avatar">
+              @if (!isAvatarBroken(q.id)) {
+                <img
+                  [src]="q.avatar"
+                  [alt]="'Avatar de ' + q.authorName"
+                  width="42"
+                  height="42"
+                  (error)="onAvatarError(q.id)"
+                />
+              } @else {
+                <div
+                  class="avatar-fallback"
+                  [style.background-color]="q.avatarFallbackBg"
+                  [style.color]="q.avatarFallbackColor"
+                  aria-hidden="true"
+                >
+                  {{ q.initials }}
+                </div>
+              }
+            </div>
+
+            <div class="forum-content">
+              <h3 class="forum-title">{{ q.title }}</h3>
+              <div class="forum-meta-row">
+                <span class="forum-tag" [class]="q.tagClass">
+                  <i [class]="q.tagIcon"></i>
+                  <span>{{ q.tagText }}</span>
+                </span>
+                <span class="forum-bullet">•</span>
+                <span class="forum-time">{{ q.timeAgo }} en {{ q.subject }}</span>
+              </div>
+            </div>
+
+            <div class="forum-action">
+              <button type="button" class="btn-outline-pill" (click)="onViewThread(q)">
+                Ver hilo
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  </main>
+
+  <!-- ── 3. PANEL LATERAL DERECHO (ASISTENTE IA) ── -->
+  <aside class="ai-sidebar" aria-label="Asistente de aprendizaje inteligente">
+    <div class="ai-header">
+      <div class="ai-header-icon">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div class="ai-header-titles">
+        <h2 class="ai-main-title">Asistente de Aprendizaje IA</h2>
+        <span class="ai-subtitle">Tu tutor inteligente</span>
+      </div>
+    </div>
+
+    <!-- Historial de Chat con IA -->
+    <div class="ai-chat-body">
+      <div class="date-divider">
+        <span>HOY</span>
+      </div>
+
+      <div class="chat-thread">
+        @for (msg of chatMessages(); track msg.id) {
+          @if (msg.sender === 'user') {
+            <div class="chat-bubble-user">
+              <p class="bubble-text">{{ msg.text }}</p>
+            </div>
+          } @else {
+            <div class="chat-bubble-ai">
+              <div class="ai-avatar-tiny" aria-hidden="true">
+                <i class="bi bi-robot"></i>
+              </div>
+              <div class="ai-text-box">
+                <p class="bubble-text">{{ msg.text }}</p>
+              </div>
+            </div>
+          }
+        }
+
+        @if (isAiThinking()) {
+          <div class="ai-bubble-thinking">
+            <div class="dot-typing">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="thinking-label">El tutor IA está razonando...</span>
+          </div>
+        }
+      </div>
+
+      <div class="ai-disclaimer">
+        <span>Contenido generado por IA - Verifique información importante.</span>
+      </div>
+    </div>
+
+    <!-- Acciones Rápidas del Tutor IA -->
+    <div class="ai-quick-actions-box">
+      <h3 class="quick-actions-heading">Acciones Rápidas</h3>
+      <div class="quick-buttons-list">
+        @for (action of quickActions(); track action.id) {
+          <button type="button" class="btn-ai-action" (click)="onQuickAction(action)">
+            <i [class]="action.icon"></i>
+            <span>{{ action.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Barra Inferior de Entrada de Pregunta -->
+    <div class="ai-input-container">
+      <form class="ai-input-form" (submit)="submitAiMessage(); $event.preventDefault()">
+        <input
+          type="text"
+          class="ai-input-field"
+          placeholder="Escribe tu pregunta..."
+          [(ngModel)]="aiInputText"
+          name="aiInputText"
+          aria-label="Pregunta al tutor de IA"
+        />
+        <button
+          type="submit"
+          class="btn-send-ai"
+          [disabled]="!aiInputText() || isAiThinking()"
+          aria-label="Enviar mensaje a la IA"
+        >
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Toast flotante para feedback de acciones -->
+  @if (toastMessage()) {
+    <div class="student-toast anim-fade-in" role="status" aria-live="polite">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>{{ toastMessage() }}</span>
+    </div>
+  }
+</div>
