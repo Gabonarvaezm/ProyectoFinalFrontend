@@ -105,8 +105,14 @@
       </div>
     </header>
 
-    <!-- Saludo y Bienvenida -->
-    <section class="welcome-section">
+    @if (activeNav() === 'biblioteca') {
+      <app-biblioteca
+        [userRole]="'student'"
+        [initialCategory]="selectedSubjectCategory()"
+      ></app-biblioteca>
+    } @else {
+      <!-- Saludo y Bienvenida -->
+      <section class="welcome-section">
       <h1 class="welcome-title">¡Hola, {{ studentName() }}!</h1>
       <p class="welcome-subtitle">
         Tienes un <strong>85% de progreso</strong> en Biología esta semana. ¡Sigue así!
@@ -276,6 +282,7 @@
         }
       </div>
     </section>
+    }
   </main>
 
   <!-- ── 3. PANEL LATERAL DERECHO (ASISTENTE IA) ── -->

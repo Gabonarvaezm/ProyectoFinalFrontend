@@ -119,4 +119,28 @@ describe('Profesor Component', () => {
     expect(component.students().length).toBe(initialCount - 1);
     expect(component.actionNotification()).toContain('eliminado');
   });
+
+  it('debe registrar recomendación de libro en la clase', () => {
+    const mockBook = {
+      id: 'bk-test',
+      title: 'Biología General',
+      author: 'Autor Test',
+      category: 'ciencias' as const,
+      categoryLabel: 'Ciencias Naturales',
+      description: 'Desc',
+      coverImage: 'img.jpg',
+      pages: 100,
+      year: 2024,
+      format: 'PDF' as const,
+      rating: 5,
+      reviewsCount: 1,
+      readsCount: 10,
+      institution: 'Inst',
+      tags: ['bio'],
+      featured: false,
+    };
+
+    component.onBookRecommended(mockBook);
+    expect(component.actionNotification()).toContain('Biología General');
+  });
 });

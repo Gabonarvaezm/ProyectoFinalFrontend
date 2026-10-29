@@ -1,0 +1,378 @@
+<div class="biblioteca-container">
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 1. ENCABEZADO Y BUSCADOR PRINCIPAL DE LA BIBLIOTECA                    -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <header class="biblioteca-header">
+    <div class="header-titles">
+      <div class="header-badge">
+        <i class="bi bi-book-half" aria-hidden="true"></i>
+        <span>Repositorio Académico Abierto</span>
+      </div>
+      <h1 class="biblioteca-title">Biblioteca Digital Universitaria</h1>
+      <p class="biblioteca-subtitle">
+        Explora y consulta libremente material bibliográfico de alta calidad académica, 
+        diseñado para el fortalecimiento de la educación pública.
+      </p>
+    </div>
+
+    <!-- Barra de Búsqueda y Filtros Rápidos -->
+    <div class="search-filters-bar">
+      <div class="search-input-wrapper">
+        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+        <input
+          #libSearch
+          type="search"
+          class="search-field"
+          placeholder="Buscar por título, autor, asignatura o palabras clave..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set(libSearch.value)"
+          aria-label="Buscar libros en el repositorio"
+        />
+        @if (searchQuery()) {
+          <button
+            type="button"
+            class="btn-clear-search"
+            (click)="searchQuery.set('')"
+            aria-label="Limpiar búsqueda"
+          >
+            <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+          </button>
+        }
+      </div>
+
+      <!-- Filtro por formato -->
+      <div class="format-filter-group" role="group" aria-label="Filtrar por formato">
+        <button
+          type="button"
+          class="format-pill"
+          [class.active]="selectedFormat() === 'all'"
+          (click)="setFormat('all')"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          class="format-pill"
+          [class.active]="selectedFormat() === 'pdf'"
+          (click)="setFormat('pdf')"
+        >
+          <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+          PDF
+        </button>
+        <button
+          type="button"
+          class="format-pill"
+          [class.active]="selectedFormat() === 'epub'"
+          (click)="setFormat('epub')"
+        >
+          <i class="bi bi-journal-text" aria-hidden="true"></i>
+          EPUB
+        </button>
+        <button
+          type="button"
+          class="format-pill"
+          [class.active]="selectedFormat() === 'interactivo'"
+          (click)="setFormat('interactivo')"
+        >
+          <i class="bi bi-lightning-charge" aria-hidden="true"></i>
+          Interactivo
+        </button>
+      </div>
+    </div>
+
+    <!-- Categorías Temáticas (Chips) -->
+    <nav class="categories-nav" aria-label="Filtrar por área académica">
+      <ul class="categories-list">
+        @for (cat of categories(); track cat.id) {
+          <li class="category-item">
+            <button
+              type="button"
+              class="category-chip"
+              [class.active]="selectedCategory() === cat.id"
+              (click)="setCategory(cat.id)"
+              [attr.aria-pressed]="selectedCategory() === cat.id"
+            >
+              <i [class]="cat.icon" aria-hidden="true"></i>
+              <span>{{ cat.label }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 2. RESUMEN DE RESULTADOS Y METADATOS                                   -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="catalog-status-row">
+    <span class="results-count">
+      Mostrando <strong>{{ totalCount() }}</strong> recursos disponibles
+    </span>
+
+    @if (userRole() === 'professor') {
+      <div class="role-badge role-professor">
+        <i class="bi bi-person-badge" aria-hidden="true"></i>
+        <span>Modo Docente: Puedes recomendar libros a tus clases</span>
+      </div>
+    } @else {
+      <div class="role-badge role-student">
+        <i class="bi bi-mortarboard" aria-hidden="true"></i>
+        <span>Modo Estudiante: Acceso libre y descarga ilimitada</span>
+      </div>
+    }
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 3. CUADRÍCULA DE LIBROS Y RECURSOS                                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (filteredBooks().length > 0) {
+    <div class="books-grid">
+      @for (book of filteredBooks(); track book.id) {
+        <article
+          class="book-card"
+          (click)="openBookModal(book)"
+          (keydown.enter)="openBookModal(book)"
+          (keydown.space)="$event.preventDefault(); openBookModal(book)"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="book.title + ', autor ' + book.author"
+        >
+          <!-- Portada con Badges -->
+          <div class="book-cover-wrap">
+            <img
+              [src]="book.coverImage"
+              [alt]="'Portada del libro ' + book.title"
+              class="book-cover-img"
+              loading="lazy"
+            />
+            <div class="cover-gradient-overlay" aria-hidden="true"></div>
+
+            <span class="badge-format" [class]="'format-' + book.format.toLowerCase()">
+              {{ book.format }}
+            </span>
+
+            <button
+              type="button"
+              class="btn-bookmark"
+              [class.saved]="isBookmarked(book.id)"
+              (click)="toggleBookmark(book, $event)"
+              [attr.aria-label]="isBookmarked(book.id) ? 'Quitar de marcadores' : 'Guardar en marcadores'"
+            >
+              <i class="bi" [class.bi-bookmark-fill]="isBookmarked(book.id)" [class.bi-bookmark]="!isBookmarked(book.id)"></i>
+            </button>
+          </div>
+
+          <!-- Contenido del Libro -->
+          <div class="book-body">
+            <span class="book-category-tag">{{ book.categoryLabel }}</span>
+            <h3 class="book-title" [title]="book.title">{{ book.title }}</h3>
+            <p class="book-author">Por <strong>{{ book.author }}</strong></p>
+
+            <p class="book-description">
+              {{ book.description }}
+            </p>
+
+            <div class="book-meta-row">
+              <div class="rating-box" aria-label="Calificación promedio">
+                <i class="bi bi-star-fill star-icon" aria-hidden="true"></i>
+                <span class="rating-val">{{ book.rating }}</span>
+                <span class="reviews-count">({{ book.reviewsCount }})</span>
+              </div>
+
+              <span class="meta-separator">•</span>
+              <span class="meta-pages">{{ book.pages }} págs</span>
+
+              <span class="meta-separator">•</span>
+              <span class="meta-reads" title="Lecturas acumuladas">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+                {{ book.readsCount }}
+              </span>
+            </div>
+
+            <!-- Etiquetas / Tags -->
+            <div class="book-tags-list">
+              @for (tag of book.tags; track tag) {
+                <span class="book-tag">{{ tag }}</span>
+              }
+            </div>
+
+            <!-- Acciones según el rol -->
+            <div class="book-actions-row">
+              @if (userRole() === 'professor') {
+                <button
+                  type="button"
+                  class="btn-recommend"
+                  (click)="onRecommend(book, $event)"
+                  title="Recomendar lectura a la clase"
+                  aria-label="Recomendar libro a los alumnos"
+                >
+                  <i class="bi bi-send-check" aria-hidden="true"></i>
+                  <span>Recomendar</span>
+                </button>
+              }
+
+              <button
+                type="button"
+                class="btn-read-primary"
+                (click)="openBookModal(book); $event.stopPropagation()"
+                aria-label="Leer libro ahora"
+              >
+                <i class="bi bi-book-half" aria-hidden="true"></i>
+                <span>Leer ahora</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-icon-download"
+                (click)="onDownload(book, $event)"
+                [title]="'Descargar ' + book.format"
+                aria-label="Descargar archivo del libro"
+              >
+                <i class="bi bi-download" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <!-- Estado Vacío / Sin Resultados -->
+    <div class="empty-results-box" role="status">
+      <div class="empty-icon-circle">
+        <i class="bi bi-search" aria-hidden="true"></i>
+      </div>
+      <h3 class="empty-title">No encontramos resultados para tu búsqueda</h3>
+      <p class="empty-desc">
+        Intenta buscando con otros términos o seleccionando otra área temática.
+      </p>
+      <button type="button" class="btn-reset-filters" (click)="clearFilters()">
+        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+        <span>Restablecer Filtros</span>
+      </button>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 4. MODAL DETALLE / LECTOR DIGITAL ACCESIBLE                             -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (selectedBook(); as book) {
+    <div
+      class="book-modal-backdrop"
+      (click)="closeBookModal()"
+      (keydown.escape)="closeBookModal()"
+      role="presentation"
+    >
+      <div
+        class="book-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-labelledby]="'modal-book-title-' + book.id"
+        (click)="$event.stopPropagation()"
+        tabindex="-1"
+      >
+        <button
+          type="button"
+          class="btn-modal-close"
+          (click)="closeBookModal()"
+          aria-label="Cerrar ventana de detalles"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+
+        <div class="modal-book-grid">
+          <div class="modal-cover-side">
+            <img
+              [src]="book.coverImage"
+              [alt]="'Portada ampliada de ' + book.title"
+              class="modal-cover-image"
+            />
+            <div class="modal-meta-pills">
+              <span class="modal-pill format">{{ book.format }}</span>
+              <span class="modal-pill year">Año {{ book.year }}</span>
+              <span class="modal-pill pages">{{ book.pages }} Páginas</span>
+            </div>
+          </div>
+
+          <div class="modal-content-side">
+            <span class="modal-category">{{ book.categoryLabel }}</span>
+            <h2 [id]="'modal-book-title-' + book.id" class="modal-book-title">
+              {{ book.title }}
+            </h2>
+            <p class="modal-book-author">Por <strong>{{ book.author }}</strong></p>
+
+            <div class="modal-institution-tag">
+              <i class="bi bi-building" aria-hidden="true"></i>
+              <span>Avalado por: {{ book.institution }}</span>
+            </div>
+
+            <div class="modal-rating-row">
+              <div class="stars">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+              </div>
+              <strong class="score">{{ book.rating }} / 5.0</strong>
+              <span class="reviews">({{ book.reviewsCount }} valoraciones de la comunidad)</span>
+            </div>
+
+            <div class="modal-summary-box">
+              <h3 class="summary-heading">Sinopsis Académica</h3>
+              <p class="summary-text">{{ book.description }}</p>
+            </div>
+
+            <div class="modal-tags">
+              <h4 class="tags-heading">Temas Clave:</h4>
+              <div class="tags-wrap">
+                @for (tag of book.tags; track tag) {
+                  <span class="tag-pill">{{ tag }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="modal-actions-footer">
+              <button
+                type="button"
+                class="btn-start-read"
+                (click)="onStartReading(book)"
+              >
+                <i class="bi bi-book" aria-hidden="true"></i>
+                <span>Comenzar Lectura Online</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-download-modal"
+                (click)="onDownload(book, $event)"
+              >
+                <i class="bi bi-download" aria-hidden="true"></i>
+                <span>Descargar {{ book.format }}</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-save-modal"
+                [class.active]="isBookmarked(book.id)"
+                (click)="toggleBookmark(book, $event)"
+              >
+                <i class="bi" [class.bi-bookmark-fill]="isBookmarked(book.id)" [class.bi-bookmark]="!isBookmarked(book.id)"></i>
+                <span>{{ isBookmarked(book.id) ? 'Guardado' : 'Guardar' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 5. FEEDBACK TIPO TOAST ACCESIBLE                                       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (toastFeedback()) {
+    <div class="biblioteca-toast" role="status" aria-live="polite">
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      <span>{{ toastFeedback() }}</span>
+    </div>
+  }
+</div>

@@ -125,4 +125,21 @@ describe('Estudiante', () => {
     component.onAvatarError('q1');
     expect(component.isAvatarBroken('q1')).toBe(true);
   });
+
+  it('debe navegar al catálogo de biblioteca y pasar la categoría al seleccionar una materia', () => {
+    const matSubject = component.subjects()[0]; // id: 'mat', name: 'Matemáticas'
+    component.onSelectSubject(matSubject);
+
+    expect(component.activeNav()).toBe('biblioteca');
+    expect(component.selectedSubjectCategory()).toBe('matematicas');
+    expect(component.toastMessage()).toContain('Matemáticas');
+  });
+
+  it('debe limpiar la categoría seleccionada al pulsar Ver todo en la biblioteca', () => {
+    component.selectedSubjectCategory.set('ciencias');
+    component.onViewAllLibrary();
+
+    expect(component.activeNav()).toBe('biblioteca');
+    expect(component.selectedSubjectCategory()).toBeNull();
+  });
 });

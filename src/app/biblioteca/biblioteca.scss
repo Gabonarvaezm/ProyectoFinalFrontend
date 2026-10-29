@@ -1,0 +1,938 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Estilos del Componente Biblioteca Digital Académica
+// ─────────────────────────────────────────────────────────────────────────────
+
+$color-bg-body: #f8fafc;
+$color-bg-card: #ffffff;
+$color-blue-primary: #1d4ed8;
+$color-blue-hover: #1e40af;
+$color-blue-light: #2563eb;
+$color-blue-subtle: #eff6ff;
+$color-border: #e2e8f0;
+$color-text-main: #0f172a;
+$color-text-muted: #64748b;
+$color-text-light: #94a3b8;
+$color-green-badge: #16a34a;
+$color-amber-badge: #d97706;
+$color-purple-badge: #7c3aed;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.biblioteca-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding-bottom: 3rem;
+}
+
+// ============================================
+// 1. HEADER Y CONTROLES DE BÚSQUEDA
+// ============================================
+.biblioteca-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid $color-border;
+  border-radius: 20px;
+  padding: 2rem 2.25rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+.header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .header-badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: $color-blue-primary;
+    background-color: $color-blue-subtle;
+    border: 1px solid #bfdbfe;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .biblioteca-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: $color-text-main;
+    margin: 0;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  .biblioteca-subtitle {
+    font-size: 0.95rem;
+    color: $color-text-muted;
+    margin: 0;
+    max-width: 720px;
+    line-height: 1.5;
+  }
+}
+
+// Barra de búsqueda con filtros de formato
+.search-filters-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+
+  .search-input-wrapper {
+    flex: 1;
+    min-width: 280px;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .search-icon {
+      position: absolute;
+      left: 1.15rem;
+      color: $color-text-light;
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .search-field {
+      width: 100%;
+      background-color: #ffffff;
+      border: 1.5px solid $color-border;
+      border-radius: 12px;
+      padding: 0.75rem 2.85rem 0.75rem 2.85rem;
+      font-size: 0.925rem;
+      font-family: inherit;
+      color: $color-text-main;
+      outline: none;
+      transition: all 0.2s ease;
+
+      &::placeholder {
+        color: $color-text-light;
+      }
+
+      &:focus {
+        border-color: $color-blue-primary;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+    }
+
+    .btn-clear-search {
+      position: absolute;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: $color-text-light;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        color: $color-text-main;
+      }
+    }
+  }
+
+  .format-filter-group {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f1f5f9;
+    border-radius: 10px;
+    padding: 0.25rem;
+    gap: 0.25rem;
+
+    .format-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: none;
+      background: transparent;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: $color-text-muted;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(.active) {
+        color: $color-text-main;
+      }
+
+      &.active {
+        background-color: #ffffff;
+        color: $color-blue-primary;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+    }
+  }
+}
+
+// Categorías chips
+.categories-nav {
+  .categories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  }
+
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    padding: 0.55rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid $color-border;
+    background-color: #ffffff;
+    color: $color-text-muted;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    &:hover {
+      border-color: $color-blue-light;
+      color: $color-blue-primary;
+      background-color: $color-blue-subtle;
+    }
+
+    &.active {
+      background-color: $color-blue-primary;
+      color: #ffffff;
+      border-color: $color-blue-primary;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+
+      i {
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+// ============================================
+// 2. FILA DE ESTADO Y METADATOS
+// ============================================
+.catalog-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .results-count {
+    font-size: 0.925rem;
+    color: $color-text-muted;
+
+    strong {
+      color: $color-text-main;
+      font-weight: 700;
+    }
+  }
+
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+
+    &.role-professor {
+      background-color: #f5f3ff;
+      color: $color-purple-badge;
+      border: 1px solid #ddd6fe;
+    }
+
+    &.role-student {
+      background-color: #f0fdf4;
+      color: $color-green-badge;
+      border: 1px solid #bbf7d0;
+    }
+  }
+}
+
+// ============================================
+// 3. CUADRÍCULA DE TARJETAS DE LIBROS
+// ============================================
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.5rem;
+}
+
+.book-card {
+  background-color: #ffffff;
+  border: 1px solid $color-border;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  outline: none;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+    border-color: #bfdbfe;
+  }
+
+  .book-cover-wrap {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background-color: #0f172a;
+    overflow: hidden;
+
+    .book-cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .cover-gradient-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(15, 23, 42, 0.7) 100%);
+    }
+
+    .badge-format {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 0.725rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+      &.format-pdf {
+        background-color: #ef4444;
+        color: #ffffff;
+      }
+
+      &.format-epub {
+        background-color: #0284c7;
+        color: #ffffff;
+      }
+
+      &.format-interactivo {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #ffffff;
+      }
+    }
+
+    .btn-bookmark {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.9);
+      color: $color-text-muted;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+
+      &:hover {
+        background-color: #ffffff;
+        color: $color-blue-primary;
+        transform: scale(1.08);
+      }
+
+      &.saved {
+        background-color: #fef08a;
+        color: #ca8a04;
+      }
+    }
+  }
+
+  &:hover .book-cover-img {
+    transform: scale(1.05);
+  }
+
+  .book-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.65rem;
+
+    .book-category-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: $color-blue-primary;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .book-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: $color-text-main;
+      margin: 0;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-author {
+      font-size: 0.85rem;
+      color: $color-text-muted;
+      margin: 0;
+    }
+
+    .book-description {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin: 0;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: $color-text-light;
+      margin-top: auto;
+      padding-top: 0.5rem;
+      border-top: 1px dashed $color-border;
+
+      .rating-box {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #ca8a04;
+        font-weight: 700;
+
+        .reviews-count {
+          font-weight: 400;
+          color: $color-text-light;
+        }
+      }
+
+      .meta-reads {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+    }
+
+    .book-tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+
+      .book-tag {
+        font-size: 0.72rem;
+        background-color: #f1f5f9;
+        color: #475569;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+    }
+
+    .book-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+
+      .btn-read-primary {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        padding: 0.6rem 1rem;
+        background-color: $color-blue-primary;
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: $color-blue-hover;
+        }
+      }
+
+      .btn-recommend {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.6rem 0.85rem;
+        background-color: #f5f3ff;
+        color: $color-purple-badge;
+        border: 1px solid #ddd6fe;
+        border-radius: 10px;
+        font-size: 0.825rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: #ede9fe;
+          color: #6d28d9;
+        }
+      }
+
+      .btn-icon-download {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid $color-border;
+        background-color: #ffffff;
+        color: $color-text-muted;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: #f8fafc;
+          color: $color-blue-primary;
+          border-color: #bfdbfe;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// 4. ESTADO VACÍO (SIN RESULTADOS)
+// ============================================
+.empty-results-box {
+  background-color: #ffffff;
+  border: 1.5px dashed $color-border;
+  border-radius: 20px;
+  padding: 4rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  .empty-icon-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: $color-blue-subtle;
+    color: $color-blue-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+  }
+
+  .empty-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-text-main;
+    margin: 0;
+  }
+
+  .empty-desc {
+    font-size: 0.925rem;
+    color: $color-text-muted;
+    max-width: 440px;
+    margin: 0;
+  }
+
+  .btn-reset-filters {
+    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    background-color: $color-blue-primary;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: $color-blue-hover;
+    }
+  }
+}
+
+// ============================================
+// 5. MODAL DE DETALLE Y LECTURA
+// ============================================
+.book-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.book-modal-dialog {
+  background-color: #ffffff;
+  border-radius: 24px;
+  max-width: 820px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+
+  .btn-modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid $color-border;
+    background-color: #ffffff;
+    color: $color-text-muted;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    z-index: 10;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #f1f5f9;
+      color: $color-text-main;
+    }
+  }
+}
+
+.modal-book-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  padding: 2.25rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+
+  .modal-cover-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .modal-cover-image {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
+
+      @media (max-width: 768px) {
+        height: 240px;
+      }
+    }
+
+    .modal-meta-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+
+      .modal-pill {
+        display: block;
+        text-align: center;
+        padding: 0.45rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background-color: #f1f5f9;
+        color: #475569;
+
+        &.format {
+          background-color: $color-blue-subtle;
+          color: $color-blue-primary;
+        }
+      }
+    }
+  }
+
+  .modal-content-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+
+    .modal-category {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: $color-blue-primary;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .modal-book-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: $color-text-main;
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .modal-book-author {
+      font-size: 0.95rem;
+      color: $color-text-muted;
+      margin: 0;
+    }
+
+    .modal-institution-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.825rem;
+      color: #059669;
+      background-color: #ecfdf5;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-weight: 600;
+      align-self: flex-start;
+    }
+
+    .modal-rating-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+
+      .stars {
+        color: #ca8a04;
+      }
+
+      .score {
+        color: $color-text-main;
+      }
+
+      .reviews {
+        color: $color-text-light;
+      }
+    }
+
+    .modal-summary-box {
+      background-color: #f8fafc;
+      border: 1px solid $color-border;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+
+      .summary-heading {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: $color-text-main;
+        margin: 0 0 0.35rem;
+      }
+
+      .summary-text {
+        font-size: 0.875rem;
+        color: #475569;
+        margin: 0;
+        line-height: 1.55;
+      }
+    }
+
+    .modal-tags {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+
+      .tags-heading {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $color-text-muted;
+        margin: 0;
+      }
+
+      .tags-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+
+        .tag-pill {
+          font-size: 0.75rem;
+          background-color: #f1f5f9;
+          color: #334155;
+          padding: 0.2rem 0.6rem;
+          border-radius: 6px;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .modal-actions-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+
+      .btn-start-read {
+        flex: 1;
+        min-width: 180px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background-color: $color-blue-primary;
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: $color-blue-hover;
+        }
+      }
+
+      .btn-download-modal,
+      .btn-save-modal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        padding: 0.75rem 1.15rem;
+        border: 1.5px solid $color-border;
+        border-radius: 12px;
+        background-color: #ffffff;
+        color: $color-text-main;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: #f8fafc;
+          border-color: #bfdbfe;
+          color: $color-blue-primary;
+        }
+
+        &.active {
+          background-color: #fef9c3;
+          border-color: #fde047;
+          color: #a16207;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// 6. TOAST DE FEEDBACK
+// ============================================
+.biblioteca-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 0.85rem 1.35rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  z-index: 1100;
+  animation: slideUp 0.25s ease-out;
+
+  i {
+    color: #10b981;
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

@@ -90,8 +90,14 @@
 
     <!-- Contenido Scrollable / Dashboard Canvas -->
     <main class="dashboard-canvas">
-      <!-- Banner de Bienvenida -->
-      <section class="welcome-card" aria-label="Bienvenida al docente">
+      @if (activeNav() === 'biblioteca') {
+        <app-biblioteca
+          [userRole]="'professor'"
+          (bookRecommended)="onBookRecommended($event)"
+        ></app-biblioteca>
+      } @else {
+        <!-- Banner de Bienvenida -->
+        <section class="welcome-card" aria-label="Bienvenida al docente">
         <h1 class="welcome-title">¡Hola, Prof. García!</h1>
         <p class="welcome-subtitle">
           Tus alumnos han avanzado un <strong class="stat-highlight">12%</strong> más esta semana.
@@ -259,6 +265,7 @@
           </section>
         </div>
       </div>
+      }
     </main>
   </div>
 
