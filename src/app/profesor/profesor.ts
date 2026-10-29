@@ -17,9 +17,11 @@ import {
   StudentProgress,
   StudentStatus,
 } from './models/profesor.model';
+import { Biblioteca } from '../biblioteca/biblioteca';
+import { Book } from '../biblioteca/models/book.model';
 
 @Component({
-  imports: [RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [RouterLink, FormsModule, ReactiveFormsModule, Biblioteca],
   selector: 'app-profesor',
   styleUrl: './profesor.scss',
   templateUrl: './profesor.html',
@@ -143,6 +145,11 @@ export class Profesor {
     this.showToast('Generando análisis comparativo de la cohorte...');
   }
 
+  // ── Gestión de Recomendaciones de Biblioteca ─────────────────────────────
+  public onBookRecommended(book: Book): void {
+    this.showToast(`"${book.title}" ha sido añadido a las lecturas recomendadas para tu clase.`);
+  }
+
   // ── Gestión del Modal de Registro ────────────────────────────────────────
 
   public openRegisterModal(): void {
@@ -215,37 +222,31 @@ export class Profesor {
     this.isAiThinking.set(true);
 
     const timer = setTimeout(() => {
-      const currentStudents = this.students();
-      let responseText = 'He procesado tu consulta. Puedo preparar una rúbrica o resumen pedagógico.';
+      let replyText =
+        'He analizado los datos actuales del aula y puedo asistirte con las evaluaciones y seguimiento.';
 
-      const lowerPrompt = promptText.toLowerCase();
+      const lower = promptText.toLowerCase();
 
-      if (lowerPrompt.includes('struggling') || lowerPrompt.includes('atención') || lowerPrompt.includes('prioritaria')) {
-        const struggling = currentStudents.filter((s) => s.score < 50 || s.status === 'needs-attention');
+      if (lower.includes('promedio') || lower.includes('grading')) {
+        const avg = this.kpiMetrics().find((m) => m.id === 'avg-score')?.value ?? '78.5%';
+        replyText = `El promedio general de tu clase es ${avg}. El desempeño general muestra una tendencia positiva (+4.1%).`;
+      } else if (lower.includes('atención') || lower.includes('struggling') || lower.includes('prioritaria')) {
+        const struggling = this.students().filter((s) => s.score < 70);
         if (struggling.length > 0) {
           const names = struggling.map((s) => `${s.studentName} (${s.score}%)`).join(', ');
-          responseText = `Identifiqué ${struggling.length} estudiante(s) con necesidad de apoyo: ${names}. Sugiero asignarles lecturas de refuerzo.`;
+          replyText = `Los estudiantes que requieren seguimiento prioritario son: ${names}.`;
         } else {
-          responseText = `¡Excelente noticia! Ningún estudiante registrado se encuentra actualmente en estado crítico de rendimiento.`;
+          replyText = 'Actualmente todos los estudiantes tienen un rendimiento igual o superior a 70%.';
         }
-      } else if (lowerPrompt.includes('grading') || lowerPrompt.includes('promedio') || lowerPrompt.includes('evaluar')) {
-        if (currentStudents.length > 0) {
-          const avg = Math.round(
-            currentStudents.reduce((acc, s) => acc + s.score, 0) / currentStudents.length
-          );
-          responseText = `La cohorte cuenta con ${currentStudents.length} estudiantes registrados con un puntaje promedio del ${avg}%. La distribución de notas es consistente.`;
-        } else {
-          responseText = 'Aún no hay estudiantes registrados para calcular métricas de evaluación.';
-        }
-      } else if (lowerPrompt.includes('moderation') || lowerPrompt.includes('foro')) {
-        responseText =
-          'Hay 2 dudas abiertas en el foro de "Glucólisis". He redactado un borrador de explicación biológica paso a paso para tu validación.';
+      } else if (lower.includes('foro') || lower.includes('moderation')) {
+        replyText =
+          'Hay 2 preguntas sin resolver en el foro de Biología relacionadas con "Mitosis y Meiosis" y una consulta sobre "Integrales por partes".';
       }
 
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: 'ai',
-        text: responseText,
+        text: replyText,
         timestamp: new Date(),
       };
 

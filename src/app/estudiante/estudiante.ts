@@ -16,6 +16,7 @@ import {
   QuickAction,
   STORAGE_KEYS,
 } from '../core/models/auth.model';
+import { Biblioteca } from '../biblioteca/biblioteca';
 
 export type { ChatMessage, NavItem, QuickAction };
 
@@ -44,7 +45,7 @@ export interface ForumQuestion {
 }
 
 @Component({
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, Biblioteca],
   selector: 'app-estudiante',
   styleUrl: './estudiante.scss',
   templateUrl: './estudiante.html',
@@ -59,6 +60,7 @@ export class Estudiante {
 
   // ── Navegación Lateral ───────────────────────────────────────────────────
   public readonly activeNav = signal<string>('dashboard');
+  public readonly selectedSubjectCategory = signal<string | null>(null);
 
   public readonly navItems = signal<NavItem[]>([
     { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-grid-fill' },
@@ -273,6 +275,9 @@ export class Estudiante {
 
   public selectNav(id: string): void {
     this.activeNav.set(id);
+    if (id === 'biblioteca') {
+      this.selectedSubjectCategory.set(null);
+    }
     if (id === 'perfil') {
       this.showToast(`Perfil de ${this.studentName()} • ${this.studentInstitution()}`);
     } else {
@@ -301,10 +306,20 @@ export class Estudiante {
   }
 
   public onSelectSubject(subject: LibrarySubject): void {
+    const catMap: Record<string, string> = {
+      mat: 'matematicas',
+      cie: 'ciencias',
+      his: 'humanidades',
+      len: 'lenguaje',
+    };
+    const category = catMap[subject.id] || subject.name;
+    this.selectedSubjectCategory.set(category);
+    this.activeNav.set('biblioteca');
     this.showToast(`Abriendo biblioteca: ${subject.name} - ${subject.topic}`);
   }
 
   public onViewAllLibrary(): void {
+    this.selectedSubjectCategory.set(null);
     this.activeNav.set('biblioteca');
     this.showToast('Abriendo catálogo completo de la Biblioteca Digital');
   }

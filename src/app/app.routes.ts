@@ -23,6 +23,10 @@ export const routes: Routes = [
     loadComponent: () => import('./estudiante/estudiante').then((m) => m.Estudiante),
   },
   {
+    path: 'biblioteca',
+    loadComponent: () => import('./biblioteca/biblioteca').then((m) => m.Biblioteca),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
