@@ -90,8 +90,8 @@ export class Profesor {
   // ── Acciones Rápidas ─────────────────────────────────────────────────────
   public readonly quickActions = signal<QuickAction[]>([
     { id: 'register-student', label: 'Registrar Estudiante', icon: 'bi bi-person-plus-fill', primary: true },
-    { id: 'message-class', label: 'Message Class', icon: 'bi bi-chat-square-text' },
-    { id: 'create-exam', label: 'Create Exam', icon: 'bi bi-file-earmark-plus' },
+    { id: 'message-class', label: 'Enviar Mensaje a la Clase', icon: 'bi bi-chat-square-text' },
+    { id: 'create-exam', label: 'Crear Examen', icon: 'bi bi-file-earmark-plus' },
   ]);
 
   // ── Modal de Registro y Creación de Estudiante ───────────────────────────
@@ -110,19 +110,19 @@ export class Profesor {
   public readonly aiSuggestions = signal<AiSuggestion[]>([
     {
       id: 'grading',
-      label: 'Help with grading',
+      label: 'Ayuda con calificaciones',
       icon: 'bi bi-text-left',
       prompt: '¿Cuál es el promedio general y cómo evaluar la cohorte actual?',
     },
     {
       id: 'struggling',
-      label: 'Identify struggling students',
+      label: 'Identificar estudiantes con dificultades',
       icon: 'bi bi-search',
       prompt: '¿Cuáles estudiantes necesitan atención prioritaria según sus notas?',
     },
     {
       id: 'moderation',
-      label: 'Forum moderation',
+      label: 'Moderación de foros',
       icon: 'bi bi-chat-square-dots',
       prompt: 'Resume las preguntas sin responder en los foros de Biología.',
     },

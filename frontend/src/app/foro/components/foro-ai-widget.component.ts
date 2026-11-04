@@ -20,7 +20,7 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
         </div>
 
         <div class="ai-widget-content">
-          <span class="ai-kicker">SUGGESTIONS FOR ANSWERS</span>
+          <span class="ai-kicker">SUGERENCIAS DE RESPUESTAS</span>
           <div class="ai-suggestion-box">
             <p class="suggestion-text">
               {{ aiSuggestion().summary }}
@@ -31,7 +31,7 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
               (click)="onDraftClick()"
               aria-label="Insertar borrador de respuesta sugerido por IA"
             >
-              <span>Draft response</span>
+              <span>Insertar borrador</span>
               <i class="bi bi-arrow-right"></i>
             </button>
           </div>
@@ -42,7 +42,7 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
       <section class="widget-card related-topics-widget">
         <div class="widget-header">
           <i class="bi bi-chat-left-dots widget-icon"></i>
-          <h3 class="widget-title-sm">RELATED TOPICS</h3>
+          <h3 class="widget-title-sm">TEMAS RELACIONADOS</h3>
         </div>
 
         <ul class="related-list">
@@ -55,7 +55,7 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
               >
                 <span class="related-title">{{ topic.title }}</span>
                 <span class="related-meta">
-                  {{ topic.subject }} • {{ topic.activeThreads }} active threads
+                  {{ topic.subject }} • {{ topic.activeThreads }} hilos activos
                 </span>
               </button>
             </li>
@@ -67,7 +67,7 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
       <section class="widget-card etiquette-widget">
         <div class="widget-header">
           <i class="bi bi-info-circle widget-icon"></i>
-          <h3 class="widget-title-sm">FORUM ETIQUETTE</h3>
+          <h3 class="widget-title-sm">NORMAS DEL FORO</h3>
         </div>
 
         <ul class="etiquette-list">
@@ -83,62 +83,55 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
   `,
   styles: [`
     .widgets-column {
-      width: 360px;
-      min-width: 360px;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-
-      @media (max-width: 1280px) {
-        width: 100%;
-        min-width: 100%;
-      }
+      gap: 1.25rem;
     }
 
     .widget-card {
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 1.35rem;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
 
+    /* ── Tarjeta Asistente IA ── */
     .ai-assistant-widget {
-      border-color: rgba(99, 102, 241, 0.25);
-      background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%);
+      border-color: #c7d2fe;
+      background: linear-gradient(180deg, #f5f3ff 0%, #ffffff 40%);
     }
 
     .ai-header {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      margin-bottom: 1.15rem;
+      margin-bottom: 1rem;
     }
 
     .ai-badge-icon {
       width: 36px;
       height: 36px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.15rem;
-      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
     }
 
     .widget-title {
       font-size: 0.95rem;
       font-weight: 700;
-      color: #0f172a;
+      color: #1e1b4b;
       margin: 0;
       line-height: 1.2;
     }
 
     .widget-subtitle {
-      font-size: 0.75rem;
-      color: #4f46e5;
+      font-size: 0.725rem;
+      color: #6366f1;
       font-weight: 600;
     }
 
@@ -146,116 +139,115 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
       display: block;
       font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
-      color: #94a3b8;
-      text-transform: uppercase;
-      margin-bottom: 0.65rem;
+      letter-spacing: 0.05em;
+      color: #4f46e5;
+      margin-bottom: 0.5rem;
     }
 
     .ai-suggestion-box {
       background-color: #ffffff;
-      border: 1px solid rgba(99, 102, 241, 0.18);
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.05);
+      border: 1px solid #e0e7ff;
+      border-radius: 8px;
+      padding: 0.85rem;
+      box-shadow: 0 1px 2px rgba(79, 70, 229, 0.05);
 
       .suggestion-text {
-        font-size: 0.85rem;
+        font-size: 0.825rem;
+        line-height: 1.45;
         color: #334155;
-        line-height: 1.5;
-        margin: 0 0 0.85rem;
+        margin: 0 0 0.65rem;
       }
     }
 
     .ai-draft-link {
-      background: transparent;
-      border: none;
-      color: #1d4ed8;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #4f46e5;
+      background: transparent;
+      border: none;
       padding: 0;
-      transition: all 0.2s ease;
+      cursor: pointer;
+      transition: gap 0.2s ease, color 0.2s ease;
 
       &:hover {
-        color: #1e40af;
-        gap: 0.5rem;
+        color: #3730a3;
+        gap: 0.55rem;
+        text-decoration: underline;
       }
     }
 
+    /* ── Encabezado Estándar para Tarjetas 2 y 3 ── */
     .widget-header {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.85rem;
 
       .widget-icon {
-        color: #94a3b8;
-        font-size: 1rem;
+        font-size: 0.95rem;
+        color: #64748b;
+      }
+
+      .widget-title-sm {
+        font-size: 0.725rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin: 0;
       }
     }
 
-    .widget-title-sm {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      color: #94a3b8;
-      text-transform: uppercase;
-      margin: 0;
-    }
-
+    /* ── Tarjeta Temas Relacionados ── */
     .related-list {
       list-style: none;
       padding: 0;
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 0.4rem;
     }
 
     .related-item {
-      width: 100%;
-    }
+      .related-link-btn {
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+        padding: 0.5rem 0.6rem;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        transition: background-color 0.15s ease;
 
-    .related-link-btn {
-      width: 100%;
-      text-align: left;
-      background-color: #f1f5f9;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      padding: 0.75rem 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
+        &:hover {
+          background-color: #f8fafc;
 
-      &:hover {
-        background-color: #ffffff;
-        border-color: #e2e8f0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+          .related-title {
+            color: #2563eb;
+          }
+        }
 
         .related-title {
-          color: #1d4ed8;
+          font-size: 0.825rem;
+          font-weight: 600;
+          color: #1e293b;
+          line-height: 1.3;
+          transition: color 0.15s ease;
+        }
+
+        .related-meta {
+          font-size: 0.725rem;
+          color: #94a3b8;
         }
       }
     }
 
-    .related-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #0f172a;
-      transition: color 0.2s ease;
-    }
-
-    .related-meta {
-      font-size: 0.75rem;
-      color: #64748b;
-    }
-
+    /* ── Tarjeta Normas de Etiqueta ── */
     .etiquette-list {
       list-style: none;
       padding: 0;
@@ -286,9 +278,9 @@ export class ForoAiWidgetComponent {
   public readonly aiSuggestion = input.required<CommunityAiSuggestion>();
   public readonly relatedTopics = input<readonly RelatedTopic[]>([]);
   public readonly etiquetteRules = input<readonly string[]>([
-    'Always cite your sources when providing academic answers.',
-    'Check if a similar question has been asked before posting.',
-    'Be respectful and constructive in your critiques.',
+    'Cita siempre tus fuentes al proporcionar respuestas académicas.',
+    'Verifica si ya existe una pregunta similar antes de publicar.',
+    'Sé respetuoso y constructivo en tus comentarios.',
   ]);
 
   public readonly draftRequested = output<CommunityAiSuggestion>();
@@ -302,4 +294,3 @@ export class ForoAiWidgetComponent {
     this.topicSelected.emit(topic);
   }
 }
-

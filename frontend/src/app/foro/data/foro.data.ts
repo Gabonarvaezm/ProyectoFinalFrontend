@@ -8,7 +8,7 @@ export const INITIAL_AI_SUGGESTION: CommunityAiSuggestion = {
   postId: 'post-1',
   postTitle: '¿Cómo resuelvo integrales por partes?',
   summary:
-    'For the "Integrales por partes" question, consider recommending the LIATE rule (Logarithmic, Inverse trig, Algebraic, Trig, Exponential) as a mnemonic for choosing \'u\'.',
+    'Para la consulta sobre "Integrales por partes", considera recomendar la regla LIATE (Logarítmicas, Inversas trigonométricas, Algebraicas, Trigonométricas, Exponenciales) como mnemotecnia para elegir "u".',
   draftResponse:
     'Para resolver integrales por partes de forma sistemática utiliza la regla mnemotécnica LIATE:\n1. Logarítmicas (L)\n2. Inversas trigonométricas (I)\n3. Algebraicas (A)\n4. Trigonométricas (T)\n5. Exponenciales (E)\n\nElige como "u" la función que aparezca primero en esta lista y como "dv" el resto. Luego aplica la fórmula: ∫u dv = u*v - ∫v du.',
   referenceMnemonic: 'LIATE',
@@ -36,9 +36,9 @@ export const INITIAL_RELATED_TOPICS: readonly RelatedTopic[] = [
 ];
 
 export const FORUM_ETIQUETTE_RULES: readonly string[] = [
-  'Always cite your sources when providing academic answers.',
-  'Check if a similar question has been asked before posting.',
-  'Be respectful and constructive in your critiques.',
+  'Cita siempre tus fuentes al proporcionar respuestas académicas.',
+  'Verifica si ya existe una consulta similar antes de publicar.',
+  'Sé respetuoso y constructivo en tus comentarios.',
 ];
 
 export const INITIAL_FORUM_POSTS: readonly ForumPost[] = [
@@ -57,7 +57,7 @@ export const INITIAL_FORUM_POSTS: readonly ForumPost[] = [
       initials: 'AS',
     },
     subject: 'Matemáticas',
-    createdAt: '2 hours ago',
+    createdAt: 'Hace 2 horas',
     isTeacherVerified: true,
     isUnanswered: false,
     helpfulCount: 24,
@@ -82,7 +82,7 @@ export const INITIAL_FORUM_POSTS: readonly ForumPost[] = [
         },
         content:
           'Excelente consulta, Ana. La regla estándar en el análisis de cálculo es **LIATE** (Logarítmicas, Inversas trigonométricas, Algebraicas, Trigonométricas, Exponenciales). La que aparezca más arriba en el acrónimo debe ser seleccionada como "u", facilitando que al derivarla se simplifique la expresión restante.',
-        createdAt: '1 hour ago',
+        createdAt: 'Hace 1 hora',
         helpfulCount: 18,
         userHasVotedHelpful: false,
         isTeacherVerified: true,
@@ -106,7 +106,7 @@ export const INITIAL_FORUM_POSTS: readonly ForumPost[] = [
       initials: 'CM',
     },
     subject: 'Historia',
-    createdAt: '5 hours ago',
+    createdAt: 'Hace 5 horas',
     isTeacherVerified: false,
     isUnanswered: false,
     helpfulCount: 8,
@@ -129,7 +129,7 @@ export const INITIAL_FORUM_POSTS: readonly ForumPost[] = [
         },
         content:
           'El Concilio de Trento (Contrarreforma) fue el catalizador principal: la Iglesia Católica buscó emocionar e impresionar a los fieles mediante la teatralidad y el dinamismo lumínico frente a la sobriedad protestante.',
-        createdAt: '3 hours ago',
+        createdAt: 'Hace 3 horas',
         helpfulCount: 6,
         userHasVotedHelpful: false,
         isTeacherVerified: false,
@@ -151,7 +151,7 @@ export const INITIAL_FORUM_POSTS: readonly ForumPost[] = [
       initials: 'ER',
     },
     subject: 'Ciencias',
-    createdAt: '1 day ago',
+    createdAt: 'Hace 1 día',
     isTeacherVerified: false,
     isUnanswered: true,
     helpfulCount: 3,
@@ -163,4 +163,3 @@ export const INITIAL_FORUM_POSTS: readonly ForumPost[] = [
     replies: [],
   },
 ];
-

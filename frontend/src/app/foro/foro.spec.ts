@@ -20,7 +20,7 @@ describe('Foro Component (Parent Orchestrator & Child Nodes)', () => {
   it('should create the parent Foro component and initialize signals', () => {
     expect(component).toBeTruthy();
     expect(component.posts().length).toBeGreaterThan(0);
-    expect(component.selectedSubject()).toBe('All Subjects');
+    expect(component.selectedSubject()).toBe('Todas las Materias');
   });
 
   it('should update filteredPosts when filters node modifies subject or search query', () => {

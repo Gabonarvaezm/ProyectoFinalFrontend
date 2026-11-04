@@ -12,7 +12,7 @@ import { NavItem } from '../models/profesor.model';
       <div class="sidebar-header">
         <a routerLink="/" class="brand-link" title="Ir a la página principal">
           <span class="brand-title">DiscerIA</span>
-          <span class="brand-subtitle">Academic Research</span>
+          <span class="brand-subtitle">Investigación Académica</span>
         </a>
       </div>
 
@@ -43,7 +43,7 @@ import { NavItem } from '../models/profesor.model';
           aria-label="Iniciar nuevo análisis académico"
         >
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
-          <span>New Analysis</span>
+          <span>Nuevo Análisis</span>
         </button>
       </div>
     </aside>
@@ -162,4 +162,3 @@ export class ProfesorSidebarComponent {
     this.navSelected.emit(id);
   }
 }
-

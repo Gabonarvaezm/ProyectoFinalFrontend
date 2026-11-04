@@ -7,10 +7,10 @@ import { QuickAction, RecentActivity } from '../models/profesor.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="side-column">
-      <!-- Recent Activity -->
+      <!-- Actividad Reciente -->
       <section class="card-section activity-card" aria-labelledby="heading-recent-activity">
         <div class="card-header">
-          <h2 id="heading-recent-activity" class="card-title">Recent Activity</h2>
+          <h2 id="heading-recent-activity" class="card-title">Actividad Reciente</h2>
         </div>
 
         <ul class="activity-list">
@@ -28,9 +28,9 @@ import { QuickAction, RecentActivity } from '../models/profesor.model';
         </ul>
       </section>
 
-      <!-- Quick Actions -->
+      <!-- Acciones Rápidas -->
       <section class="card-section quick-actions-card" aria-label="Acciones rápidas">
-        <h3 class="quick-actions-title">QUICK ACTIONS</h3>
+        <h3 class="quick-actions-title">ACCIONES RÁPIDAS</h3>
         <div class="actions-stack">
           @for (action of quickActions(); track action.id) {
             <button
@@ -151,4 +151,3 @@ export class ProfesorActivityFeedComponent {
 
   public readonly quickActionTriggered = output<QuickAction>();
 }
-

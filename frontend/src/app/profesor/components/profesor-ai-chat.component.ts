@@ -15,14 +15,14 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
         </div>
         <div class="ai-title-wrapper">
           <h2 class="ai-title">Asistente del Profesor</h2>
-          <span class="ai-subtitle">AI Support</span>
+          <span class="ai-subtitle">Soporte con IA</span>
         </div>
       </div>
 
       <div class="ai-body">
         <!-- Tarjeta de Sugerencias Rápidas -->
         <div class="suggestions-card">
-          <h3 class="suggestions-prompt">How can I help you today?</h3>
+          <h3 class="suggestions-prompt">¿En qué puedo ayudarte hoy?</h3>
 
           <div class="suggestions-list">
             @for (sug of aiSuggestions(); track sug.id) {
@@ -67,7 +67,7 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
             #chatInput
             type="text"
             class="ai-input"
-            placeholder="Ask AI..."
+            placeholder="Pregunta a la IA..."
             [value]="inputText()"
             (input)="inputText.set(chatInput.value)"
             name="chatText"
@@ -298,4 +298,3 @@ export class ProfesorAiChatComponent {
     this.inputText.set('');
   }
 }
-

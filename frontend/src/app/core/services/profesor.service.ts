@@ -13,9 +13,6 @@ import {
   INITIAL_STUDENTS_SEED,
 } from '../../profesor/data/profesor.data';
 
-// Claves centralizadas en STORAGE_KEYS
-
-
 @Injectable({
   providedIn: 'root',
 })
@@ -42,21 +39,21 @@ export class ProfesorService {
   public readonly kpiMetrics = computed<KpiMetric[]>(() => [
     {
       id: 'total-students',
-      label: 'TOTAL STUDENTS',
+      label: 'TOTAL ESTUDIANTES',
       value: this.totalStudents(),
       icon: 'bi bi-people-fill',
       variant: 'blue',
     },
     {
       id: 'active-now',
-      label: 'ACTIVE NOW',
+      label: 'ACTIVOS AHORA',
       value: this.activeStudents(),
       icon: 'bi bi-broadcast',
       variant: 'purple',
     },
     {
       id: 'assignments',
-      label: 'ASSIGNMENTS',
+      label: 'EVALUACIONES',
       value: this._assignmentsCount(),
       icon: 'bi bi-file-earmark-text',
       variant: 'amber',
@@ -74,9 +71,9 @@ export class ProfesorService {
    */
   public registerStudent(dto: CreateStudentDto): StudentProgress {
     const statusLabels: Record<StudentStatus, string> = {
-      active: 'Active',
-      'needs-attention': 'Needs Attention',
-      completed: 'Completed',
+      active: 'Activo',
+      'needs-attention': 'Requiere Atención',
+      completed: 'Completado',
     };
 
     const newStudent: StudentProgress = {
@@ -86,7 +83,7 @@ export class ProfesorService {
       topic: dto.topic.trim(),
       score: Math.min(100, Math.max(0, dto.score)),
       status: dto.status,
-      statusLabel: statusLabels[dto.status] || 'Active',
+      statusLabel: statusLabels[dto.status] || 'Activo',
       registeredAt: new Date(),
     };
 
@@ -120,13 +117,13 @@ export class ProfesorService {
 
         if (clampedScore === 100) {
           newStatus = 'completed';
-          newLabel = 'Completed';
+          newLabel = 'Completado';
         } else if (clampedScore < 50) {
           newStatus = 'needs-attention';
-          newLabel = 'Needs Attention';
+          newLabel = 'Requiere Atención';
         } else {
           newStatus = 'active';
-          newLabel = 'Active';
+          newLabel = 'Activo';
         }
 
         return {
@@ -176,7 +173,7 @@ export class ProfesorService {
     const newAct: RecentActivity = {
       id: `act-${Date.now()}`,
       description,
-      timeAgo: 'Just now',
+      timeAgo: 'Hace un momento',
       icon,
       iconType,
     };
@@ -228,7 +225,7 @@ export class ProfesorService {
               topic: 'Biología: Mitosis',
               score: 80,
               status: 'active',
-              statusLabel: 'Active',
+              statusLabel: 'Activo',
             });
           }
         }

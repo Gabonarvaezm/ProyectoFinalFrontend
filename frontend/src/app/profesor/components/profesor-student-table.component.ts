@@ -9,7 +9,7 @@ import { StudentProgress } from '../models/profesor.model';
     <section class="card-section progress-card" aria-labelledby="heading-student-progress">
       <div class="card-header">
         <div class="card-title-group">
-          <h2 id="heading-student-progress" class="card-title">Student Progress</h2>
+          <h2 id="heading-student-progress" class="card-title">Progreso de Estudiantes</h2>
           <span class="students-count-badge">{{ totalCount() }} alumnos</span>
         </div>
         <div class="card-header-actions">
@@ -20,9 +20,9 @@ import { StudentProgress } from '../models/profesor.model';
             title="Registrar nuevo estudiante"
           >
             <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
-            <span>Registrar Alumno</span>
+            <span>Registrar Estudiante</span>
           </button>
-          <button type="button" class="btn-link-action">View All</button>
+          <button type="button" class="btn-link-action">Ver Todos</button>
         </div>
       </div>
 
@@ -30,10 +30,10 @@ import { StudentProgress } from '../models/profesor.model';
         <table class="progress-table">
           <thead>
             <tr>
-              <th scope="col">Student</th>
-              <th scope="col">Topic</th>
-              <th scope="col">Score</th>
-              <th scope="col">Status</th>
+              <th scope="col">Estudiante</th>
+              <th scope="col">Tema</th>
+              <th scope="col">Puntaje</th>
+              <th scope="col">Estado</th>
               <th scope="col" class="th-actions"><span class="sr-only">Acciones</span></th>
             </tr>
           </thead>
@@ -334,4 +334,3 @@ export class ProfesorStudentTableComponent {
     this.deleteStudent.emit(student);
   }
 }
-

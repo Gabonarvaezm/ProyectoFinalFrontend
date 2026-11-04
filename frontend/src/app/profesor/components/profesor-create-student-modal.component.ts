@@ -88,9 +88,9 @@ import { CreateStudentDto, StudentStatus } from '../models/profesor.model';
               <div class="form-group flex-1">
                 <label for="studentStatus" class="form-label">Estado Inicial *</label>
                 <select id="studentStatus" formControlName="status" class="form-control">
-                  <option value="active">Active (Activo)</option>
-                  <option value="needs-attention">Needs Attention (Atención)</option>
-                  <option value="completed">Completed (Completado)</option>
+                  <option value="active">Activo</option>
+                  <option value="needs-attention">Requiere Atención</option>
+                  <option value="completed">Completado</option>
                 </select>
               </div>
             </div>
@@ -387,4 +387,3 @@ export class ProfesorCreateStudentModalComponent {
     this.studentSubmitted.emit(dto);
   }
 }
-
