@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ProfesorService } from '../core/services/profesor.service';
 import {
   AiSuggestion,
@@ -27,6 +27,7 @@ import { Book } from '../biblioteca/models/book.model';
   templateUrl: './profesor.html',
 })
 export class Profesor {
+  private readonly router = inject(Router);
   private readonly profesorService = inject(ProfesorService);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
@@ -125,6 +126,7 @@ export class Profesor {
   // ── Métodos de Interacción del Dashboard ─────────────────────────────────
 
   public selectNav(navId: string): void {
+    if (navId === 'foros') { this.router.navigate(['/foro']); return; }
     this.activeNav.set(navId);
   }
 
