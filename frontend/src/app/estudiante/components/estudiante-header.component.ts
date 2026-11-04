@@ -46,16 +46,6 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
             <span class="user-name">{{ studentName() }}</span>
           </div>
         </div>
-
-        <button
-          type="button"
-          class="btn-icon-action btn-logout"
-          (click)="logoutClicked.emit()"
-          aria-label="Cerrar sesión"
-          title="Cerrar sesión"
-        >
-          <i class="bi bi-box-arrow-right"></i>
-        </button>
       </div>
     </header>
   `,
@@ -137,15 +127,6 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
         border-color: #cbd5e1;
       }
 
-      &.btn-logout {
-        color: #dc2626;
-        &:hover {
-          background-color: #fef2f2;
-          color: #b91c1c;
-          border-color: #fecaca;
-        }
-      }
-
       .notification-dot {
         position: absolute;
         top: 8px;
@@ -215,7 +196,6 @@ export class EstudianteHeaderComponent {
   public readonly searchChanged = output<string>();
   public readonly notificationsClicked = output<void>();
   public readonly profileClicked = output<void>();
-  public readonly logoutClicked = output<void>();
 
   public onSearch(val: string): void {
     this.searchQuery.set(val);

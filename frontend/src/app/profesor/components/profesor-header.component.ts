@@ -12,7 +12,7 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
           #searchInput
           type="search"
           class="search-input"
-          placeholder="Search students, exams..."
+          placeholder="Buscar estudiantes, exámenes..."
           [value]="searchQuery()"
           (input)="onSearchChange(searchInput.value)"
           aria-label="Buscar estudiantes o exámenes"
@@ -153,4 +153,3 @@ export class ProfesorHeaderComponent {
     this.searchQuery.set(val);
   }
 }
-

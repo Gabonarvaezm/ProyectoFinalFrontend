@@ -8,7 +8,7 @@ export const INITIAL_STUDENTS_SEED: readonly StudentProgress[] = [
     topic: 'Biología: Mitosis',
     score: 75,
     status: 'active',
-    statusLabel: 'Active',
+    statusLabel: 'Activo',
   },
   {
     id: 'std-2',
@@ -17,7 +17,7 @@ export const INITIAL_STUDENTS_SEED: readonly StudentProgress[] = [
     topic: 'Biología: Mitosis',
     score: 40,
     status: 'needs-attention',
-    statusLabel: 'Needs Attention',
+    statusLabel: 'Requiere Atención',
   },
   {
     id: 'std-3',
@@ -26,7 +26,7 @@ export const INITIAL_STUDENTS_SEED: readonly StudentProgress[] = [
     topic: 'Biología: Mitosis',
     score: 100,
     status: 'completed',
-    statusLabel: 'Completed',
+    statusLabel: 'Completado',
   },
 ];
 
@@ -34,16 +34,15 @@ export const INITIAL_ACTIVITIES_SEED: readonly RecentActivity[] = [
   {
     id: 'act-1',
     description: 'Juan terminó el examen de Mitosis.',
-    timeAgo: '10 mins ago',
+    timeAgo: 'Hace 10 min',
     icon: 'bi bi-check-circle',
     iconType: 'blue',
   },
   {
     id: 'act-2',
     description: 'Duda en el foro sobre Glucólisis.',
-    timeAgo: '1 hr ago',
+    timeAgo: 'Hace 1 hora',
     icon: 'bi bi-chat-square-text',
     iconType: 'purple',
   },
 ];
-

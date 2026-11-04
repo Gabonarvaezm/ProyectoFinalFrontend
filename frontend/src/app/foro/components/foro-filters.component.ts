@@ -12,7 +12,7 @@ import { ForoFilterPayload } from '../models/foro.model';
         <input
           type="text"
           class="topic-search-input"
-          placeholder="Search by topic..."
+          placeholder="Buscar por tema..."
           [value]="searchQuery()"
           (input)="onSearchInput($event)"
           aria-label="Filtrar por tema"
@@ -59,22 +59,22 @@ import { ForoFilterPayload } from '../models/foro.model';
 
     .topic-search-input {
       width: 100%;
-      padding: 0.6rem 1rem 0.6rem 2.4rem;
-      background-color: #ffffff;
+      padding: 0.65rem 1rem 0.65rem 2.4rem;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.875rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
       color: #0f172a;
+      background-color: #ffffff;
       outline: none;
       transition: all 0.2s ease;
 
-      &:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-      }
-
       &::placeholder {
         color: #94a3b8;
+      }
+
+      &:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
       }
     }
 
@@ -86,26 +86,28 @@ import { ForoFilterPayload } from '../models/foro.model';
     }
 
     .subject-pill {
-      padding: 0.55rem 1.1rem;
-      border-radius: 10px;
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
-      color: #334155;
+      border-radius: 9999px;
+      padding: 0.45rem 1rem;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 500;
+      color: #475569;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
 
       &:hover {
-        background-color: #f1f5f9;
+        background-color: #f8fafc;
         border-color: #cbd5e1;
+        color: #0f172a;
       }
 
       &.active {
-        background-color: #1d4ed8;
-        border-color: #1d4ed8;
+        background-color: #2563eb;
+        border-color: #2563eb;
         color: #ffffff;
-        box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
       }
     }
   `],
@@ -114,7 +116,7 @@ export class ForoFiltersComponent {
   public readonly selectedSubject = model.required<string>();
   public readonly searchQuery = model<string>('');
   public readonly subjects = input<string[]>([
-    'All Subjects',
+    'Todas las Materias',
     'Matemáticas',
     'Ciencias',
     'Historia',
@@ -135,4 +137,3 @@ export class ForoFiltersComponent {
     this.filterChanged.emit({ subject: this.selectedSubject(), query: target.value });
   }
 }
-

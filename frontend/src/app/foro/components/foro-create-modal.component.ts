@@ -410,7 +410,7 @@ export class ForoCreateModalComponent {
         const subj = this.defaultSubject();
         this.postForm.reset({
           title: '',
-          subject: subj !== 'All Subjects' ? subj : 'Matemáticas',
+          subject: subj !== 'Todas las Materias' ? subj : 'Matemáticas',
           content: '',
           academicReference: '',
         });

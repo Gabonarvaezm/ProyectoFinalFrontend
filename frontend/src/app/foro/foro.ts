@@ -65,9 +65,9 @@ export class Foro {
   // ── Estado Global del Foro (Gestión Central del Componente Padre) ───────
   public readonly currentRole = signal<UserRole>('student');
   public readonly searchQuery = signal<string>('');
-  public readonly selectedSubject = signal<string>('All Subjects');
+  public readonly selectedSubject = signal<string>('Todas las Materias');
   public readonly subjects = signal<string[]>([
-    'All Subjects',
+    'Todas las Materias',
     'Matemáticas',
     'Ciencias',
     'Historia',
@@ -124,7 +124,7 @@ export class Foro {
 
     return allPosts.filter((post) => {
       const matchesSubject =
-        currentSubject === 'All Subjects' || post.subject === currentSubject;
+        currentSubject === 'Todas las Materias' || post.subject === currentSubject;
 
       const matchesSearch =
         query === '' ||
@@ -145,7 +145,7 @@ export class Foro {
     this.currentRole.set(nextRole);
     this.showToast(
       nextRole === 'professor'
-        ? 'Cambiaste a Modo Docente (Puedes certificar respuestas con Teacher Verified)'
+        ? 'Cambiaste a Modo Docente (Puedes certificar respuestas con solución oficial docente)'
         : 'Cambiaste a Modo Estudiante'
     );
   }
@@ -216,7 +216,7 @@ export class Foro {
         initials: author.initials,
       },
       content: payload.content,
-      createdAt: 'Just now',
+      createdAt: 'Hace un momento',
       helpfulCount: 0,
       userHasVotedHelpful: false,
       isTeacherVerified: payload.isTeacherVerified,
@@ -290,7 +290,7 @@ export class Foro {
           avatar: author.avatar,
           initials: author.initials,
         },
-        createdAt: 'Just now',
+        createdAt: 'Hace un momento',
         isTeacherVerified: author.role === 'professor',
         isUnanswered: true,
         helpfulCount: 0,

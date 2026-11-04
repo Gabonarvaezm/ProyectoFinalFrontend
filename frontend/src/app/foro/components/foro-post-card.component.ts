@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   effect,
@@ -23,7 +23,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article class="post-card" [class.expanded]="isExpanded()">
-      <!-- Cabecera de la Publicación -->
+      <!-- Cabecera de la PublicaciÃ³n -->
       <div class="post-header">
         <div class="post-author-wrap">
           @if (post().author.avatar) {
@@ -39,7 +39,7 @@ import {
           }
           <div class="author-meta">
             <span class="author-name">{{ post().author.name }}</span>
-            <span class="meta-separator">•</span>
+            <span class="meta-separator">â€¢</span>
             <span class="post-time">{{ post().createdAt }}</span>
           </div>
         </div>
@@ -50,21 +50,21 @@ import {
           </span>
 
           @if (post().isTeacherVerified) {
-            <span class="badge-teacher-verified" title="Esta respuesta contiene verificación de un profesor">
+            <span class="badge-teacher-verified" title="Esta respuesta contiene verificaciÃ³n de un profesor">
               <i class="bi bi-patch-check-fill"></i>
-              <span>Teacher Verified</span>
+              <span>Verificado por Docente</span>
             </span>
           }
 
           @if (post().isUnanswered) {
-            <span class="badge-unanswered" title="Aún no cuenta con una solución validada">
-              Unanswered
+            <span class="badge-unanswered" title="AÃºn no cuenta con una soluciÃ³n validada">
+              Sin responder
             </span>
           }
         </div>
       </div>
 
-      <!-- Título y Contenido de la Duda -->
+      <!-- TÃ­tulo y Contenido de la Duda -->
       <div class="post-body">
         <h2 class="post-title">
           <button
@@ -88,10 +88,10 @@ import {
         }
       </div>
 
-      <!-- Barra Inferior de Métricas e Interacciones -->
+      <!-- Barra Inferior de MÃ©tricas e Interacciones -->
       <footer class="post-footer">
         <div class="footer-left">
-          <!-- Botón Respuestas -->
+          <!-- BotÃ³n Respuestas -->
           <button
             type="button"
             class="stat-action-btn"
@@ -104,39 +104,39 @@ import {
             <span>{{ post().repliesCount }} respuestas</span>
           </button>
 
-          <!-- Botón Helpful / Útil -->
+          <!-- BotÃ³n Helpful / Ãštil -->
           <button
             type="button"
             class="stat-action-btn"
             [class.active-helpful]="post().userHasVotedHelpful"
             (click)="onHelpfulClick()"
-            aria-label="Marcar como útil"
+            aria-label="Marcar como Ãºtil"
           >
             <i [class]="post().userHasVotedHelpful ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
-            <span>{{ post().helpfulCount }} helpful</span>
+            <span>{{ post().helpfulCount }} útil</span>
           </button>
         </div>
 
         <div class="footer-right">
-          <span class="views-stat" title="Número de lecturas">
+          <span class="views-stat" title="NÃºmero de lecturas">
             <i class="bi bi-eye"></i>
-            <span>{{ post().viewsCount }} views</span>
+            <span>{{ post().viewsCount }} vistas</span>
           </span>
         </div>
       </footer>
 
-      <!-- ── HILO EXPANDIDO DE RESPUESTAS & FORMULARIO REACTIVO ── -->
+      <!-- â”€â”€ HILO EXPANDIDO DE RESPUESTAS & FORMULARIO REACTIVO â”€â”€ -->
       @if (isExpanded()) {
         <div class="thread-expanded-container">
-          <!-- Lista de Respuestas Académicas Existentes -->
+          <!-- Lista de Respuestas AcadÃ©micas Existentes -->
           <div class="replies-section">
             <h3 class="replies-title">
-              Respuestas Académicas ({{ post().replies.length }})
+              Respuestas AcadÃ©micas ({{ post().replies.length }})
             </h3>
 
             @if (post().replies.length === 0) {
               <p class="no-replies-msg">
-                Aún no hay respuestas en esta discusión. Sé el primero en contribuir académicamente.
+                AÃºn no hay respuestas en esta discusiÃ³n. SÃ© el primero en contribuir acadÃ©micamente.
               </p>
             }
 
@@ -160,13 +160,13 @@ import {
                           <span class="docente-tag">Docente</span>
                         }
                       </div>
-                      <span class="reply-time">{{ reply.createdAt }} • {{ reply.author.institution }}</span>
+                      <span class="reply-time">{{ reply.createdAt }} â€¢ {{ reply.author.institution }}</span>
                     </div>
                   </div>
 
                   @if (reply.isTeacherVerified) {
                     <div class="verified-stamp">
-                      <i class="bi bi-patch-check-fill"></i> Solución Verificada
+                      <i class="bi bi-patch-check-fill"></i> SoluciÃ³n Verificada
                     </div>
                   }
                 </div>
@@ -189,14 +189,14 @@ import {
                     (click)="onReplyHelpfulClick(reply)"
                   >
                     <i [class]="reply.userHasVotedHelpful ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
-                    <span>{{ reply.helpfulCount }} útil</span>
+                    <span>{{ reply.helpfulCount }} Ãºtil</span>
                   </button>
                 </div>
               </div>
             }
           </div>
 
-          <!-- Formulario Reactivo para Responder a la Discusión -->
+          <!-- Formulario Reactivo para Responder a la DiscusiÃ³n -->
           <form
             [formGroup]="replyForm"
             (ngSubmit)="onReplySubmit()"
@@ -205,20 +205,20 @@ import {
           >
             <h4 class="reply-form-title">
               <i class="bi bi-pencil-square"></i>
-              <span>Agregar tu Aporte Académico</span>
+              <span>Agregar tu Aporte AcadÃ©mico</span>
             </h4>
 
             <!-- Campo Contenido de la Respuesta -->
             <div class="form-group">
               <label [for]="'reply-content-' + post().id" class="form-label">
-                Tu explicación o demostración
+                Tu explicaciÃ³n o demostraciÃ³n
               </label>
               <textarea
                 [id]="'reply-content-' + post().id"
                 formControlName="content"
                 class="form-textarea"
                 rows="4"
-                placeholder="Escribe una respuesta académica rigurosa, clara y justificada..."
+                placeholder="Escribe una respuesta acadÃ©mica rigurosa, clara y justificada..."
                 [class.is-invalid]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched"
                 [attr.aria-invalid]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched ? true : null"
                 [attr.aria-describedby]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched ? ('reply-content-error-' + post().id) : null"
@@ -232,21 +232,21 @@ import {
               }
             </div>
 
-            <!-- Campo Referencia Académica Opcional -->
+            <!-- Campo Referencia AcadÃ©mica Opcional -->
             <div class="form-group">
               <label [for]="'reply-reference-' + post().id" class="form-label">
-                Cita bibliográfica o fuente académica (Opcional recomendado)
+                Cita bibliogrÃ¡fica o fuente acadÃ©mica (Opcional recomendado)
               </label>
               <input
                 type="text"
                 [id]="'reply-reference-' + post().id"
                 formControlName="academicReference"
                 class="form-input"
-                placeholder="Ej. Stewart, J. Cálculo Trascendentes Tempranas, Cap. 7"
+                placeholder="Ej. Stewart, J. CÃ¡lculo Trascendentes Tempranas, Cap. 7"
               />
             </div>
 
-            <!-- Opción exclusiva para Docentes: Certificar Respuesta -->
+            <!-- OpciÃ³n exclusiva para Docentes: Certificar Respuesta -->
             @if (currentRole() === 'professor') {
               <div class="form-checkbox-group">
                 <label class="checkbox-label" [for]="'reply-verified-' + post().id">
@@ -257,14 +257,14 @@ import {
                     class="custom-checkbox"
                   />
                   <span class="checkbox-text">
-                    <strong>Certificar como Solución Oficial (Teacher Verified)</strong>
-                    <small>Otorga credencial de validación docente a esta solución</small>
+                    <strong>Certificar como Solución Oficial Docente</strong>
+                    <small>Otorga credencial de validaciÃ³n docente a esta soluciÃ³n</small>
                   </span>
                 </label>
               </div>
             }
 
-            <!-- Botón Enviar Respuesta -->
+            <!-- BotÃ³n Enviar Respuesta -->
             <div class="reply-form-actions">
               <button
                 type="submit"
@@ -374,7 +374,7 @@ import {
       background-color: #eff6ff;
       color: #1d4ed8;
 
-      &[data-subject="Matemáticas"] {
+      &[data-subject="MatemÃ¡ticas"] {
         background-color: #e0e7ff;
         color: #4338ca;
       }
@@ -390,7 +390,7 @@ import {
         background-color: #ffe4e6;
         color: #be123c;
       }
-      &[data-subject="Tecnología"] {
+      &[data-subject="TecnologÃ­a"] {
         background-color: #e0f2fe;
         color: #0369a1;
       }
@@ -915,7 +915,7 @@ export class ForoPostCardComponent {
       if (draft && this.isExpanded()) {
         this.replyForm.patchValue({
           content: draft,
-          academicReference: 'Recomendación Contextual DiscerIA AI',
+          academicReference: 'RecomendaciÃ³n Contextual DiscerIA AI',
         });
       }
     });
