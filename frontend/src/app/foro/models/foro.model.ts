@@ -55,3 +55,26 @@ export interface RelatedTopic {
   activeThreads: number;
 }
 
+export interface ForoFilterPayload {
+  readonly subject: string;
+  readonly query: string;
+}
+
+export interface CreatePostPayload {
+  readonly title: string;
+  readonly subject: string;
+  readonly content: string;
+  readonly academicReference?: string;
+}
+
+export interface CreateReplyPayload {
+  readonly postId: string;
+  readonly content: string;
+  readonly academicReference?: string;
+  readonly isTeacherVerified?: boolean;
+}
+
+export interface ReplyHelpfulVotePayload {
+  readonly postId: string;
+  readonly replyId: string;
+}

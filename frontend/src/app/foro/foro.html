@@ -1,6 +1,6 @@
 <div class="foro-layout">
   <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- 1. BARRA LATERAL IZQUIERDA (SIDEBAR)                                    -->
+  <!-- 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN INSTITUCIONAL)                  -->
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   <aside class="sidebar" aria-label="Navegación principal de DiscerIA">
     <div class="sidebar-top">
@@ -51,7 +51,7 @@
         </button>
       </div>
 
-      <!-- Botón de Acción Principal (+ New Analysis / Nueva Consulta) -->
+      <!-- Botón de Acción Principal (+ Nueva Consulta Académica) -->
       <button
         type="button"
         class="new-topic-btn"
@@ -65,57 +65,16 @@
   </aside>
 
   <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- 2. CONTENIDO PRINCIPAL (HEADER + FEED DEL FORO)                        -->
+  <!-- 2. CONTENIDO PRINCIPAL: ORQUESTACIÓN DE NODOS HIJOS                   -->
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   <div class="main-wrapper">
-    <!-- Header Superior -->
-    <header class="top-header">
-      <div class="header-search-wrap">
-        <i class="bi bi-search search-icon" aria-hidden="true"></i>
-        <input
-          type="search"
-          class="header-search-input"
-          placeholder="Search forums..."
-          [value]="searchQuery()"
-          (input)="onSearchInput($event)"
-          aria-label="Buscar en los foros académicos"
-        />
-      </div>
-
-      <div class="header-actions">
-        <button
-          type="button"
-          class="icon-btn"
-          aria-label="Notificaciones del foro"
-          title="2 respuestas nuevas en tus publicaciones"
-        >
-          <i class="bi bi-bell"></i>
-          <span class="notification-indicator"></span>
-          <span class="visually-hidden">Tienes notificaciones académicas nuevas</span>
-        </button>
-
-        <button
-          type="button"
-          class="icon-btn"
-          aria-label="Configuración de preferencias"
-          title="Configuración"
-        >
-          <i class="bi bi-gear"></i>
-        </button>
-
-        <div class="user-profile-badge" [title]="currentUser().name + ' (' + currentUser().roleTitle + ')'">
-          @if (currentUser().avatar) {
-            <img
-              [src]="currentUser().avatar"
-              [alt]="currentUser().name"
-              class="user-avatar"
-            />
-          } @else {
-            <div class="user-avatar-initials">{{ currentUser().initials }}</div>
-          }
-        </div>
-      </div>
-    </header>
+    <!-- NODO HIJO: Header Superior con Búsqueda y Notificaciones -->
+    <app-foro-header
+      [(searchQuery)]="searchQuery"
+      [currentUser]="currentUser()"
+      [currentRole]="currentRole()"
+      (roleToggled)="toggleRole()"
+    />
 
     <!-- Contenedor con Feed Central y Panel Lateral Derecho de Asistente -->
     <div class="content-columns">
@@ -128,36 +87,15 @@
           </p>
         </div>
 
-        <!-- Barra de Búsqueda Secundaria y Filtros por Materia -->
-        <section class="filters-section" aria-label="Filtros de temas académicos">
-          <div class="topic-search-wrap">
-            <i class="bi bi-search" aria-hidden="true"></i>
-            <input
-              type="text"
-              class="topic-search-input"
-              placeholder="Search by topic..."
-              [value]="searchQuery()"
-              (input)="onSearchInput($event)"
-              aria-label="Filtrar por tema"
-            />
-          </div>
+        <!-- NODO HIJO: Filtros de Búsqueda y Píldoras de Materias -->
+        <app-foro-filters
+          [(selectedSubject)]="selectedSubject"
+          [(searchQuery)]="searchQuery"
+          [subjects]="subjects()"
+          (filterChanged)="onFilterChanged($event)"
+        />
 
-          <div class="subject-pills-row" role="group" aria-label="Filtro de materias académicas">
-            @for (subj of subjects(); track subj) {
-              <button
-                type="button"
-                class="subject-pill"
-                [class.active]="selectedSubject() === subj"
-                (click)="onSelectSubject(subj)"
-                [attr.aria-pressed]="selectedSubject() === subj"
-              >
-                {{ subj }}
-              </button>
-            }
-          </div>
-        </section>
-
-        <!-- Lista de Publicaciones -->
+        <!-- Lista de Nodos Hijos: Publicaciones Académicas -->
         <section class="posts-list" aria-label="Lista de publicaciones académicas">
           @if (filteredPosts().length === 0) {
             <div class="empty-state-card">
@@ -171,489 +109,45 @@
           }
 
           @for (post of filteredPosts(); track post.id) {
-            <article class="post-card" [class.expanded]="activeExpandedPostId() === post.id">
-              <!-- Cabecera de la Publicación -->
-              <div class="post-header">
-                <div class="post-author-wrap">
-                  @if (post.author.avatar) {
-                    <img
-                      [src]="post.author.avatar"
-                      [alt]="post.author.name"
-                      class="author-avatar"
-                    />
-                  } @else {
-                    <div class="author-avatar-fallback">
-                      <i class="bi bi-person"></i>
-                    </div>
-                  }
-                  <div class="author-meta">
-                    <span class="author-name">{{ post.author.name }}</span>
-                    <span class="meta-separator">•</span>
-                    <span class="post-time">{{ post.createdAt }}</span>
-                  </div>
-                </div>
-
-                <div class="post-badges">
-                  <span class="subject-tag" [attr.data-subject]="post.subject">
-                    {{ post.subject }}
-                  </span>
-
-                  @if (post.isTeacherVerified) {
-                    <span class="badge-teacher-verified" title="Esta respuesta contiene verificación de un profesor">
-                      <i class="bi bi-patch-check-fill"></i>
-                      <span>Teacher Verified</span>
-                    </span>
-                  }
-
-                  @if (post.isUnanswered) {
-                    <span class="badge-unanswered" title="Aún no cuenta con una solución validada">
-                      Unanswered
-                    </span>
-                  }
-                </div>
-              </div>
-
-              <!-- Título y Contenido de la Duda -->
-              <div class="post-body">
-                <h2 class="post-title">
-                  <button
-                    type="button"
-                    class="post-title-btn"
-                    (click)="toggleExpandPost(post.id)"
-                    [attr.aria-expanded]="activeExpandedPostId() === post.id"
-                  >
-                    {{ post.title }}
-                  </button>
-                </h2>
-                <p class="post-excerpt">{{ post.content }}</p>
-
-                @if (post.academicReference) {
-                  <div class="academic-cite-box">
-                    <i class="bi bi-journal-bookmark-fill cite-icon"></i>
-                    <span class="cite-text">
-                      <strong>Referencia sugerida:</strong> {{ post.academicReference }}
-                    </span>
-                  </div>
-                }
-              </div>
-
-              <!-- Barra Inferior de Métricas e Interacciones -->
-              <footer class="post-footer">
-                <div class="footer-left">
-                  <!-- Botón Respuestas -->
-                  <button
-                    type="button"
-                    class="stat-action-btn"
-                    [class.active]="activeExpandedPostId() === post.id"
-                    (click)="toggleExpandPost(post.id)"
-                    aria-label="Ver respuestas del tema"
-                    [attr.aria-expanded]="activeExpandedPostId() === post.id"
-                  >
-                    <i class="bi bi-chat-left-text"></i>
-                    <span>{{ post.repliesCount }} respuestas</span>
-                  </button>
-
-                  <!-- Botón Helpful / Útil -->
-                  <button
-                    type="button"
-                    class="stat-action-btn"
-                    [class.active-helpful]="post.userHasVotedHelpful"
-                    (click)="toggleHelpful(post)"
-                    aria-label="Marcar como útil"
-                  >
-                    <i [class]="post.userHasVotedHelpful ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
-                    <span>{{ post.helpfulCount }} helpful</span>
-                  </button>
-                </div>
-
-                <div class="footer-right">
-                  <span class="views-stat" title="Número de lecturas">
-                    <i class="bi bi-eye"></i>
-                    <span>{{ post.viewsCount }} views</span>
-                  </span>
-                </div>
-              </footer>
-
-              <!-- ── HILO EXPANDIDO DE RESPUESTAS & FORMULARIO REACTIVO ── -->
-              @if (activeExpandedPostId() === post.id) {
-                <div class="thread-expanded-container">
-                  <!-- Lista de Respuestas Académicas Existentes -->
-                  <div class="replies-section">
-                    <h3 class="replies-title">
-                      Respuestas Académicas ({{ post.replies.length }})
-                    </h3>
-
-                    @if (post.replies.length === 0) {
-                      <p class="no-replies-msg">
-                        Aún no hay respuestas en esta discusión. Sé el primero en contribuir académicamente.
-                      </p>
-                    }
-
-                    @for (reply of post.replies; track reply.id) {
-                      <div class="reply-card" [class.reply-verified]="reply.isTeacherVerified">
-                        <div class="reply-header">
-                          <div class="reply-author-info">
-                            @if (reply.author.avatar) {
-                              <img
-                                [src]="reply.author.avatar"
-                                [alt]="reply.author.name"
-                                class="reply-avatar"
-                              />
-                            } @else {
-                              <div class="reply-avatar-initials">{{ reply.author.initials }}</div>
-                            }
-                            <div>
-                              <div class="reply-name-row">
-                                <span class="reply-author-name">{{ reply.author.name }}</span>
-                                @if (reply.author.role === 'professor') {
-                                  <span class="docente-tag">Docente</span>
-                                }
-                              </div>
-                              <span class="reply-time">{{ reply.createdAt }} • {{ reply.author.institution }}</span>
-                            </div>
-                          </div>
-
-                          @if (reply.isTeacherVerified) {
-                            <div class="verified-stamp">
-                              <i class="bi bi-patch-check-fill"></i> Solución Verificada
-                            </div>
-                          }
-                        </div>
-
-                        <div class="reply-body">
-                          <p>{{ reply.content }}</p>
-                          @if (reply.academicReference) {
-                            <div class="reply-reference">
-                              <i class="bi bi-quote"></i>
-                              <span>{{ reply.academicReference }}</span>
-                            </div>
-                          }
-                        </div>
-
-                        <div class="reply-footer">
-                          <button
-                            type="button"
-                            class="reply-helpful-btn"
-                            [class.active]="reply.userHasVotedHelpful"
-                            (click)="toggleReplyHelpful(reply)"
-                          >
-                            <i [class]="reply.userHasVotedHelpful ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
-                            <span>{{ reply.helpfulCount }} útil</span>
-                          </button>
-                        </div>
-                      </div>
-                    }
-                  </div>
-
-                  <!-- Formulario Reactivo para Responder a la Discusión -->
-                  <form
-                    [formGroup]="replyForm"
-                    (ngSubmit)="submitReply(post.id)"
-                    class="reply-form"
-                    novalidate
-                  >
-                    <h4 class="reply-form-title">
-                      <i class="bi bi-pencil-square"></i>
-                      <span>Agregar tu Aporte Académico</span>
-                    </h4>
-
-                    <!-- Campo Contenido de la Respuesta -->
-                    <div class="form-group">
-                      <label [for]="'reply-content-' + post.id" class="form-label">
-                        Tu explicación o demostración
-                      </label>
-                      <textarea
-                        [id]="'reply-content-' + post.id"
-                        formControlName="content"
-                        class="form-textarea"
-                        rows="4"
-                        placeholder="Escribe una respuesta académica rigurosa, clara y justificada..."
-                        [class.is-invalid]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched"
-                        [attr.aria-invalid]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched ? true : null"
-                        [attr.aria-describedby]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched ? ('reply-content-error-' + post.id) : null"
-                      ></textarea>
-
-                      @if (replyForm.get('content')?.invalid && replyForm.get('content')?.touched) {
-                        <p [id]="'reply-content-error-' + post.id" class="form-error-msg" role="alert">
-                          <i class="bi bi-exclamation-circle"></i>
-                          La respuesta debe tener al menos 10 caracteres.
-                        </p>
-                      }
-                    </div>
-
-                    <!-- Campo Referencia Académica Opcional -->
-                    <div class="form-group">
-                      <label [for]="'reply-reference-' + post.id" class="form-label">
-                        Cita bibliográfica o fuente académica (Opcional recomendado)
-                      </label>
-                      <input
-                        type="text"
-                        [id]="'reply-reference-' + post.id"
-                        formControlName="academicReference"
-                        class="form-input"
-                        placeholder="Ej. Stewart, J. Cálculo Trascendentes Tempranas, Cap. 7"
-                      />
-                    </div>
-
-                    <!-- Opción exclusiva para Docentes: Certificar Respuesta -->
-                    @if (currentRole() === 'professor') {
-                      <div class="form-checkbox-group">
-                        <label class="checkbox-label" [for]="'reply-verified-' + post.id">
-                          <input
-                            type="checkbox"
-                            [id]="'reply-verified-' + post.id"
-                            formControlName="markAsTeacherVerified"
-                            class="custom-checkbox"
-                          />
-                          <span class="checkbox-text">
-                            <strong>Certificar como Solución Oficial (Teacher Verified)</strong>
-                            <small>Otorga credencial de validación docente a esta solución</small>
-                          </span>
-                        </label>
-                      </div>
-                    }
-
-                    <!-- Botón Enviar Respuesta -->
-                    <div class="reply-form-actions">
-                      <button
-                        type="submit"
-                        class="btn-primary"
-                        [disabled]="replyForm.invalid || isSubmittingReply()"
-                      >
-                        @if (isSubmittingReply()) {
-                          <span class="spinner-sm"></span> Publicando...
-                        } @else {
-                          <i class="bi bi-send-fill"></i> Publicar Respuesta
-                        }
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              }
-            </article>
+            <app-foro-post-card
+              [post]="post"
+              [isExpanded]="activeExpandedPostId() === post.id"
+              [currentRole]="currentRole()"
+              [currentUser]="currentUser()"
+              [draftContent]="activeExpandedPostId() === post.id ? activeDraftContent() : ''"
+              (toggleExpand)="toggleExpandPost($event)"
+              (helpfulVote)="handleHelpfulVote($event)"
+              (replyHelpfulVote)="handleReplyHelpfulVote($event)"
+              (replySubmit)="handleReplySubmit($event)"
+            />
           }
         </section>
       </main>
 
-      <!-- ── COLUMNA DERECHA: WIDGETS Y ASISTENTE DISCERIA CONTEXT AI ── -->
-      <aside class="widgets-column" aria-label="Asistente inteligente y recursos del foro">
-        <!-- Tarjeta 1: Asistente de Comunidad - DiscerIA Context AI -->
-        <section class="widget-card ai-assistant-widget">
-          <div class="widget-header ai-header">
-            <div class="ai-badge-icon">
-              <i class="bi bi-robot"></i>
-            </div>
-            <div>
-              <h3 class="widget-title">Asistente de Comunidad</h3>
-              <span class="widget-subtitle">DiscerIA Context AI</span>
-            </div>
-          </div>
-
-          <div class="ai-widget-content">
-            <span class="ai-kicker">SUGGESTIONS FOR ANSWERS</span>
-            <div class="ai-suggestion-box">
-              <p class="suggestion-text">
-                {{ aiSuggestion().summary }}
-              </p>
-              <button
-                type="button"
-                class="ai-draft-link"
-                (click)="applyAiDraftResponse()"
-                aria-label="Insertar borrador de respuesta sugerido por IA"
-              >
-                <span>Draft response</span>
-                <i class="bi bi-arrow-right"></i>
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Tarjeta 2: Temas Relacionados (Related Topics) -->
-        <section class="widget-card related-topics-widget">
-          <div class="widget-header">
-            <i class="bi bi-chat-left-dots widget-icon"></i>
-            <h3 class="widget-title-sm">RELATED TOPICS</h3>
-          </div>
-
-          <ul class="related-list">
-            @for (topic of relatedTopics(); track topic.id) {
-              <li class="related-item">
-                <button
-                  type="button"
-                  class="related-link-btn"
-                  (click)="filterByRelatedTopic(topic)"
-                >
-                  <span class="related-title">{{ topic.title }}</span>
-                  <span class="related-meta">
-                    {{ topic.subject }} • {{ topic.activeThreads }} active threads
-                  </span>
-                </button>
-              </li>
-            }
-          </ul>
-        </section>
-
-        <!-- Tarjeta 3: Normas de Etiqueta del Foro (Forum Etiquette) -->
-        <section class="widget-card etiquette-widget">
-          <div class="widget-header">
-            <i class="bi bi-info-circle widget-icon"></i>
-            <h3 class="widget-title-sm">FORUM ETIQUETTE</h3>
-          </div>
-
-          <ul class="etiquette-list">
-            @for (rule of forumEtiquette; track rule) {
-              <li class="etiquette-item">
-                <i class="bi bi-check2-circle etiquette-check"></i>
-                <span>{{ rule }}</span>
-              </li>
-            }
-          </ul>
-        </section>
-      </aside>
+      <!-- NODO HIJO: Asistente IA, Temas Relacionados y Normas de Etiqueta -->
+      <app-foro-ai-widget
+        [aiSuggestion]="aiSuggestion()"
+        [relatedTopics]="relatedTopics()"
+        [etiquetteRules]="forumEtiquette"
+        (draftRequested)="handleAiDraftRequested($event)"
+        (topicSelected)="handleRelatedTopicSelected($event)"
+      />
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- 3. MODAL REACTIVO: NUEVA PUBLICACIÓN ACADÉMICA                          -->
+  <!-- 3. NODO HIJO: MODAL REACTIVO DE NUEVA PUBLICACIÓN                      -->
   <!-- ══════════════════════════════════════════════════════════════════════ -->
-  @if (isCreateModalOpen()) {
-    <div
-      class="modal-backdrop"
-      (click)="closeCreateModal()"
-      (keydown.escape)="closeCreateModal()"
-      tabindex="-1"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <div class="modal-dialog" (click)="$event.stopPropagation()">
-        <header class="modal-header">
-          <div class="modal-title-wrap">
-            <div class="modal-icon">
-              <i class="bi bi-pencil-square"></i>
-            </div>
-            <div>
-              <h2 id="modal-title" class="modal-title">Nueva Publicación Académica</h2>
-              <p class="modal-subtitle">
-                Comparte tu consulta para debate colaborativo con estudiantes y catedráticos.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            class="modal-close-btn"
-            (click)="closeCreateModal()"
-            aria-label="Cerrar ventana"
-          >
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </header>
-
-        <form [formGroup]="postForm" (ngSubmit)="submitNewPost()" novalidate class="modal-body">
-          <!-- Campo Título -->
-          <div class="form-group">
-            <label for="post-title" class="form-label">
-              Título o Pregunta de la Discusión <span class="required-star">*</span>
-            </label>
-            <input
-              type="text"
-              id="post-title"
-              formControlName="title"
-              class="form-input"
-              placeholder="Ej. ¿Cómo resuelvo integrales por partes?"
-              [class.is-invalid]="postForm.get('title')?.invalid && postForm.get('title')?.touched"
-              [attr.aria-invalid]="postForm.get('title')?.invalid && postForm.get('title')?.touched ? true : null"
-              [attr.aria-describedby]="postForm.get('title')?.invalid && postForm.get('title')?.touched ? 'post-title-error' : null"
-            />
-            @if (postForm.get('title')?.invalid && postForm.get('title')?.touched) {
-              <p id="post-title-error" class="form-error-msg" role="alert">
-                <i class="bi bi-exclamation-circle"></i>
-                El título debe tener entre 8 y 120 caracteres.
-              </p>
-            }
-          </div>
-
-          <!-- Campo Materia / Categoría -->
-          <div class="form-group">
-            <label for="post-subject" class="form-label">
-              Materia o Disciplina Académica <span class="required-star">*</span>
-            </label>
-            <select id="post-subject" formControlName="subject" class="form-select">
-              <option value="Matemáticas">Matemáticas</option>
-              <option value="Ciencias">Ciencias</option>
-              <option value="Historia">Historia</option>
-              <option value="Lenguaje">Lenguaje</option>
-              <option value="Tecnología">Tecnología</option>
-            </select>
-          </div>
-
-          <!-- Campo Contenido Detallado -->
-          <div class="form-group">
-            <label for="post-content" class="form-label">
-              Descripción detallada de la duda o problema <span class="required-star">*</span>
-            </label>
-            <textarea
-              id="post-content"
-              formControlName="content"
-              class="form-textarea"
-              rows="5"
-              placeholder="Explica qué has intentado, tus premisas o las dudas puntuales..."
-              [class.is-invalid]="postForm.get('content')?.invalid && postForm.get('content')?.touched"
-              [attr.aria-invalid]="postForm.get('content')?.invalid && postForm.get('content')?.touched ? true : null"
-              [attr.aria-describedby]="postForm.get('content')?.invalid && postForm.get('content')?.touched ? 'post-content-error' : null"
-            ></textarea>
-            @if (postForm.get('content')?.invalid && postForm.get('content')?.touched) {
-              <p id="post-content-error" class="form-error-msg" role="alert">
-                <i class="bi bi-exclamation-circle"></i>
-                La descripción debe tener al menos 20 caracteres para aportar contexto académico suficiente.
-              </p>
-            }
-          </div>
-
-          <!-- Campo Referencia Bibliográfica -->
-          <div class="form-group">
-            <label for="post-reference" class="form-label">
-              Referencia Bibliográfica / Texto de Consulta
-            </label>
-            <input
-              type="text"
-              id="post-reference"
-              formControlName="academicReference"
-              class="form-input"
-              placeholder="Ej. Stewart, J. (2016). Cálculo Trascendentes Tempranas."
-            />
-            <span class="form-hint">
-              Citar la bibliografía facilita a los profesores y compañeros validar la duda con precisión.
-            </span>
-          </div>
-
-          <footer class="modal-footer">
-            <button
-              type="button"
-              class="btn-secondary"
-              (click)="closeCreateModal()"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="btn-primary"
-              [disabled]="postForm.invalid || isSubmittingPost()"
-            >
-              @if (isSubmittingPost()) {
-                <span class="spinner-sm"></span> Publicando...
-              } @else {
-                <i class="bi bi-check-lg"></i> Publicar en el Foro
-              }
-            </button>
-          </footer>
-        </form>
-      </div>
-    </div>
-  }
+  <app-foro-create-modal
+    [isOpen]="isCreateModalOpen()"
+    [defaultSubject]="selectedSubject()"
+    [isSubmitting]="isSubmittingPost()"
+    (closeModal)="closeCreateModal()"
+    (postSubmitted)="handlePostSubmitted($event)"
+  />
 
   <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- 4. MENSAJE TOAST FLOTANTE DE RETROALIMENTACIÓN                          -->
+  <!-- 4. MENSAJE TOAST FLOTANTE DE RETROALIMENTACIÓN                         -->
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   @if (toastMessage()) {
     <div class="toast-notification" role="status" aria-live="polite">

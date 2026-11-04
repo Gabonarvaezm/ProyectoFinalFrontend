@@ -8,34 +8,50 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Book, BookCategory, CategoryFilter } from './models/book.model';
 import { CATEGORIES, INITIAL_BOOKS } from './data/books.data';
+import {
+  BibliotecaBookCardComponent,
+  BibliotecaCategoryNavComponent,
+  BibliotecaDetailModalComponent,
+  BibliotecaHeaderComponent,
+} from './components';
 
 @Component({
-  imports: [FormsModule],
+  imports: [
+    BibliotecaHeaderComponent,
+    BibliotecaCategoryNavComponent,
+    BibliotecaBookCardComponent,
+    BibliotecaDetailModalComponent,
+  ],
   selector: 'app-biblioteca',
   styleUrl: './biblioteca.scss',
   templateUrl: './biblioteca.html',
 })
+
 export class Biblioteca implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
-  // ── Inputs Modernos con Signals ──────────────────────────────────────────
+  // ── Inputs y Outputs Públicos del Módulo ──────────────────────────────────
   public readonly userRole = input<'student' | 'professor' | 'general'>('student');
   public readonly initialCategory = input<string | null>(null);
 
-  // ── Outputs Modernos con output() ─────────────────────────────────────────
   public readonly bookSelected = output<Book>();
   public readonly bookRecommended = output<Book>();
 
-  // ── Estado Reactivo de la Biblioteca (Signals) ───────────────────────────
+  // ── Estado Reactivo Central (Signals Gestionados por el Padre) ───────────
   public readonly searchQuery = signal<string>('');
   public readonly selectedCategory = signal<BookCategory>('all');
   public readonly selectedFormat = signal<string>('all');
   public readonly books = signal<Book[]>(INITIAL_BOOKS);
-  public readonly categories = signal<CategoryFilter[]>(CATEGORIES);
+  public readonly categories = computed<CategoryFilter[]>(() => {
+    const all = this.books();
+    return CATEGORIES.map((cat) => ({
+      ...cat,
+      count: cat.id === 'all' ? all.length : all.filter((b) => b.category === cat.id).length,
+    }));
+  });
 
   /** Libro seleccionado para modal de lectura / detalle */
   public readonly selectedBook = signal<Book | null>(null);
@@ -53,13 +69,9 @@ export class Biblioteca implements OnInit {
     const fmt = this.selectedFormat();
 
     return this.books().filter((book) => {
-      // Filtro por categoría
       const matchesCategory = cat === 'all' || book.category === cat;
-
-      // Filtro por formato
       const matchesFormat = fmt === 'all' || book.format.toLowerCase() === fmt.toLowerCase();
 
-      // Filtro por texto (título, autor, etiquetas, institución)
       const matchesQuery =
         !query ||
         book.title.toLowerCase().includes(query) ||
@@ -96,7 +108,7 @@ export class Biblioteca implements OnInit {
     }
   }
 
-  // ── Acciones de Filtrado y Búsqueda ──────────────────────────────────────
+  // ── Coordinación de Eventos y Comunicación entre Nodos Hijos ────────────
 
   public setCategory(catId: BookCategory): void {
     this.selectedCategory.set(catId);
@@ -106,13 +118,19 @@ export class Biblioteca implements OnInit {
     this.selectedFormat.set(format);
   }
 
+  public onCategorySelected(catId: BookCategory): void {
+    this.setCategory(catId);
+  }
+
+  public onFormatChanged(format: string): void {
+    this.setFormat(format);
+  }
+
   public clearFilters(): void {
     this.searchQuery.set('');
     this.selectedCategory.set('all');
     this.selectedFormat.set('all');
   }
-
-  // ── Interacciones con Libros ─────────────────────────────────────────────
 
   public openBookModal(book: Book): void {
     this.selectedBook.set(book);
@@ -123,8 +141,10 @@ export class Biblioteca implements OnInit {
     this.selectedBook.set(null);
   }
 
-  public toggleBookmark(book: Book, event: Event): void {
-    event.stopPropagation();
+  public toggleBookmark(book: Book, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
     const current = new Set(this.bookmarkedIds());
     const isSaved = current.has(book.id);
 
@@ -139,14 +159,18 @@ export class Biblioteca implements OnInit {
     this.bookmarkedIds.set(current);
   }
 
-  public onRecommend(book: Book, event: Event): void {
-    event.stopPropagation();
+  public onRecommend(book: Book, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.bookRecommended.emit(book);
     this.showToast(`"${book.title}" recomendado a los alumnos de tu cohorte.`);
   }
 
-  public onDownload(book: Book, event: Event): void {
-    event.stopPropagation();
+  public onDownload(book: Book, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.showToast(`Iniciando descarga en formato ${book.format}: ${book.title}`);
   }
 

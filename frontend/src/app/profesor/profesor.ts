@@ -2,26 +2,44 @@ import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { ProfesorService } from '../core/services/profesor.service';
 import {
   AiSuggestion,
   ChatMessage,
   CreateStudentDto,
+  KpiMetric,
   NavItem,
   QuickAction,
+  RecentActivity,
   StudentProgress,
   StudentStatus,
 } from './models/profesor.model';
 import { Biblioteca } from '../biblioteca/biblioteca';
 import { Book } from '../biblioteca/models/book.model';
+import {
+  ProfesorActivityFeedComponent,
+  ProfesorAiChatComponent,
+  ProfesorCreateStudentModalComponent,
+  ProfesorHeaderComponent,
+  ProfesorKpiCardsComponent,
+  ProfesorSidebarComponent,
+  ProfesorStudentTableComponent,
+} from './components';
 
 @Component({
-  imports: [RouterLink, FormsModule, ReactiveFormsModule, Biblioteca],
+  imports: [
+    Biblioteca,
+    ProfesorSidebarComponent,
+    ProfesorHeaderComponent,
+    ProfesorKpiCardsComponent,
+    ProfesorStudentTableComponent,
+    ProfesorActivityFeedComponent,
+    ProfesorAiChatComponent,
+    ProfesorCreateStudentModalComponent,
+  ],
   selector: 'app-profesor',
   styleUrl: './profesor.scss',
   templateUrl: './profesor.html',
@@ -55,7 +73,7 @@ export class Profesor {
   public readonly searchQuery = signal<string>('');
 
   /** Estudiantes filtrados en tiempo real por el buscador */
-  public readonly filteredStudents = computed(() => {
+  public readonly filteredStudents = computed<StudentProgress[]>(() => {
     const query = this.searchQuery().trim().toLowerCase();
     const all = this.students();
     if (!query) return all;
@@ -84,7 +102,7 @@ export class Profesor {
     studentName: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     topic: ['Biología: Mitosis', [Validators.required, Validators.minLength(3)]],
-    score: [70, [Validators.required, Validators.min(0), Validators.max(100)]],
+    score: [75, [Validators.required, Validators.min(0), Validators.max(100)]],
     status: ['active' as StudentStatus, [Validators.required]],
   });
 
@@ -126,13 +144,24 @@ export class Profesor {
   // ── Métodos de Interacción del Dashboard ─────────────────────────────────
 
   public selectNav(navId: string): void {
-    if (navId === 'foros') { this.router.navigate(['/foro']); return; }
+    if (navId === 'foros') {
+      this.router.navigate(['/foro']);
+      return;
+    }
     this.activeNav.set(navId);
   }
 
-  public onSearchChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchQuery.set(target.value);
+  public onSearchChange(eventOrValue: Event | string): void {
+    if (typeof eventOrValue === 'string') {
+      this.searchQuery.set(eventOrValue);
+    } else {
+      const target = eventOrValue.target as HTMLInputElement;
+      this.searchQuery.set(target.value);
+    }
+  }
+
+  public onNotificationsClick(): void {
+    this.showToast('Tienes 1 notificación académica pendiente.');
   }
 
   public triggerQuickAction(action: QuickAction): void {
@@ -169,32 +198,38 @@ export class Profesor {
     this.isRegisterModalOpen.set(false);
   }
 
-  public onRegisterStudentSubmit(): void {
-    if (this.studentForm.invalid) {
-      this.studentForm.markAllAsTouched();
-      this.showToast('Por favor completa todos los campos del estudiante.');
-      return;
+  public onRegisterStudentSubmit(dto?: CreateStudentDto): void {
+    let payload: CreateStudentDto;
+
+    if (dto) {
+      payload = dto;
+    } else {
+      if (this.studentForm.invalid) {
+        this.studentForm.markAllAsTouched();
+        this.showToast('Por favor completa todos los campos del estudiante.');
+        return;
+      }
+      const formValue = this.studentForm.value;
+      payload = {
+        studentName: formValue.studentName,
+        email: formValue.email,
+        topic: formValue.topic,
+        score: Number(formValue.score),
+        status: formValue.status,
+      };
     }
 
     this.isSubmittingStudent.set(true);
-    const formValue = this.studentForm.value;
-
-    const dto: CreateStudentDto = {
-      studentName: formValue.studentName,
-      email: formValue.email,
-      topic: formValue.topic,
-      score: Number(formValue.score),
-      status: formValue.status,
-    };
-
-    const newStudent = this.profesorService.registerStudent(dto);
+    const newStudent = this.profesorService.registerStudent(payload);
     this.isSubmittingStudent.set(false);
     this.closeRegisterModal();
     this.showToast(`¡Estudiante ${newStudent.studentName} registrado exitosamente!`);
   }
 
-  public onDeleteStudent(student: StudentProgress, event: Event): void {
-    event.stopPropagation();
+  public onDeleteStudent(student: StudentProgress, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.profesorService.deleteStudent(student.id);
     this.showToast(`Estudiante ${student.studentName} eliminado.`);
   }
@@ -211,6 +246,10 @@ export class Profesor {
     this.sendAiMessage(text);
   }
 
+  public onSendAiMessage(text: string): void {
+    this.sendAiMessage(text);
+  }
+
   private sendAiMessage(promptText: string): void {
     const userMsg: ChatMessage = {
       id: `usr-${Date.now()}`,
@@ -224,26 +263,7 @@ export class Profesor {
     this.isAiThinking.set(true);
 
     const timer = setTimeout(() => {
-      let replyText =
-        'He analizado los datos actuales del aula y puedo asistirte con las evaluaciones y seguimiento.';
-
-      const lower = promptText.toLowerCase();
-
-      if (lower.includes('promedio') || lower.includes('grading')) {
-        const avg = this.kpiMetrics().find((m) => m.id === 'avg-score')?.value ?? '78.5%';
-        replyText = `El promedio general de tu clase es ${avg}. El desempeño general muestra una tendencia positiva (+4.1%).`;
-      } else if (lower.includes('atención') || lower.includes('struggling') || lower.includes('prioritaria')) {
-        const struggling = this.students().filter((s) => s.score < 70);
-        if (struggling.length > 0) {
-          const names = struggling.map((s) => `${s.studentName} (${s.score}%)`).join(', ');
-          replyText = `Los estudiantes que requieren seguimiento prioritario son: ${names}.`;
-        } else {
-          replyText = 'Actualmente todos los estudiantes tienen un rendimiento igual o superior a 70%.';
-        }
-      } else if (lower.includes('foro') || lower.includes('moderation')) {
-        replyText =
-          'Hay 2 preguntas sin resolver en el foro de Biología relacionadas con "Mitosis y Meiosis" y una consulta sobre "Integrales por partes".';
-      }
+      const replyText = this.generateAiReply(promptText);
 
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
@@ -257,6 +277,35 @@ export class Profesor {
     }, 600);
 
     this.timerIds.push(timer);
+  }
+
+  private generateAiReply(promptText: string): string {
+    const lower = promptText.toLowerCase();
+
+    if (lower.includes('promedio') || lower.includes('grading')) {
+      return this.buildGradeAverageReply();
+    }
+    if (lower.includes('atención') || lower.includes('struggling') || lower.includes('prioritaria')) {
+      return this.buildStrugglingStudentsReply();
+    }
+    if (lower.includes('foro') || lower.includes('moderation')) {
+      return 'Hay 2 preguntas sin resolver en el foro de Biología relacionadas con "Mitosis y Meiosis" y una consulta sobre "Integrales por partes".';
+    }
+    return 'He analizado los datos actuales del aula y puedo asistirte con las evaluaciones y seguimiento.';
+  }
+
+  private buildGradeAverageReply(): string {
+    const avg = this.kpiMetrics().find((m) => m.id === 'avg-score')?.value ?? '78.5%';
+    return `El promedio general de tu clase es ${avg}. El desempeño general muestra una tendencia positiva (+4.1%).`;
+  }
+
+  private buildStrugglingStudentsReply(): string {
+    const struggling = this.students().filter((s) => s.score < 70);
+    if (struggling.length === 0) {
+      return 'Actualmente todos los estudiantes tienen un rendimiento igual o superior a 70%.';
+    }
+    const names = struggling.map((s) => `${s.studentName} (${s.score}%)`).join(', ');
+    return `Los estudiantes que requieren seguimiento prioritario son: ${names}.`;
   }
 
   private showToast(msg: string): void {

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Foro } from './foro';
 
-describe('Foro Component', () => {
+describe('Foro Component (Parent Orchestrator & Child Nodes)', () => {
   let component: Foro;
   let fixture: ComponentFixture<Foro>;
 
@@ -17,75 +17,77 @@ describe('Foro Component', () => {
     await fixture.whenStable();
   });
 
-  it('should create the Foro component successfully', () => {
+  it('should create the parent Foro component and initialize signals', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should initialize with default posts and filters', () => {
     expect(component.posts().length).toBeGreaterThan(0);
     expect(component.selectedSubject()).toBe('All Subjects');
-    expect(component.filteredPosts().length).toBe(component.posts().length);
   });
 
-  it('should filter posts by subject', () => {
-    component.onSelectSubject('Matemáticas');
-    const mathPosts = component.filteredPosts();
-    expect(mathPosts.every((p) => p.subject === 'Matemáticas')).toBe(true);
+  it('should update filteredPosts when filters node modifies subject or search query', () => {
+    component.onFilterChanged({ subject: 'Matemáticas', query: 'integrales' });
+    const filtered = component.filteredPosts();
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(filtered.every((p) => p.subject === 'Matemáticas')).toBe(true);
   });
 
-  it('should filter posts by search query', () => {
-    const inputEvent = { target: { value: 'integrales' } } as unknown as Event;
-    component.onSearchInput(inputEvent);
-    expect(component.filteredPosts().length).toBeGreaterThan(0);
-    expect(
-      component.filteredPosts()[0].title.toLowerCase().includes('integrales')
-    ).toBe(true);
-  });
-
-  it('should validate postForm requiring title and content min length', () => {
-    const form = component.postForm;
-    form.setValue({
-      title: '',
-      subject: 'Matemáticas',
-      content: '',
-      academicReference: '',
-    });
-    expect(form.valid).toBe(false);
-    expect(form.get('title')?.hasError('required')).toBe(true);
-    expect(form.get('content')?.hasError('required')).toBe(true);
-
-    form.patchValue({
-      title: 'Valid Academic Title Here',
-      content: 'This is a sufficiently long description that satisfies the minimum length requirement.',
-    });
-    expect(form.valid).toBe(true);
-  });
-
-  it('should toggle helpful votes on a post', () => {
+  it('should toggle helpful votes when post card node emits helpfulVote', () => {
     const post = component.posts()[0];
     const initialHelpful = post.helpfulCount;
 
-    component.toggleHelpful(post);
-    const updatedPost = component.posts().find((p) => p.id === post.id);
-    expect(updatedPost?.helpfulCount).toBe(initialHelpful + 1);
-    expect(updatedPost?.userHasVotedHelpful).toBe(true);
+    component.handleHelpfulVote(post);
+    const updated = component.posts().find((p) => p.id === post.id);
+    expect(updated?.helpfulCount).toBe(initialHelpful + 1);
+    expect(updated?.userHasVotedHelpful).toBe(true);
 
-    // Toggle back
-    component.toggleHelpful(updatedPost!);
-    const toggledBack = component.posts().find((p) => p.id === post.id);
-    expect(toggledBack?.helpfulCount).toBe(initialHelpful);
-    expect(toggledBack?.userHasVotedHelpful).toBe(false);
+    component.handleHelpfulVote(updated!);
+    const reverted = component.posts().find((p) => p.id === post.id);
+    expect(reverted?.helpfulCount).toBe(initialHelpful);
+    expect(reverted?.userHasVotedHelpful).toBe(false);
   });
 
-  it('should toggle user role between student and professor', () => {
+  it('should add a new reply when post card node emits replySubmit', () => {
+    const targetPost = component.posts()[0];
+    const initialReplies = targetPost.repliesCount;
+
+    component.handleReplySubmit({
+      postId: targetPost.id,
+      content: 'Respuesta académica de prueba verificada con rigor.',
+      academicReference: 'Bibliografía de prueba',
+      isTeacherVerified: false,
+    });
+
+    const updated = component.posts().find((p) => p.id === targetPost.id);
+    expect(updated?.repliesCount).toBe(initialReplies + 1);
+    expect(updated?.replies.some((r) => r.content.includes('rigor'))).toBe(true);
+  });
+
+  it('should coordinate node-to-node communication when AI widget requests draft response', () => {
+    const suggestion = component.aiSuggestion();
+    component.handleAiDraftRequested(suggestion);
+
+    expect(component.activeExpandedPostId()).toBe(suggestion.postId);
+    expect(component.activeDraftContent()).toBe(suggestion.draftResponse);
+  });
+
+  it('should add a new post when create modal node emits postSubmitted', async () => {
+    const initialCount = component.posts().length;
+    component.handlePostSubmitted({
+      title: 'Nueva Consulta sobre Álgebra Lineal',
+      subject: 'Matemáticas',
+      content: 'Descripción de prueba suficientemente larga para cumplir los criterios.',
+      academicReference: 'Strang, G. (2016). Linear Algebra.',
+    });
+
+    // Simulamos la respuesta asíncrona del modal
+    await new Promise((r) => setTimeout(r, 450));
+    expect(component.posts().length).toBe(initialCount + 1);
+    expect(component.posts()[0].title).toBe('Nueva Consulta sobre Álgebra Lineal');
+  });
+
+  it('should toggle user roles when header emits roleToggled', () => {
     expect(component.currentRole()).toBe('student');
     component.toggleRole();
     expect(component.currentRole()).toBe('professor');
     expect(component.currentUser().role).toBe('professor');
-  });
-
-  it('should prefill reply with AI draft response', () => {
-    component.applyAiDraftResponse();
-    expect(component.replyForm.get('content')?.value).toContain('LIATE');
   });
 });

@@ -1,109 +1,26 @@
 <div class="student-dashboard-layout">
-  <!-- ── 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN) ── -->
-  <aside class="sidebar" aria-label="Panel lateral de navegación">
-    <div class="sidebar-header">
-      <a routerLink="/" class="brand-link" aria-label="Ir a inicio de DiscerIA">
-        <div class="brand-logo-wrap">
-          <div class="brand-icon">
-            <i class="bi bi-mortarboard-fill"></i>
-          </div>
-          <div class="brand-text">
-            <span class="brand-name">DiscerIA</span>
-            <span class="brand-sub">Plataforma Educativa</span>
-          </div>
-        </div>
-      </a>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Navegación del estudiante">
-      <ul class="nav-list">
-        @for (item of navItems(); track item.id) {
-          <li class="nav-item">
-            <button
-              type="button"
-              class="nav-btn"
-              [class.active]="activeNav() === item.id"
-              (click)="selectNav(item.id)"
-            >
-              <i [class]="item.icon + ' nav-icon'"></i>
-              <span class="nav-label">{{ item.label }}</span>
-            </button>
-          </li>
-        }
-      </ul>
-    </nav>
-
-    <!-- Indicador inferior de Institución y Cierre de Sesión -->
-    <div class="sidebar-footer">
-      <div class="institution-badge" [title]="studentInstitution()">
-        <i class="bi bi-building"></i>
-        <span>{{ studentInstitution() }}</span>
-      </div>
-      <button
-        type="button"
-        class="nav-btn nav-btn-logout"
-        (click)="onLogout()"
-        aria-label="Cerrar sesión"
-      >
-        <i class="bi bi-box-arrow-right nav-icon"></i>
-        <span class="nav-label">Cerrar Sesión</span>
-      </button>
-    </div>
-  </aside>
+  <!-- ── 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN - NODO HIJO PRESENTACIONAL) ── -->
+  <app-estudiante-sidebar
+    [navItems]="navItems()"
+    [(activeNav)]="activeNav"
+    [institution]="studentInstitution()"
+    (navSelected)="selectNav($event)"
+    (logoutClicked)="onLogout()"
+  />
 
   <!-- ── 2. ÁREA CENTRAL DE CONTENIDO (DASHBOARD) ── -->
   <main class="main-content">
-    <!-- Header Superior con Buscador y Notificaciones -->
-    <header class="top-header">
-      <div class="search-bar-wrap">
-        <i class="bi bi-search search-icon" aria-hidden="true"></i>
-        <input
-          #searchInput
-          type="search"
-          class="search-input"
-          placeholder="Buscar en la biblioteca..."
-          [value]="searchQuery()"
-          (input)="searchQuery.set(searchInput.value)"
-          aria-label="Buscar recursos en la biblioteca"
-        />
-      </div>
-
-      <div class="header-user-actions">
-        <button type="button" class="btn-icon-badge" aria-label="Ver notificaciones">
-          <i class="bi bi-bell"></i>
-          @if (notificationsCount() > 0) {
-            <span class="notification-dot" aria-hidden="true"></span>
-          }
-        </button>
-
-        <div class="user-avatar-wrap" [title]="studentName() + ' (' + studentInstitution() + ')'">
-          @if (!isAvatarBroken('user-header')) {
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-              [alt]="'Foto de perfil de ' + studentName()"
-              class="user-avatar"
-              width="40"
-              height="40"
-              (error)="onAvatarError('user-header')"
-            />
-          } @else {
-            <div class="header-avatar-fallback" aria-hidden="true">
-              <span>{{ userInitials() }}</span>
-            </div>
-          }
-        </div>
-
-        <button
-          type="button"
-          class="btn-icon-badge btn-icon-logout"
-          (click)="onLogout()"
-          title="Cerrar sesión"
-          aria-label="Cerrar sesión"
-        >
-          <i class="bi bi-box-arrow-right"></i>
-        </button>
-      </div>
-    </header>
+    <!-- Header Superior con Buscador y Notificaciones (NODO HIJO PRESENTACIONAL) -->
+    <app-estudiante-header
+      [(searchQuery)]="searchQuery"
+      [studentName]="studentName()"
+      [userInitials]="userInitials()"
+      [notificationsCount]="notificationsCount()"
+      (searchChanged)="onSearchChange($event)"
+      (notificationsClicked)="onNotificationsClick()"
+      (profileClicked)="selectNav('perfil')"
+      (logoutClicked)="onLogout()"
+    />
 
     @if (activeNav() === 'biblioteca') {
       <app-biblioteca

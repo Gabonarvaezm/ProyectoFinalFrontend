@@ -25,11 +25,14 @@ export interface Book {
   institution: string;
   tags: string[];
   featured?: boolean;
+  coverTheme?: string;
+  subject?: string;
+  downloadsCount?: number;
 }
 
 export interface CategoryFilter {
   id: BookCategory;
   label: string;
   icon: string;
+  count?: number;
 }
-
