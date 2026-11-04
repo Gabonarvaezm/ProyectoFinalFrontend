@@ -11,6 +11,12 @@ import { Router, RouterLink } from '@angular/router';
 import { LottieComponent } from '../shared/components/lottie';
 import { fadeInOut, fadeInUp } from '../shared/animations';
 import { AuthService } from '../core/services/auth.service';
+import {
+  AUTH_MESSAGES,
+  AUTH_ROUTES,
+  AUTH_TIMERS,
+  VALIDATION_REGEX,
+} from '../core/constants/auth.constants';
 
 @Component({
   imports: [ReactiveFormsModule, RouterLink, LottieComponent],
@@ -41,14 +47,14 @@ export class Login {
       [
         Validators.required,
         Validators.email,
-        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+        Validators.pattern(VALIDATION_REGEX.EMAIL),
       ],
     ],
     password: [
       '',
       [
         Validators.required,
-        Validators.minLength(6),
+        Validators.minLength(AUTH_TIMERS.PASSWORD_MIN_LENGTH),
       ],
     ],
     rememberMe: [false],
@@ -88,17 +94,19 @@ export class Login {
 
     if (control.hasError('required')) {
       return fieldName === 'email'
-        ? 'El correo electrónico es requerido'
-        : 'La contraseña es requerida';
+        ? AUTH_MESSAGES.REQUIRED_EMAIL
+        : AUTH_MESSAGES.REQUIRED_PASSWORD;
     }
 
     if (control.hasError('email') || control.hasError('pattern')) {
-      return 'Ingresa un correo válido (ej: estudiante@universidad.edu)';
+      return AUTH_MESSAGES.INVALID_EMAIL_FORMAT;
     }
 
     if (control.hasError('minlength')) {
-      const minLength = control.getError('minlength')?.requiredLength ?? 6;
-      return `La contraseña debe contener al menos ${minLength} caracteres`;
+      const minLength =
+        control.getError('minlength')?.requiredLength ??
+        AUTH_TIMERS.PASSWORD_MIN_LENGTH;
+      return AUTH_MESSAGES.INVALID_PASSWORD_MIN_LENGTH(minLength);
     }
 
     return 'Dato inválido';
@@ -113,25 +121,18 @@ export class Login {
 
   /**
    * Procesamiento y validación del formulario de inicio de sesión.
-   * Usa AuthService para autenticar y redirige según el rol del usuario:
-   *  - Profesor → /profesor (dashboard del profesor)
-   *  - Estudiante → /estudiante (dashboard del estudiante)
-   *  - Otros roles → / (página principal)
    */
   public onSubmit(): void {
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
+    this.resetStateMessages();
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-      this.errorMessage.set('Por favor, completa correctamente los campos obligatorios.');
+      this.errorMessage.set(AUTH_MESSAGES.FORM_INCOMPLETE);
       return;
     }
 
     this.isLoading.set(true);
     const { email, password, rememberMe } = this.loginForm.value;
-
-    // Buscar rol registrado a través del servicio centralizado
     const registeredRole = this.authService.getRegisteredUserRole(email);
 
     this.authService
@@ -140,26 +141,18 @@ export class Login {
       .subscribe({
         next: (response) => {
           this.isLoading.set(false);
-
-          // Determinar la ruta de destino y mensaje de feedback según el rol
           const role = registeredRole ?? response.user.role;
-          const targetRoute =
-            role === 'professor' ? '/profesor' : role === 'student' ? '/estudiante' : '/';
-
-          const successText =
-            role === 'professor'
-              ? '¡Acceso concedido! Redirigiendo a tu panel docente...'
-              : '¡Acceso concedido! Redirigiendo a tu espacio de estudio...';
+          const targetRoute = this.resolveTargetRoute(role);
+          const successText = this.resolveSuccessMessage(role);
 
           this.successMessage.set(successText);
-
           this.redirectTimeoutId = setTimeout(() => {
             this.router.navigate([targetRoute]);
-          }, 1200);
+          }, AUTH_TIMERS.LOGIN_REDIRECT_DELAY_MS);
         },
         error: (err: Error) => {
           this.isLoading.set(false);
-          this.errorMessage.set(err.message || 'Credenciales no válidas o usuario no registrado.');
+          this.errorMessage.set(err.message || AUTH_MESSAGES.LOGIN_FAILED);
         },
       });
   }
@@ -171,10 +164,27 @@ export class Login {
     event.preventDefault();
     const emailValue = this.emailControl?.value;
     if (emailValue && !this.emailControl?.hasError('email')) {
-      this.successMessage.set(`Se ha enviado un enlace de recuperación a ${emailValue}`);
+      this.successMessage.set(AUTH_MESSAGES.PASSWORD_RESET_SENT(emailValue));
     } else {
-      this.errorMessage.set('Ingresa tu correo en el formulario para solicitar la recuperación.');
+      this.errorMessage.set(AUTH_MESSAGES.PASSWORD_RESET_PROMPT);
       this.emailControl?.markAsTouched();
     }
+  }
+
+  private resetStateMessages(): void {
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+  }
+
+  private resolveTargetRoute(role: string): string {
+    if (role === 'professor') return AUTH_ROUTES.PROFESSOR;
+    if (role === 'student') return AUTH_ROUTES.STUDENT;
+    return AUTH_ROUTES.HOME;
+  }
+
+  private resolveSuccessMessage(role: string): string {
+    if (role === 'professor') return AUTH_MESSAGES.LOGIN_SUCCESS_PROFESSOR;
+    if (role === 'student') return AUTH_MESSAGES.LOGIN_SUCCESS_STUDENT;
+    return AUTH_MESSAGES.LOGIN_SUCCESS_DEFAULT;
   }
 }

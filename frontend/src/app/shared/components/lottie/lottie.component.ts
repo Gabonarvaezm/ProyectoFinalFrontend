@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
   afterNextRender,
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -15,6 +16,8 @@ import { LOTTIE_PRESETS, LottiePreset } from './lottie-presets';
 
 @Component({
   selector: 'app-lottie',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
       #lottieContainer

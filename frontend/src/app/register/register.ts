@@ -21,14 +21,20 @@ import { Router, RouterLink } from '@angular/router';
 import { LottieComponent } from '../shared/components/lottie';
 import { fadeInOut, fadeInUp } from '../shared/animations';
 import { STORAGE_KEYS } from '../core/models/auth.model';
+import {
+  AUTH_ROUTES,
+  AUTH_TIMERS,
+  VALIDATION_REGEX,
+} from '../core/constants/auth.constants';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Constantes de validación
-// ─────────────────────────────────────────────────────────────────────────────
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const FULL_NAME_REGEX = /^[\p{L}\s]+$/u;
-/** Mínimo 8 caracteres, al menos una letra y un número */
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+const FIELD_REQUIRED_MESSAGES: Readonly<Record<string, string>> = {
+  fullName: 'El nombre completo es requerido',
+  email: 'El correo institucional es requerido',
+  institution: 'La universidad o institución es requerida',
+  password: 'La contraseña es requerida',
+  confirmPassword: 'Debes confirmar tu contraseña',
+  acceptTerms: 'Debes aceptar los términos y condiciones',
+};
 
 @Component({
   imports: [ReactiveFormsModule, RouterLink, LottieComponent],
@@ -84,7 +90,7 @@ export class Register {
         [
           Validators.required,
           Validators.minLength(3),
-          Validators.pattern(FULL_NAME_REGEX),
+          Validators.pattern(VALIDATION_REGEX.FULL_NAME),
         ],
       ],
       email: [
@@ -92,7 +98,7 @@ export class Register {
         [
           Validators.required,
           Validators.email,
-          Validators.pattern(EMAIL_REGEX),
+          Validators.pattern(VALIDATION_REGEX.EMAIL),
         ],
       ],
       institution: [
@@ -104,8 +110,8 @@ export class Register {
         '',
         [
           Validators.required,
-          Validators.minLength(8),
-          Validators.pattern(PASSWORD_REGEX),
+          Validators.minLength(AUTH_TIMERS.PASSWORD_STRONG_MIN_LENGTH),
+          Validators.pattern(VALIDATION_REGEX.PASSWORD_SECURE),
         ],
       ],
       confirmPassword: ['', [Validators.required]],
@@ -139,6 +145,7 @@ export class Register {
   constructor() {
     this.destroyRef.onDestroy(() => {
       this.timerIds.forEach((id) => clearTimeout(id));
+      this.timerIds = [];
     });
   }
 
@@ -183,22 +190,7 @@ export class Register {
     if (!control || !control.errors) return '';
 
     if (control.hasError('required') || control.hasError('requiredTrue')) {
-      switch (fieldName) {
-        case 'fullName':
-          return 'El nombre completo es requerido';
-        case 'email':
-          return 'El correo institucional es requerido';
-        case 'institution':
-          return 'La universidad o institución es requerida';
-        case 'password':
-          return 'La contraseña es requerida';
-        case 'confirmPassword':
-          return 'Debes confirmar tu contraseña';
-        case 'acceptTerms':
-          return 'Debes aceptar los términos y condiciones';
-        default:
-          return 'Campo obligatorio';
-      }
+      return FIELD_REQUIRED_MESSAGES[fieldName] ?? 'Campo obligatorio';
     }
 
     if (control.hasError('minlength')) {
@@ -245,8 +237,6 @@ export class Register {
 
   /**
    * Envío y procesamiento del registro reactivo.
-   * Persiste los datos del usuario registrado en localStorage
-   * y redirige al login para que inicie sesión.
    */
   public onSubmit(): void {
     this.errorMessage.set(null);
@@ -254,7 +244,9 @@ export class Register {
 
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
-      this.errorMessage.set('Por favor, completa correctamente todos los campos obligatorios.');
+      this.errorMessage.set(
+        'Por favor, completa correctamente todos los campos obligatorios.'
+      );
       return;
     }
 
@@ -266,7 +258,6 @@ export class Register {
       role: 'student' | 'professor' | 'admin';
     };
 
-    // Simulación de llamada al backend — listo para conectar con API real
     const submitTimer = setTimeout(() => {
       this.isLoading.set(false);
       this.successMessage.set(
@@ -276,13 +267,21 @@ export class Register {
       if (isPlatformBrowser(this.platformId)) {
         localStorage.setItem(
           STORAGE_KEYS.REGISTERED_USER,
-          JSON.stringify({ fullName, email: email.toLowerCase(), institution, role })
+          JSON.stringify({
+            fullName,
+            email: email.toLowerCase(),
+            institution,
+            role,
+          })
         );
       }
 
-      const navTimer = setTimeout(() => this.router.navigate(['/login']), 1500);
+      const navTimer = setTimeout(
+        () => this.router.navigate([AUTH_ROUTES.LOGIN]),
+        AUTH_TIMERS.REGISTER_REDIRECT_DELAY_MS
+      );
       this.timerIds.push(navTimer);
-    }, 1200);
+    }, AUTH_TIMERS.REGISTER_SIMULATION_MS);
 
     this.timerIds.push(submitTimer);
   }

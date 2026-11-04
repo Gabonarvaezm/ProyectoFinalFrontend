@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import {
   ChatMessage,
@@ -17,6 +17,15 @@ import {
   STORAGE_KEYS,
 } from '../core/models/auth.model';
 import { Biblioteca } from '../biblioteca/biblioteca';
+import {
+  EstudianteHeaderComponent,
+  EstudianteSidebarComponent,
+} from './components';
+import {
+  AI_DEFAULT_FALLBACK_REPLY,
+  AI_KNOWLEDGE_BASE,
+  SUBJECT_CATEGORY_MAP,
+} from './constants/estudiante.constants';
 
 export type { ChatMessage, NavItem, QuickAction };
 
@@ -45,7 +54,12 @@ export interface ForumQuestion {
 }
 
 @Component({
-  imports: [RouterLink, FormsModule, Biblioteca],
+  imports: [
+    FormsModule,
+    Biblioteca,
+    EstudianteHeaderComponent,
+    EstudianteSidebarComponent,
+  ],
   selector: 'app-estudiante',
   styleUrl: './estudiante.scss',
   templateUrl: './estudiante.html',
@@ -302,18 +316,20 @@ export class Estudiante {
     this.showToast(`Continuando: ${this.currentCourse().title}`);
   }
 
+  public onSearchChange(val: string): void {
+    this.searchQuery.set(val);
+  }
+
+  public onNotificationsClick(): void {
+    this.showToast('Tienes 2 tareas y foros pendientes de revisión.');
+  }
+
   public onStartExam(): void {
     this.showToast(`Iniciando ${this.practiceExam().title}: ${this.practiceExam().topic}`);
   }
 
   public onSelectSubject(subject: LibrarySubject): void {
-    const catMap: Record<string, string> = {
-      mat: 'matematicas',
-      cie: 'ciencias',
-      his: 'humanidades',
-      len: 'lenguaje',
-    };
-    const category = catMap[subject.id] || subject.name;
+    const category = SUBJECT_CATEGORY_MAP[subject.id] || subject.name;
     this.selectedSubjectCategory.set(category);
     this.activeNav.set('biblioteca');
     this.showToast(`Abriendo biblioteca: ${subject.name} - ${subject.topic}`);
@@ -326,8 +342,7 @@ export class Estudiante {
   }
 
   public onViewAllForums(): void {
-    this.router.navigate(['/foro']); return;
-    this.showToast('Accediendo a todos los foros de discusión');
+    this.router.navigate(['/foro']);
   }
 
   public onViewThread(question: ForumQuestion): void {
@@ -365,22 +380,11 @@ export class Estudiante {
     this.isAiThinking.set(true);
 
     const timer = setTimeout(() => {
-      let reply = 'He analizado tu consulta con base en la biblioteca académica de DiscerIA.';
       const lower = promptText.toLowerCase();
-
-      if (lower.includes('resumen') || lower.includes('biología') || lower.includes('mitosis')) {
-        reply =
-          'Resumen de Mitosis: Consta de 4 etapas clave (Profase, Metafase, Anafase y Telofase), asegurando que cada célula hija reciba una dotación cromosómica completa (2n). La Meiosis, en cambio, reduce los cromosomas a la mitad (n) para formar gametos.';
-      } else if (lower.includes('examen') || lower.includes('preguntas')) {
-        reply =
-          'Pregunta 1: ¿En qué fase de la mitosis se alinean los cromosomas en el ecuador celular?\nA) Anafase\nB) Metafase\nC) Telofase\nResponde para validar tu respuesta.';
-      } else if (lower.includes('profase') || lower.includes('diferencia')) {
-        reply =
-          'En la Profase la cromatina se condensa en cromosomas visibles y la membrana nuclear se desintegra. En la Metafase los cromosomas ya están alineados en la placa ecuatorial listos para separarse.';
-      } else if (lower.includes('integral') || lower.includes('partes') || lower.includes('matemática')) {
-        reply =
-          'La fórmula de integración por partes es: ∫ u dv = u·v - ∫ v du. Elige "u" usando el método ILATE (Inversas, Logarítmicas, Algebraicas, Trigonométricas, Exponenciales).';
-      }
+      const matched = AI_KNOWLEDGE_BASE.find((rule) =>
+        rule.keywords.some((kw) => lower.includes(kw))
+      );
+      const reply = matched?.response ?? AI_DEFAULT_FALLBACK_REPLY;
 
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
