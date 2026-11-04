@@ -274,6 +274,7 @@ export class Estudiante {
   // ── Métodos de Interacción ───────────────────────────────────────────────
 
   public selectNav(id: string): void {
+    if (id === 'foros') { this.router.navigate(['/foro']); return; }
     this.activeNav.set(id);
     if (id === 'biblioteca') {
       this.selectedSubjectCategory.set(null);
@@ -325,7 +326,7 @@ export class Estudiante {
   }
 
   public onViewAllForums(): void {
-    this.activeNav.set('foros');
+    this.router.navigate(['/foro']); return;
     this.showToast('Accediendo a todos los foros de discusión');
   }
 

@@ -27,6 +27,10 @@ export const routes: Routes = [
     loadComponent: () => import('./biblioteca/biblioteca').then((m) => m.Biblioteca),
   },
   {
+    path: 'foro',
+    loadComponent: () => import('./foro/foro').then((m) => m.Foro),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
