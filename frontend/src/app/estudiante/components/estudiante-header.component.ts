@@ -1,9 +1,7 @@
-import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 
 @Component({
   selector: 'app-estudiante-header',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="top-header">
       <div class="search-bar-wrap">
@@ -51,19 +49,24 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
   `,
   styles: [`
     .top-header {
-      background-color: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 1rem 2rem;
+      background-color: var(--color-bg-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0 var(--space-8);
+      height: var(--header-height, 70px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.5rem;
+      gap: var(--space-6);
       position: sticky;
       top: 0;
       z-index: 20;
 
       @media (max-width: 768px) {
-        padding: 0.85rem 1rem;
+        padding: 0 var(--space-4);
+        height: auto;
+        min-height: 60px;
+        flex-wrap: wrap;
+        gap: var(--space-3);
       }
     }
 
@@ -77,25 +80,34 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
+        color: var(--color-slate-400);
         pointer-events: none;
+        font-size: 0.95rem;
       }
 
       .search-input {
         width: 100%;
-        padding: 0.65rem 1rem 0.65rem 2.6rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 9999px;
-        background-color: #f8fafc;
-        font-size: 0.9rem;
-        color: #0f172a;
+        padding: 0.625rem 1rem 0.625rem 2.6rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-slate-50);
+        font-size: var(--font-size-sm);
+        color: var(--color-slate-900);
         outline: none;
-        transition: all 0.2s ease;
+        transition: var(--transition-fast);
+
+        &::placeholder {
+          color: var(--color-slate-400);
+        }
+
+        &:hover {
+          border-color: var(--color-slate-300);
+        }
 
         &:focus {
-          background-color: #ffffff;
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+          background-color: var(--color-bg-surface);
+          border-color: var(--color-primary-600);
+          box-shadow: var(--focus-ring);
         }
       }
     }
@@ -103,86 +115,92 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-3);
     }
 
     .btn-icon-action {
       position: relative;
       width: 40px;
       height: 40px;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      background-color: #f8fafc;
-      color: #64748b;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border-subtle);
+      background-color: transparent;
+      color: var(--color-slate-600);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-size: 1.15rem;
-      transition: all 0.2s ease;
+      transition: var(--transition-fast);
 
       &:hover {
-        background-color: #f1f5f9;
-        color: #0f172a;
-        border-color: #cbd5e1;
+        background-color: var(--color-slate-100);
+        color: var(--color-slate-900);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
       }
 
       .notification-dot {
         position: absolute;
         top: 8px;
-        right: 8px;
+        right: 9px;
         width: 8px;
         height: 8px;
-        background-color: #ef4444;
-        border-radius: 50%;
-        border: 2px solid #ffffff;
+        background-color: var(--color-danger);
+        border-radius: var(--radius-full);
+        border: 2px solid var(--color-white);
       }
     }
 
     .user-profile-badge {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 12px;
+      gap: var(--space-3);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-md);
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: var(--transition-fast);
 
       &:hover {
-        background-color: #f8fafc;
+        background-color: var(--color-slate-100);
       }
     }
 
     .user-avatar-initials {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1d4ed8, #2563eb);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 0.85rem;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--color-ai-gradient);
+      color: var(--color-white);
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-xs);
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: var(--shadow-sm);
     }
 
     .user-info-text {
       display: flex;
       flex-direction: column;
+      line-height: 1.2;
 
       @media (max-width: 640px) {
         display: none;
       }
 
       .user-greeting {
-        font-size: 0.725rem;
-        color: #94a3b8;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
       }
 
       .user-name {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #0f172a;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
       }
     }
   `],

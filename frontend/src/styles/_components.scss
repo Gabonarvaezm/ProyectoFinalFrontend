@@ -337,3 +337,226 @@
     color: #0369a1;
   }
 }
+
+
+// ── Layout Unificado para Portales y Dashboards ─────────────────────────────
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-bg-app);
+  color: var(--color-text-main);
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+}
+
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.dashboard-canvas {
+  flex: 1;
+  padding: var(--space-6) var(--space-8);
+  max-width: var(--max-content-width);
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  @media (max-width: 768px) {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+}
+
+// ── Banners de Bienvenida Unificados ─────────────────────────────────────────
+
+.welcome-banner {
+  background: linear-gradient(135deg, var(--color-white) 0%, var(--color-slate-50) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  box-shadow: var(--shadow-sm);
+
+  .welcome-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-slate-900);
+    letter-spacing: -0.025em;
+    margin-bottom: var(--space-1);
+    line-height: var(--line-height-tight);
+  }
+
+  .welcome-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+
+    strong, .stat-highlight {
+      color: var(--color-primary-700);
+      font-weight: var(--font-weight-bold);
+    }
+  }
+}
+
+// ── Barra de Progreso Unificada ──────────────────────────────────────────────
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-slate-100);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: var(--color-ai-gradient);
+    transition: width var(--duration-normal) var(--ease-out-expo);
+
+    &.fill-primary {
+      background: var(--color-primary-600);
+    }
+
+    &.fill-success {
+      background: var(--color-success);
+    }
+  }
+}
+
+// ── Avatares Unificados ──────────────────────────────────────────────────────
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  flex-shrink: 0;
+  user-select: none;
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  border: 2px solid var(--color-white);
+  box-shadow: var(--shadow-xs);
+
+  &.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-xs);
+  }
+
+  &.avatar-md {
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-sm);
+  }
+
+  &.avatar-lg {
+    width: 48px;
+    height: 48px;
+    font-size: var(--font-size-base);
+  }
+}
+
+// ── Modales de Diálogo Accesibles Unificados ─────────────────────────────────
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: fadeIn var(--duration-fast) var(--ease-out-expo);
+}
+
+.modal-dialog {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleUp var(--duration-fast) var(--ease-out-expo);
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+
+    .modal-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-slate-900);
+      margin: 0;
+    }
+  }
+
+  .modal-body {
+    padding: var(--space-6);
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-slate-50);
+  }
+}
+
+// ── Estados Vacíos (Empty States) ───────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  background-color: var(--color-bg-surface);
+  border: 2px dashed var(--color-slate-200);
+  border-radius: var(--radius-lg);
+
+  .empty-state-icon {
+    font-size: 2.5rem;
+    color: var(--color-slate-400);
+    margin-bottom: var(--space-3);
+  }
+
+  .empty-state-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-800);
+    margin-bottom: var(--space-1);
+  }
+
+  .empty-state-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    max-width: 380px;
+    margin: 0;
+  }
+}

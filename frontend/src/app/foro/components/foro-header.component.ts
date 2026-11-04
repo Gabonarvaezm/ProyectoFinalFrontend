@@ -1,10 +1,8 @@
-import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { ForumAuthor, UserRole } from '../models/foro.model';
 
 @Component({
   selector: 'app-foro-header',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="top-header">
       <div class="header-search-wrap">
@@ -12,7 +10,7 @@ import { ForumAuthor, UserRole } from '../models/foro.model';
         <input
           type="search"
           class="header-search-input"
-          placeholder="Search forums..."
+          placeholder="Buscar discusiones, dudas o publicaciones..."
           [value]="searchQuery()"
           (input)="onSearchInput($event)"
           aria-label="Buscar en los foros académicos"
@@ -61,21 +59,24 @@ import { ForumAuthor, UserRole } from '../models/foro.model';
   `,
   styles: [`
     .top-header {
-      height: 70px;
-      background-color: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
+      height: var(--header-height, 70px);
+      background-color: var(--color-bg-surface);
+      border-bottom: 1px solid var(--color-border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 2rem;
-      gap: 1.5rem;
+      padding: 0 var(--space-8);
+      gap: var(--space-6);
       position: sticky;
       top: 0;
-      z-index: 30;
+      z-index: 20;
 
       @media (max-width: 768px) {
-        padding: 0 1rem;
-        height: 60px;
+        padding: 0 var(--space-4);
+        height: auto;
+        min-height: 60px;
+        flex-wrap: wrap;
+        gap: var(--space-3);
       }
     }
 
@@ -89,69 +90,74 @@ import { ForumAuthor, UserRole } from '../models/foro.model';
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
+        color: var(--color-slate-400);
         pointer-events: none;
+        font-size: 0.95rem;
       }
     }
 
     .header-search-input {
       width: 100%;
-      padding: 0.65rem 1rem 0.65rem 2.6rem;
-      background-color: #f1f5f9;
-      border: 1px solid transparent;
-      border-radius: 9999px;
-      font-size: 0.9rem;
-      color: #0f172a;
+      padding: 0.625rem 1rem 0.625rem 2.6rem;
+      background-color: var(--color-slate-50);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-slate-900);
       outline: none;
-      transition: all 0.2s ease;
+      transition: var(--transition-fast);
 
       &:focus {
-        background-color: #ffffff;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        background-color: var(--color-bg-surface);
+        border-color: var(--color-primary-600);
+        box-shadow: var(--focus-ring);
       }
 
       &::placeholder {
-        color: #94a3b8;
+        color: var(--color-slate-400);
       }
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: var(--space-3);
     }
 
     .icon-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
       background-color: transparent;
-      border: 1px solid #e2e8f0;
-      color: #64748b;
+      border: 1px solid var(--color-border-subtle);
+      color: var(--color-slate-600);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       cursor: pointer;
       position: relative;
-      transition: all 0.2s ease;
+      transition: var(--transition-fast);
 
       &:hover {
-        background-color: #f1f5f9;
-        color: #0f172a;
-        border-color: #cbd5e1;
+        background-color: var(--color-slate-100);
+        color: var(--color-slate-900);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
       }
 
       .notification-indicator {
         position: absolute;
         top: 8px;
-        right: 8px;
+        right: 9px;
         width: 8px;
         height: 8px;
-        background-color: #ef4444;
-        border-radius: 50%;
-        border: 2px solid #ffffff;
+        background-color: var(--color-danger);
+        border-radius: var(--radius-full);
+        border: 2px solid var(--color-white);
       }
     }
 
@@ -162,25 +168,26 @@ import { ForumAuthor, UserRole } from '../models/foro.model';
     }
 
     .user-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
       object-fit: cover;
-      border: 2px solid #ffffff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      border: 2px solid var(--color-white);
+      box-shadow: var(--shadow-xs);
     }
 
     .user-avatar-initials {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1d4ed8, #4f46e5);
-      color: #ffffff;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--color-ai-gradient);
+      color: var(--color-white);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      font-size: 0.85rem;
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-xs);
+      box-shadow: var(--shadow-sm);
     }
 
     .visually-hidden {
@@ -208,4 +215,3 @@ export class ForoHeaderComponent {
     this.searchQuery.set(target.value);
   }
 }
-

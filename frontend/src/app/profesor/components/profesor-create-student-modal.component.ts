@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
   inject,
@@ -11,9 +10,7 @@ import { CreateStudentDto, StudentStatus } from '../models/profesor.model';
 
 @Component({
   selector: 'app-profesor-create-student-modal',
-  standalone: true,
   imports: [ReactiveFormsModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isOpen()) {
       <div
@@ -139,56 +136,59 @@ import { CreateStudentDto, StudentStatus } from '../models/profesor.model';
       inset: 0;
       background-color: rgba(15, 23, 42, 0.45);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      padding: 1rem;
-      animation: fadeIn 0.2s ease;
+      padding: var(--space-4);
+      animation: fadeIn var(--duration-fast) var(--ease-out-expo);
     }
 
     .modal-dialog {
-      background-color: #fff;
-      border-radius: 16px;
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
       max-width: 520px;
       width: 100%;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-xl);
       overflow: hidden;
-      animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: scaleUp var(--duration-fast) var(--ease-out-expo);
     }
 
     .modal-header {
       display: flex;
       align-items: flex-start;
-      gap: 1rem;
-      padding: 1.5rem 1.75rem 1rem;
-      border-bottom: 1px solid #f1f5f9;
+      gap: var(--space-4);
+      padding: var(--space-5) var(--space-6) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
 
       .modal-icon-badge {
         width: 42px;
         height: 42px;
-        background-color: #e0f2fe;
-        color: #0284c7;
-        border-radius: 12px;
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-700);
+        border: 1px solid var(--color-primary-200);
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.35rem;
+        font-size: 1.25rem;
       }
 
       .modal-title-wrapper {
         flex: 1;
 
         .modal-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #0f172a;
-          margin: 0 0 0.25rem;
+          font-size: var(--font-size-md);
+          font-weight: var(--font-weight-bold);
+          color: var(--color-slate-900);
+          margin: 0 0 0.15rem;
         }
 
         .modal-subtitle {
-          font-size: 0.85rem;
-          color: #64748b;
+          font-size: var(--font-size-xs);
+          color: var(--color-text-muted);
           margin: 0;
         }
       }
@@ -196,43 +196,48 @@ import { CreateStudentDto, StudentStatus } from '../models/profesor.model';
       .btn-close-modal {
         background: transparent;
         border: none;
-        color: #94a3b8;
+        color: var(--color-slate-400);
         font-size: 1.1rem;
         cursor: pointer;
-        padding: 0.4rem;
-        border-radius: 6px;
-        transition: all 0.15s ease;
+        padding: var(--space-1);
+        border-radius: var(--radius-sm);
+        transition: var(--transition-fast);
 
         &:hover {
-          color: #0f172a;
-          background-color: #f1f5f9;
+          color: var(--color-slate-900);
+          background-color: var(--color-slate-100);
         }
       }
     }
 
     .modal-form {
-      padding: 1.5rem 1.75rem;
+      padding: var(--space-5) var(--space-6);
       display: flex;
       flex-direction: column;
-      gap: 1.15rem;
+      gap: var(--space-4);
 
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: var(--space-1);
 
         &.flex-1 { flex: 1; }
       }
 
       .form-row {
         display: flex;
-        gap: 1rem;
+        gap: var(--space-4);
+
+        @media (max-width: 480px) {
+          flex-direction: column;
+          gap: var(--space-3);
+        }
       }
 
       .form-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #334155;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-slate-700);
       }
 
       .label-row {
@@ -242,33 +247,33 @@ import { CreateStudentDto, StudentStatus } from '../models/profesor.model';
       }
 
       .score-display-pill {
-        background-color: #eff6ff;
-        color: #1d4ed8;
-        font-weight: 700;
-        font-size: 0.8rem;
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-700);
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-xs);
         padding: 0.15rem 0.55rem;
-        border-radius: 9999px;
+        border-radius: var(--radius-full);
       }
 
       .form-control {
         width: 100%;
-        padding: 0.65rem 0.85rem;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        color: #0f172a;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        color: var(--color-slate-900);
         outline: none;
-        transition: all 0.15s ease;
+        transition: var(--transition-fast);
 
         &:focus {
-          border-color: #1053d4;
-          box-shadow: 0 0 0 3px rgba(16, 83, 212, 0.12);
+          border-color: var(--color-primary-600);
+          box-shadow: var(--focus-ring);
         }
       }
 
       .form-range {
         width: 100%;
-        accent-color: #1053d4;
+        accent-color: var(--color-primary-700);
       }
     }
 
@@ -276,44 +281,45 @@ import { CreateStudentDto, StudentStatus } from '../models/profesor.model';
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
+      gap: var(--space-3);
+      padding-top: var(--space-2);
+      border-top: 1px solid var(--color-border);
 
       .btn-cancel {
-        padding: 0.65rem 1.1rem;
-        border: 1px solid #cbd5e1;
-        background-color: #fff;
-        color: #475569;
-        font-weight: 600;
-        font-size: 0.875rem;
-        border-radius: 8px;
+        padding: 0.625rem 1.1rem;
+        border: 1px solid var(--color-border);
+        background-color: var(--color-bg-surface);
+        color: var(--color-slate-700);
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-sm);
+        border-radius: var(--radius-md);
         cursor: pointer;
-        transition: all 0.15s ease;
+        transition: var(--transition-fast);
 
         &:hover {
-          background-color: #f8fafc;
-          border-color: #94a3b8;
-          color: #0f172a;
+          background-color: var(--color-slate-100);
+          color: var(--color-slate-900);
         }
       }
 
       .btn-submit {
         display: inline-flex;
         align-items: center;
-        gap: 0.45rem;
-        padding: 0.65rem 1.25rem;
+        gap: var(--space-2);
+        padding: 0.625rem 1.25rem;
         border: none;
-        background-color: #0d59e3;
-        color: #fff;
-        font-weight: 600;
-        font-size: 0.875rem;
-        border-radius: 8px;
+        background-color: var(--color-primary-700);
+        color: var(--color-white);
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-sm);
+        border-radius: var(--radius-md);
         cursor: pointer;
-        box-shadow: 0 2px 4px rgba(13, 89, 227, 0.2);
-        transition: all 0.15s ease;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition-fast);
 
         &:hover:not(:disabled) {
-          background-color: #0b49be;
+          background-color: var(--color-primary-800);
+          transform: translateY(-1px);
         }
 
         &:disabled {

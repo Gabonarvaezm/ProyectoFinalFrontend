@@ -1,18 +1,23 @@
-import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NavItem } from '../models/profesor.model';
 
 @Component({
   selector: 'app-profesor-sidebar',
-  standalone: true,
   imports: [RouterLink],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <aside class="sidebar" aria-label="Navegación principal">
       <div class="sidebar-header">
-        <a routerLink="/" class="brand-link" title="Ir a la página principal">
-          <span class="brand-title">DiscerIA</span>
-          <span class="brand-subtitle">Investigación Académica</span>
+        <a routerLink="/" class="brand-link" title="Ir a la página principal" aria-label="Ir a inicio de DiscerIA">
+          <div class="brand-logo-wrap">
+            <div class="brand-icon">
+              <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div class="brand-text">
+              <span class="brand-name">DiscerIA</span>
+              <span class="brand-sub">Portal Docente</span>
+            </div>
+          </div>
         </a>
       </div>
 
@@ -50,35 +55,74 @@ import { NavItem } from '../models/profesor.model';
   `,
   styles: [`
     .sidebar {
-      width: 240px;
-      min-width: 240px;
-      background-color: #fff;
-      border-right: 1px solid #e5eaf2;
+      width: var(--sidebar-width, 256px);
+      min-width: var(--sidebar-width, 256px);
+      background-color: var(--color-bg-surface);
+      border-right: 1px solid var(--color-border);
       display: flex;
       flex-direction: column;
-      padding: 1.5rem 1rem 1.25rem;
+      padding: var(--space-5) var(--space-4) var(--space-4);
       justify-content: space-between;
       height: 100vh;
       position: sticky;
       top: 0;
+      z-index: 30;
+
+      @media (max-width: 1200px) {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        padding: var(--space-3) var(--space-4);
+      }
     }
 
     .sidebar-header {
-      padding: 0 0.5rem 2rem;
+      padding: 0 var(--space-2) var(--space-6);
 
-      .brand-link { display: flex; flex-direction: column; text-decoration: none; }
-      .brand-title {
-        font-size: 1.45rem;
-        font-weight: 800;
-        color: #1053d4;
-        letter-spacing: -0.02em;
-        line-height: 1.2;
+      .brand-link {
+        text-decoration: none;
+        display: block;
       }
-      .brand-subtitle {
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: #64748b;
-        margin-top: 0.15rem;
+
+      .brand-logo-wrap {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .brand-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
+        color: var(--color-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.28);
+      }
+
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+
+        .brand-name {
+          font-size: var(--font-size-lg);
+          font-weight: var(--font-weight-extrabold);
+          color: var(--color-slate-900);
+          letter-spacing: -0.02em;
+        }
+
+        .brand-sub {
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-medium);
+          color: var(--color-text-muted);
+        }
       }
     }
 
@@ -91,37 +135,53 @@ import { NavItem } from '../models/profesor.model';
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: var(--space-1);
+
+        @media (max-width: 1200px) {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
       }
 
       .nav-button {
         width: 100%;
         display: flex;
         align-items: center;
-        gap: 0.85rem;
-        padding: 0.65rem 0.9rem;
-        border-radius: 10px;
-        font-size: 0.92rem;
-        font-weight: 500;
-        color: #475569;
+        gap: var(--space-3);
+        padding: 0.65rem 0.875rem;
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-slate-600);
         cursor: pointer;
         background: transparent;
         border: none;
-        transition: all 0.15s ease;
+        transition: var(--transition-fast);
+        text-align: left;
 
-        i { font-size: 1.15rem; color: #64748b; }
+        i {
+          font-size: 1.125rem;
+          color: var(--color-slate-500);
+          transition: color var(--duration-fast) var(--ease-out-expo);
+        }
 
         &:hover {
-          background-color: #f8fafc;
-          color: #0f172a;
-          i { color: #1053d4; }
+          background-color: var(--color-slate-100);
+          color: var(--color-primary-700);
+
+          i {
+            color: var(--color-primary-700);
+          }
         }
 
         &.active {
-          background-color: #e8f1fd;
-          color: #1053d4;
-          font-weight: 600;
-          i { color: #1053d4; }
+          background-color: var(--color-primary-50);
+          color: var(--color-primary-700);
+          font-weight: var(--font-weight-semibold);
+
+          i {
+            color: var(--color-primary-700);
+          }
         }
       }
     }
@@ -131,21 +191,26 @@ import { NavItem } from '../models/profesor.model';
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      background-color: #0d59e3;
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.9rem;
+      gap: var(--space-2);
+      background: var(--color-ai-gradient);
+      color: var(--color-white);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
       padding: 0.75rem 1rem;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       cursor: pointer;
       border: none;
-      box-shadow: 0 2px 4px rgba(13, 89, 227, 0.2);
-      transition: all 0.18s ease;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+      transition: var(--transition-fast);
 
       &:hover {
-        background-color: #0b49be;
         transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        filter: brightness(1.05);
+      }
+
+      &:active {
+        transform: translateY(0);
       }
     }
   `],

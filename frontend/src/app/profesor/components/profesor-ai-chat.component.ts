@@ -1,12 +1,10 @@
-import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AiSuggestion, ChatMessage } from '../models/profesor.model';
 
 @Component({
   selector: 'app-profesor-ai-chat',
-  standalone: true,
   imports: [FormsModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <aside class="ai-assistant-panel" aria-label="Asistente de Inteligencia Artificial">
       <div class="ai-header">
@@ -14,15 +12,15 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
           <i class="bi bi-robot" aria-hidden="true"></i>
         </div>
         <div class="ai-title-wrapper">
-          <h2 class="ai-title">Asistente del Profesor</h2>
-          <span class="ai-subtitle">Soporte con IA</span>
+          <h2 class="ai-title">Asistente Docente IA</h2>
+          <span class="ai-subtitle">Copiloto Inteligente DiscerIA</span>
         </div>
       </div>
 
       <div class="ai-body">
         <!-- Tarjeta de Sugerencias Rápidas -->
         <div class="suggestions-card">
-          <h3 class="suggestions-prompt">¿En qué puedo ayudarte hoy?</h3>
+          <h3 class="suggestions-prompt">¿En qué puedo asistirte hoy?</h3>
 
           <div class="suggestions-list">
             @for (sug of aiSuggestions(); track sug.id) {
@@ -67,7 +65,7 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
             #chatInput
             type="text"
             class="ai-input"
-            placeholder="Pregunta a la IA..."
+            placeholder="Pregunta a la IA sobre tus alumnos..."
             [value]="inputText()"
             (input)="inputText.set(chatInput.value)"
             name="chatText"
@@ -90,16 +88,17 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
   `,
   styles: [`
     .ai-assistant-panel {
-      width: 320px;
-      min-width: 320px;
-      background-color: #fff;
-      border-left: 1px solid #e5eaf2;
+      width: var(--chat-panel-width, 360px);
+      min-width: var(--chat-panel-width, 360px);
+      background-color: var(--color-bg-surface);
+      border-left: 1px solid var(--color-border);
       display: flex;
       flex-direction: column;
-      padding: 1.5rem 1.25rem 1.25rem;
+      padding: var(--space-5) var(--space-4) var(--space-4);
       height: 100vh;
       position: sticky;
       top: 0;
+      z-index: 25;
 
       @media (max-width: 1200px) {
         width: 100%;
@@ -107,159 +106,210 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
         height: auto;
         position: static;
         border-left: none;
-        border-top: 1px solid #e5eaf2;
+        border-top: 1px solid var(--color-border);
+        padding: var(--space-4);
       }
     }
 
     .ai-header {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid #f1f5f9;
+      gap: var(--space-3);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
 
       .ai-icon-box {
-        width: 36px;
-        height: 36px;
-        background-color: #0d59e3;
-        border-radius: 8px;
+        width: 38px;
+        height: 38px;
+        background: var(--color-ai-gradient);
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
-        font-size: 1.1rem;
+        color: var(--color-white);
+        font-size: 1.15rem;
+        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.28);
       }
 
       .ai-title {
-        font-size: 0.98rem;
-        font-weight: 700;
-        color: #0f172a;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
         margin: 0;
       }
 
-      .ai-subtitle { font-size: 0.75rem; color: #64748b; }
+      .ai-subtitle {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+      }
     }
 
     .ai-body {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
-      padding: 1.25rem 0;
+      gap: var(--space-4);
+      padding: var(--space-4) 0;
       overflow-y: auto;
     }
 
     .suggestions-card {
-      background-color: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 1rem;
+      background-color: var(--color-ai-50);
+      border: 1px solid var(--color-ai-300);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
 
       .suggestions-prompt {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #475569;
-        margin: 0 0 0.85rem;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-ai-700);
+        margin: 0 0 var(--space-3);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
       }
 
-      .suggestions-list { display: flex; flex-direction: column; gap: 0.65rem; }
+      .suggestions-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
 
       .btn-suggestion {
         display: flex;
         align-items: center;
-        gap: 0.6rem;
-        color: #1053d4;
-        font-size: 0.825rem;
-        font-weight: 600;
+        gap: var(--space-2);
+        color: var(--color-primary-700);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
         cursor: pointer;
-        padding: 0.2rem 0;
-        background: transparent;
-        border: none;
+        padding: 0.4rem 0.6rem;
+        border-radius: var(--radius-sm);
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
         text-align: left;
+        transition: var(--transition-fast);
 
-        &:hover:not(:disabled) { color: #0b3fa8; text-decoration: underline; }
-        &:disabled { opacity: 0.6; cursor: not-allowed; }
+        &:hover:not(:disabled) {
+          border-color: var(--color-primary-500);
+          color: var(--color-primary-800);
+          transform: translateX(2px);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
       }
     }
 
     .chat-thread {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      font-size: 0.84rem;
+      gap: var(--space-3);
 
       .chat-bubble {
-        padding: 0.65rem 0.85rem;
-        border-radius: 8px;
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-lg);
         max-width: 90%;
-        line-height: 1.4;
+        line-height: var(--line-height-base);
+        font-size: var(--font-size-sm);
 
         .bubble-sender-name {
-          font-size: 0.7rem;
-          font-weight: 700;
-          margin-bottom: 0.2rem;
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-bold);
+          margin-bottom: var(--space-1);
         }
 
-        .bubble-text { margin: 0; }
+        .bubble-text {
+          margin: 0;
+        }
 
         &.user {
           align-self: flex-end;
-          background-color: #1d4ed8;
-          color: #fff;
-          .bubble-sender-name { color: #bfdbfe; }
+          background-color: var(--color-primary-700);
+          color: var(--color-white);
+          border-bottom-right-radius: var(--radius-xs);
+
+          .bubble-sender-name {
+            color: var(--color-primary-200);
+          }
         }
 
         &.ai {
           align-self: flex-start;
-          background-color: #f1f5f9;
-          color: #1e293b;
-          .bubble-sender-name { color: #64748b; }
+          background-color: var(--color-slate-100);
+          color: var(--color-slate-900);
+          border-bottom-left-radius: var(--radius-xs);
+
+          .bubble-sender-name {
+            color: var(--color-ai-600);
+          }
         }
 
         &.thinking {
           display: flex;
           align-items: center;
-          gap: 0.3rem;
+          gap: 0.35rem;
           padding: 0.75rem 1rem;
 
           .dot {
             width: 6px;
             height: 6px;
-            background-color: #64748b;
+            background-color: var(--color-ai-500);
             border-radius: 50%;
             animation: pulse 1s infinite alternate;
 
-            &:nth-child(2) { animation-delay: 0.2s; }
-            &:nth-child(3) { animation-delay: 0.4s; }
+            &:nth-child(2) {
+              animation-delay: 0.2s;
+            }
+            &:nth-child(3) {
+              animation-delay: 0.4s;
+            }
           }
         }
       }
     }
 
     @keyframes pulse {
-      0% { opacity: 0.3; transform: translateY(0); }
-      100% { opacity: 1; transform: translateY(-2px); }
+      0% {
+        opacity: 0.3;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(-2px);
+      }
     }
 
     .ai-footer {
-      padding-top: 0.75rem;
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--color-border);
 
-      .ai-input-form { position: relative; display: flex; align-items: center; }
+      .ai-input-form {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
 
       .ai-input {
         width: 100%;
-        padding: 0.7rem 2.5rem 0.7rem 0.9rem;
-        background-color: #fff;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        color: #0f172a;
+        padding: 0.65rem 2.6rem 0.65rem 0.875rem;
+        background-color: var(--color-slate-50);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        color: var(--color-slate-900);
         outline: none;
+        transition: var(--transition-fast);
 
-        &::placeholder { color: #94a3b8; }
+        &::placeholder {
+          color: var(--color-slate-400);
+        }
+
         &:focus {
-          border-color: #1053d4;
-          box-shadow: 0 0 0 2px rgba(16, 83, 212, 0.15);
+          background-color: var(--color-bg-surface);
+          border-color: var(--color-primary-600);
+          box-shadow: var(--focus-ring);
         }
       }
 
@@ -268,15 +318,24 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
         right: 0.5rem;
         background: transparent;
         border: none;
-        color: #1053d4;
+        color: var(--color-primary-600);
         cursor: pointer;
-        font-size: 1rem;
-        padding: 0.3rem;
+        font-size: 1.05rem;
+        padding: 0.35rem;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: var(--transition-fast);
 
-        &:disabled { color: #cbd5e1; cursor: not-allowed; }
+        &:hover:not(:disabled) {
+          color: var(--color-primary-800);
+          transform: scale(1.1);
+        }
+
+        &:disabled {
+          color: var(--color-slate-300);
+          cursor: not-allowed;
+        }
       }
     }
   `],
