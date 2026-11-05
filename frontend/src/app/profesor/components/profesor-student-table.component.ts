@@ -1,10 +1,8 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { StudentProgress } from '../models/profesor.model';
 
 @Component({
   selector: 'app-profesor-student-table',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="card-section progress-card" aria-labelledby="heading-student-progress">
       <div class="card-header">
@@ -109,184 +107,236 @@ import { StudentProgress } from '../models/profesor.model';
   `,
   styles: [`
     .card-section {
-      background-color: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 1.25rem 1.5rem;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      box-shadow: var(--shadow-card);
     }
 
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.25rem;
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+      gap: var(--space-3);
 
       .card-title-group {
         display: flex;
         align-items: center;
-        gap: 0.65rem;
+        gap: var(--space-3);
       }
 
       .card-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #0f172a;
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
         margin: 0;
       }
 
       .students-count-badge {
-        background-color: #e0f2fe;
-        color: #0369a1;
-        font-size: 0.72rem;
-        font-weight: 700;
-        padding: 0.15rem 0.5rem;
-        border-radius: 12px;
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-700);
+        border: 1px solid var(--color-primary-200);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
+        padding: 0.2rem 0.6rem;
+        border-radius: var(--radius-full);
       }
 
       .card-header-actions {
         display: flex;
         align-items: center;
-        gap: 0.85rem;
+        gap: var(--space-3);
       }
 
       .btn-add-student {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        background-color: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
-        padding: 0.35rem 0.7rem;
-        border-radius: 6px;
-        font-size: 0.78rem;
-        font-weight: 600;
+        gap: var(--space-2);
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-700);
+        border: 1px solid var(--color-primary-200);
+        padding: 0.45rem 0.85rem;
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: var(--transition-fast);
 
-        &:hover { background-color: #1d4ed8; color: #fff; }
+        &:hover {
+          background-color: var(--color-primary-700);
+          color: var(--color-white);
+        }
       }
 
       .btn-link-action {
-        color: #1053d4;
-        font-size: 0.825rem;
-        font-weight: 600;
+        color: var(--color-primary-700);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
         cursor: pointer;
         background: transparent;
         border: none;
         padding: 0;
-        &:hover { text-decoration: underline; }
+
+        &:hover {
+          color: var(--color-primary-800);
+          text-decoration: underline;
+        }
       }
     }
 
-    .table-responsive { width: 100%; overflow-x: auto; }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
 
     .progress-table {
       width: 100%;
       border-collapse: collapse;
 
       th, td {
-        padding: 0.85rem 0.5rem 0.85rem 0;
-        font-size: 0.88rem;
-        border-bottom: 1px solid #f1f5f9;
+        padding: var(--space-3) var(--space-2);
+        font-size: var(--font-size-sm);
+        border-bottom: 1px solid var(--color-border-subtle);
         vertical-align: middle;
       }
 
       th {
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: #64748b;
-        padding-top: 0;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-slate-500);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
         text-align: left;
       }
 
-      tbody tr:last-child td { border-bottom: none; }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover {
+        background-color: var(--color-slate-50);
+      }
 
       .student-name-cell {
         display: flex;
         flex-direction: column;
-        font-weight: 600;
-        color: #1e293b;
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-slate-900);
         white-space: nowrap;
 
         .student-email-sub {
-          font-size: 0.73rem;
-          font-weight: 400;
-          color: #94a3b8;
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-regular);
+          color: var(--color-slate-400);
         }
       }
 
-      .student-topic { color: #475569; font-size: 0.85rem; }
+      .student-topic {
+        color: var(--color-slate-600);
+        font-size: var(--font-size-sm);
+      }
 
       .score-container {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: var(--space-3);
 
         .progress-bar-track {
-          width: 75px;
-          height: 7px;
-          background-color: #e2e8f0;
-          border-radius: 9999px;
+          width: 80px;
+          height: 6px;
+          background-color: var(--color-slate-200);
+          border-radius: var(--radius-full);
           overflow: hidden;
         }
 
         .progress-bar-fill {
           height: 100%;
-          border-radius: 9999px;
+          border-radius: var(--radius-full);
 
           &.active,
-          &.completed { background-color: #1d4ed8; }
-          &.needs-attention { background-color: #f59e0b; }
+          &.completed {
+            background-color: var(--color-primary-600);
+          }
+          &.needs-attention {
+            background-color: var(--color-warning);
+          }
         }
 
         .score-label {
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: #334155;
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-bold);
+          color: var(--color-slate-700);
         }
       }
 
       .status-badge {
         display: inline-block;
-        padding: 0.28rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        padding: 0.25rem 0.65rem;
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
         white-space: nowrap;
 
-        &.active { background-color: #4338ca; color: #fff; }
-        &.needs-attention { background-color: #fef3c7; color: #b45309; }
-        &.completed { background-color: #e2e8f0; color: #475569; }
+        &.active {
+          background-color: var(--color-primary-50);
+          color: var(--color-primary-700);
+          border: 1px solid var(--color-primary-200);
+        }
+        &.needs-attention {
+          background-color: var(--color-warning-bg);
+          color: var(--color-warning);
+          border: 1px solid var(--color-warning-border);
+        }
+        &.completed {
+          background-color: var(--color-slate-100);
+          color: var(--color-slate-600);
+          border: 1px solid var(--color-slate-200);
+        }
       }
 
-      .th-actions, .td-actions { width: 38px; text-align: right; }
+      .th-actions, .td-actions {
+        width: 38px;
+        text-align: right;
+      }
 
       .btn-delete-student {
-        color: #94a3b8;
+        color: var(--color-slate-400);
         background: transparent;
         border: none;
         cursor: pointer;
-        padding: 0.3rem;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        transition: all 0.15s ease;
+        padding: var(--space-1);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+        transition: var(--transition-fast);
 
-        &:hover { color: #ef4444; background-color: #fee2e2; }
+        &:hover {
+          color: var(--color-danger);
+          background-color: var(--color-danger-bg);
+        }
       }
 
       .empty-state {
         text-align: center;
-        padding: 2rem 1rem;
+        padding: var(--space-8) var(--space-4);
 
         .empty-state-content {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.5rem;
-          color: #64748b;
-          i { font-size: 1.8rem; color: #cbd5e1; }
-          p { margin: 0; font-size: 0.88rem; }
+          gap: var(--space-2);
+          color: var(--color-text-muted);
+
+          i {
+            font-size: 2rem;
+            color: var(--color-slate-300);
+          }
+          p {
+            margin: 0;
+            font-size: var(--font-size-sm);
+          }
         }
       }
     }
@@ -294,19 +344,21 @@ import { StudentProgress } from '../models/profesor.model';
     .btn-primary-sm {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      background-color: #1d4ed8;
-      color: #fff;
+      gap: var(--space-2);
+      background-color: var(--color-primary-700);
+      color: var(--color-white);
       border: none;
-      border-radius: 6px;
-      padding: 0.45rem 0.85rem;
-      font-size: 0.82rem;
-      font-weight: 600;
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.875rem;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
       cursor: pointer;
-      margin-top: 0.4rem;
-      transition: background-color 0.15s ease;
+      margin-top: var(--space-2);
+      transition: var(--transition-fast);
 
-      &:hover { background-color: #1e40af; }
+      &:hover {
+        background-color: var(--color-primary-800);
+      }
     }
 
     .sr-only {

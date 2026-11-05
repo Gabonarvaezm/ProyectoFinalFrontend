@@ -1,29 +1,15 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// DiscerIA — Componente de Foro Académico (Modo Claro con estructura adaptable)
+// DiscerIA — Componente de Foro Académico (Diseño Unificado)
 // ─────────────────────────────────────────────────────────────────────────────
 
 :host {
   display: block;
   min-height: 100vh;
   width: 100%;
-  font-family: var(--font-family-base, 'Plus Jakarta Sans', sans-serif);
-  background-color: var(--color-bg-app, #f8fafc);
-  color: var(--color-text-main, #0f172a);
+  font-family: var(--font-family-base);
+  background-color: var(--color-bg-app);
+  color: var(--color-text-main);
 }
-
-// Variables locales semánticas para Modo Claro
-$color-bg-body: #f8fafc;
-$color-bg-surface: #ffffff;
-$color-bg-muted: #f1f5f9;
-$color-border: #e2e8f0;
-$color-blue-primary: #1d4ed8;
-$color-blue-hover: #1e40af;
-$color-blue-light: #2563eb;
-$color-text-title: #0f172a;
-$color-text-muted: #64748b;
-$color-text-light: #94a3b8;
-$radius-md: 10px;
-$radius-lg: 14px;
 
 .visually-hidden {
   position: absolute;
@@ -41,55 +27,53 @@ $radius-lg: 14px;
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background-color: $color-bg-body;
+  background-color: var(--color-bg-app);
 
   @media (max-width: 1024px) {
     flex-direction: column;
   }
 }
 
-// ============================================================================
-// 1. BARRA LATERAL IZQUIERDA (SIDEBAR)
-// ============================================================================
+// ── 1. Barra Lateral Izquierda (Navegación Institucional) ─────────────────────
 .sidebar {
-  width: 260px;
-  min-width: 260px;
-  background-color: $color-bg-surface;
-  border-right: 1px solid $color-border;
+  width: var(--sidebar-width, 256px);
+  min-width: var(--sidebar-width, 256px);
+  background-color: var(--color-bg-surface);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.5rem 1.25rem;
+  padding: var(--space-5) var(--space-4) var(--space-4);
   position: sticky;
   top: 0;
   height: 100vh;
   overflow-y: auto;
-  z-index: 40;
+  z-index: 30;
 
   @media (max-width: 1024px) {
     width: 100%;
     min-width: 100%;
     height: auto;
-    position: relative;
+    position: static;
     border-right: none;
-    border-bottom: 1px solid $color-border;
-    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
   }
 }
 
 .sidebar-top {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: var(--space-5);
 }
 
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   text-decoration: none;
   color: inherit;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--duration-fast) var(--ease-out-expo);
 
   &:hover {
     opacity: 0.9;
@@ -99,33 +83,33 @@ $radius-lg: 14px;
 .brand-icon {
   width: 38px;
   height: 38px;
-  border-radius: $radius-md;
-  background: linear-gradient(135deg, $color-blue-primary 0%, #4f46e5 100%);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  font-size: 1.2rem;
-  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
+  color: var(--color-white);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.28);
 }
 
 .brand-text {
   display: flex;
   flex-direction: column;
+  line-height: 1.2;
 }
 
 .brand-name {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: $color-text-title;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-slate-900);
   letter-spacing: -0.02em;
-  line-height: 1.1;
 }
 
 .brand-sub {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: $color-text-muted;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
 }
 
 .sidebar-nav {
@@ -135,7 +119,12 @@ $radius-lg: 14px;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: var(--space-1);
+
+    @media (max-width: 1024px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   }
 
   .nav-item {
@@ -145,38 +134,39 @@ $radius-lg: 14px;
   .nav-btn {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    padding: 0.75rem 1rem;
-    border-radius: $radius-md;
+    gap: var(--space-3);
+    padding: 0.65rem 0.875rem;
+    border-radius: var(--radius-md);
     text-decoration: none;
-    color: $color-text-muted;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    color: var(--color-slate-600);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    transition: var(--transition-fast);
     border: 1px solid transparent;
 
     .nav-icon {
-      font-size: 1.1rem;
-      transition: transform 0.2s ease;
+      font-size: 1.125rem;
+      color: var(--color-slate-500);
+      transition: color var(--duration-fast) var(--ease-out-expo);
     }
 
     &:hover {
-      background-color: $color-bg-muted;
-      color: $color-text-title;
+      background-color: var(--color-slate-100);
+      color: var(--color-primary-700);
 
       .nav-icon {
-        transform: translateX(2px);
+        color: var(--color-primary-700);
       }
     }
 
     &.active {
-      background-color: #eff6ff;
-      color: $color-blue-primary;
-      font-weight: 600;
-      border-color: rgba(37, 99, 235, 0.15);
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-700);
+      font-weight: var(--font-weight-semibold);
+      border-color: var(--color-primary-200);
 
       .nav-icon {
-        color: $color-blue-primary;
+        color: var(--color-primary-700);
       }
     }
   }
@@ -185,17 +175,17 @@ $radius-lg: 14px;
 .sidebar-bottom {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid $color-border;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
 }
 
 .role-selector-card {
-  background-color: $color-bg-muted;
-  border: 1px solid $color-border;
-  border-radius: $radius-md;
-  padding: 0.75rem;
+  background-color: var(--color-slate-50);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.625rem 0.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -204,32 +194,32 @@ $radius-lg: 14px;
 .role-badge {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: $color-blue-primary;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-700);
 
   &.professor {
-    color: #9333ea;
+    color: var(--color-ai-600);
   }
 }
 
 .role-switch-btn {
   background: transparent;
   border: none;
-  color: $color-text-muted;
-  font-size: 0.75rem;
+  color: var(--color-slate-500);
+  font-size: var(--font-size-xs);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.25rem 0.4rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  padding: 0.25rem 0.45rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
 
   &:hover {
-    background-color: rgba(15, 23, 42, 0.05);
-    color: $color-text-title;
+    background-color: var(--color-slate-200);
+    color: var(--color-slate-900);
   }
 }
 
@@ -237,22 +227,23 @@ $radius-lg: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   width: 100%;
-  padding: 0.85rem 1rem;
-  border-radius: $radius-md;
-  background: linear-gradient(135deg, $color-blue-primary 0%, $color-blue-light 100%);
-  color: #ffffff;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-700);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
-  transition: all 0.25s ease;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
 
   &:hover {
+    background-color: var(--color-primary-800);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35);
+    box-shadow: var(--shadow-md);
   }
 
   &:active {
@@ -260,9 +251,7 @@ $radius-lg: 14px;
   }
 }
 
-// ============================================================================
-// 2. CONTENIDO PRINCIPAL & COLUMNAS
-// ============================================================================
+// ── 2. Contenido Principal & Columnas ────────────────────────────────────────
 .main-wrapper {
   flex: 1;
   display: flex;
@@ -273,16 +262,16 @@ $radius-lg: 14px;
 .content-columns {
   display: flex;
   flex: 1;
-  padding: 2rem;
-  gap: 2rem;
-  max-width: 1600px;
+  padding: var(--space-6) var(--space-8);
+  gap: var(--space-8);
+  max-width: var(--max-content-width);
   width: 100%;
   margin: 0 auto;
 
   @media (max-width: 1280px) {
     flex-direction: column;
-    padding: 1.5rem 1rem;
-    gap: 1.5rem;
+    padding: var(--space-4);
+    gap: var(--space-6);
   }
 }
 
@@ -291,105 +280,105 @@ $radius-lg: 14px;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-5);
 }
 
 .feed-header {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 
   .forum-title {
-    font-size: 1.85rem;
-    font-weight: 800;
-    color: $color-text-title;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-slate-900);
     letter-spacing: -0.025em;
-    margin: 0 0 0.4rem;
+    margin: 0 0 var(--space-1);
+    line-height: var(--line-height-tight);
   }
 
   .forum-subtitle {
-    font-size: 0.95rem;
-    color: $color-text-muted;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
     margin: 0;
-    line-height: 1.45;
+    line-height: var(--line-height-base);
   }
 }
 
 .posts-list {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--space-4);
 }
 
 .empty-state-card {
-  background-color: $color-bg-surface;
-  border: 1px dashed $color-border;
-  border-radius: $radius-lg;
-  padding: 3rem 2rem;
+  background-color: var(--color-bg-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-12) var(--space-6);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
 
   .empty-icon {
     font-size: 2.75rem;
-    color: $color-text-light;
+    color: var(--color-slate-300);
   }
 
   h3 {
     margin: 0;
-    font-size: 1.15rem;
-    color: $color-text-title;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-900);
   }
 
   p {
-    margin: 0 0 1rem;
-    font-size: 0.9rem;
-    color: $color-text-muted;
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
     max-width: 400px;
   }
 
   .btn-primary {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.65rem 1.2rem;
-    background-color: $color-blue-primary;
-    color: #ffffff;
-    border-radius: $radius-md;
-    font-weight: 600;
-    font-size: 0.875rem;
+    gap: var(--space-2);
+    padding: 0.625rem 1.25rem;
+    background-color: var(--color-primary-700);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
     border: none;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: var(--transition-fast);
 
     &:hover {
-      background-color: $color-blue-hover;
+      background-color: var(--color-primary-800);
     }
   }
 }
 
-// ============================================================================
-// 3. TOAST NOTIFICACIÓN FLOTANTE
-// ============================================================================
+// ── 3. Toast Notificación Flotante ──────────────────────────────────────────
 .toast-notification {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background-color: #0f172a;
-  color: #ffffff;
-  padding: 0.85rem 1.25rem;
-  border-radius: $radius-md;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  bottom: var(--space-6);
+  right: var(--space-6);
+  background-color: var(--color-slate-900);
+  color: var(--color-white);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   z-index: 120;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideUp var(--duration-fast) var(--ease-out-expo);
 
   .toast-icon {
-    color: #60a5fa;
+    color: var(--color-info);
     font-size: 1.1rem;
   }
 }

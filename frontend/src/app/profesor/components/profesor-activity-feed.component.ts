@@ -1,10 +1,8 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { QuickAction, RecentActivity } from '../models/profesor.model';
 
 @Component({
   selector: 'app-profesor-activity-feed',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="side-column">
       <!-- Actividad Reciente -->
@@ -48,26 +46,30 @@ import { QuickAction, RecentActivity } from '../models/profesor.model';
     </div>
   `,
   styles: [`
-    .side-column { display: flex; flex-direction: column; gap: 1.25rem; }
+    .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
 
     .card-section {
-      background-color: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 1.25rem 1.5rem;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      box-shadow: var(--shadow-card);
     }
 
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.25rem;
+      margin-bottom: var(--space-4);
 
       .card-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #0f172a;
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
         margin: 0;
       }
     }
@@ -78,68 +80,96 @@ import { QuickAction, RecentActivity } from '../models/profesor.model';
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 1.15rem;
+      gap: var(--space-4);
 
-      .activity-item { display: flex; align-items: flex-start; gap: 0.85rem; }
+      .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+      }
 
       .activity-icon-badge {
-        width: 30px;
-        height: 30px;
-        min-width: 30px;
-        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: var(--radius-full);
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 0.95rem;
 
-        &.blue { background-color: #dbeafe; color: #1d4ed8; }
-        &.purple { background-color: #ede9fe; color: #7c3aed; }
+        &.blue {
+          background-color: var(--color-primary-50);
+          color: var(--color-primary-700);
+          border: 1px solid var(--color-primary-200);
+        }
+        &.purple {
+          background: var(--color-ai-gradient-subtle);
+          color: var(--color-ai-600);
+          border: 1px solid var(--color-ai-300);
+        }
       }
 
       .activity-details {
         .activity-desc {
-          font-size: 0.86rem;
-          font-weight: 500;
-          color: #1e293b;
-          margin: 0 0 0.2rem;
-          line-height: 1.35;
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          color: var(--color-slate-800);
+          margin: 0 0 0.15rem;
+          line-height: var(--line-height-base);
         }
-        .activity-time { font-size: 0.75rem; color: #94a3b8; }
+        .activity-time {
+          font-size: var(--font-size-xs);
+          color: var(--color-slate-400);
+        }
       }
     }
 
     .quick-actions-card {
       .quick-actions-title {
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        color: #64748b;
-        margin: 0 0 0.85rem;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
+        letter-spacing: 0.05em;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        margin: 0 0 var(--space-3);
       }
 
-      .actions-stack { display: flex; flex-direction: column; gap: 0.6rem; }
+      .actions-stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
 
       .btn-quick-action {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.55rem;
+        gap: var(--space-2);
         padding: 0.65rem 1rem;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 600;
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
         cursor: pointer;
-        background-color: #e8edf5;
-        color: #334155;
-        border: none;
-        transition: all 0.15s ease;
+        background-color: var(--color-slate-100);
+        color: var(--color-slate-700);
+        border: 1px solid var(--color-slate-200);
+        transition: var(--transition-fast);
 
-        &:hover { background-color: #dde4ef; color: #0f172a; }
+        &:hover {
+          background-color: var(--color-slate-200);
+          color: var(--color-slate-900);
+        }
 
         &.primary {
-          background-color: #1d4ed8;
-          color: #fff;
-          &:hover { background-color: #1e40af; }
+          background-color: var(--color-primary-700);
+          color: var(--color-white);
+          border-color: transparent;
+
+          &:hover {
+            background-color: var(--color-primary-800);
+          }
         }
       }
     }

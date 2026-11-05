@@ -1,9 +1,7 @@
-import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 
 @Component({
   selector: 'app-profesor-header',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="top-header">
       <div class="search-box">
@@ -12,7 +10,7 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
           #searchInput
           type="search"
           class="search-input"
-          placeholder="Buscar estudiantes, exámenes..."
+          placeholder="Buscar estudiantes, exámenes o cursos..."
           [value]="searchQuery()"
           (input)="onSearchChange(searchInput.value)"
           aria-label="Buscar estudiantes o exámenes"
@@ -52,12 +50,25 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
   `,
   styles: [`
     .top-header {
-      padding: 1.25rem 2rem;
+      background-color: var(--color-bg-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0 var(--space-8);
+      height: var(--header-height, 70px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.5rem;
-      background-color: transparent;
+      gap: var(--space-6);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+
+      @media (max-width: 768px) {
+        padding: 0 var(--space-4);
+        height: auto;
+        min-height: 60px;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+      }
     }
 
     .search-box {
@@ -70,24 +81,34 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
+        color: var(--color-slate-400);
+        font-size: 0.95rem;
+        pointer-events: none;
       }
 
       .search-input {
         width: 100%;
-        padding: 0.65rem 1rem 0.65rem 2.5rem;
-        background-color: #fff;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        color: #0f172a;
+        padding: 0.625rem 1rem 0.625rem 2.6rem;
+        background-color: var(--color-slate-50);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        color: var(--color-slate-900);
         outline: none;
-        transition: all 0.2s ease;
+        transition: var(--transition-fast);
 
-        &::placeholder { color: #94a3b8; }
+        &::placeholder {
+          color: var(--color-slate-400);
+        }
+
+        &:hover {
+          border-color: var(--color-slate-300);
+        }
+
         &:focus {
-          border-color: #1053d4;
-          box-shadow: 0 0 0 3px rgba(16, 83, 212, 0.12);
+          background-color: var(--color-bg-surface);
+          border-color: var(--color-primary-600);
+          box-shadow: var(--focus-ring);
         }
       }
     }
@@ -95,48 +116,63 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: var(--space-3);
 
       .icon-button {
         position: relative;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        border: 1px solid var(--color-border-subtle);
         background: transparent;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #475569;
+        color: var(--color-slate-600);
         cursor: pointer;
-        font-size: 1.2rem;
-        transition: background-color 0.2s ease;
+        font-size: 1.15rem;
+        transition: var(--transition-fast);
 
-        &:hover { background-color: #e2e8f0; color: #0f172a; }
+        &:hover {
+          background-color: var(--color-slate-100);
+          color: var(--color-slate-900);
+        }
+
+        &:focus-visible {
+          outline: none;
+          box-shadow: var(--focus-ring);
+        }
 
         .notification-indicator {
           position: absolute;
-          top: 6px;
-          right: 7px;
-          width: 7px;
-          height: 7px;
-          background-color: #ef4444;
-          border-radius: 50%;
+          top: 8px;
+          right: 9px;
+          width: 8px;
+          height: 8px;
+          background-color: var(--color-danger);
+          border-radius: var(--radius-full);
+          border: 2px solid var(--color-white);
         }
       }
 
       .avatar-circle {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #0284c7, #1d4ed8);
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        background: var(--color-ai-gradient);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
-        font-size: 0.85rem;
-        font-weight: 700;
+        color: var(--color-white);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
+        box-shadow: var(--shadow-sm);
         cursor: pointer;
+        transition: var(--transition-fast);
+
+        &:hover {
+          transform: scale(1.05);
+        }
       }
     }
   `],

@@ -1,17 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// DiscerIA — Estilos del Componente Padre Biblioteca
+// DiscerIA — Estilos del Módulo Biblioteca (Diseño Unificado)
 // ─────────────────────────────────────────────────────────────────────────────
-
-$color-bg-body: #f8fafc;
-$color-bg-card: #ffffff;
-$color-blue-primary: #1d4ed8;
-$color-blue-hover: #1e40af;
-$color-blue-light: #2563eb;
-$color-blue-subtle: #eff6ff;
-$color-border: #e2e8f0;
-$color-text-main: #0f172a;
-$color-text-muted: #64748b;
-$color-text-light: #94a3b8;
 
 :host {
   display: block;
@@ -21,160 +10,153 @@ $color-text-light: #94a3b8;
 .biblioteca-container {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
-  padding-bottom: 3rem;
+  gap: var(--space-6);
+  padding-bottom: var(--space-10);
 }
 
-// ============================================
-// BARRA DE RESULTADOS Y METADATOS
-// ============================================
+// ── Barra de Resultados y Metadatos ─────────────────────────────────────────
 .results-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 0.25rem 0.5rem;
+  gap: var(--space-3);
+  padding: 0 var(--space-1);
 }
 
 .results-info {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: var(--space-3);
 
   .count-badge {
-    background: linear-gradient(135deg, $color-blue-primary 0%, #4338ca 100%);
-    color: #ffffff;
-    font-size: 0.85rem;
-    font-weight: 800;
-    padding: 0.25rem 0.65rem;
-    border-radius: 8px;
+    background: var(--color-ai-gradient);
+    color: var(--color-white);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-extrabold);
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-full);
     box-shadow: 0 2px 6px rgba(29, 78, 216, 0.2);
   }
 
   .results-text {
-    font-size: 0.9rem;
-    color: $color-text-muted;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
 
     strong {
-      color: $color-text-main;
-      font-weight: 700;
+      color: var(--color-slate-900);
+      font-weight: var(--font-weight-bold);
     }
   }
 }
 
 .btn-reset-filters {
   background: transparent;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--color-slate-300);
   padding: 0.4rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: $color-text-muted;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-600);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  transition: all 0.2s ease;
+  gap: var(--space-2);
+  transition: var(--transition-fast);
 
   &:hover {
-    background-color: #f1f5f9;
-    color: $color-blue-primary;
-    border-color: #93c5fd;
+    background-color: var(--color-slate-100);
+    color: var(--color-primary-700);
+    border-color: var(--color-primary-400);
   }
 }
 
-// ============================================
-// GRILLA DE LIBROS
-// ============================================
+// ── Cuadrícula de Libros ────────────────────────────────────────────────────
 .books-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.5rem;
+  gap: var(--space-6);
   width: 100%;
 }
 
-// ============================================
-// ESTADO VACÍO (EMPTY STATE)
-// ============================================
+// ── Estado Vacío (Empty State) ──────────────────────────────────────────────
 .empty-results-box {
-  background-color: #ffffff;
-  border: 2px dashed #cbd5e1;
-  border-radius: 20px;
-  padding: 4rem 2rem;
+  background-color: var(--color-bg-surface);
+  border: 2px dashed var(--color-slate-200);
+  border-radius: var(--radius-xl);
+  padding: var(--space-16) var(--space-6);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
 
   .empty-icon {
     font-size: 3.5rem;
-    color: #94a3b8;
-    margin-bottom: 0.5rem;
+    color: var(--color-slate-300);
+    margin-bottom: var(--space-2);
   }
 
   .empty-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: $color-text-main;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-900);
     margin: 0;
   }
 
   .empty-desc {
-    font-size: 0.925rem;
-    color: $color-text-muted;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
     max-width: 480px;
     margin: 0;
-    line-height: 1.5;
+    line-height: var(--line-height-base);
   }
 
   .btn-reset-filters-large {
-    margin-top: 1rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    background-color: $color-blue-primary;
-    color: #ffffff;
-    font-size: 0.9rem;
-    font-weight: 600;
+    margin-top: var(--space-4);
+    padding: 0.65rem 1.5rem;
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary-700);
+    color: var(--color-white);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     border: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
-    transition: all 0.2s ease;
+    gap: var(--space-2);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-fast);
 
     &:hover {
-      background-color: $color-blue-hover;
+      background-color: var(--color-primary-800);
       transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
   }
 }
 
-// ============================================
-// NOTIFICACIÓN TOAST
-// ============================================
+// ── Notificación Toast ──────────────────────────────────────────────────────
 .toast-feedback {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background-color: #0f172a;
-  color: #ffffff;
-  padding: 0.85rem 1.35rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  bottom: var(--space-6);
+  right: var(--space-6);
+  background-color: var(--color-slate-900);
+  color: var(--color-white);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   z-index: 1100;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideUp var(--duration-fast) var(--ease-out-expo);
 
   .toast-icon {
-    color: #10b981;
+    color: var(--color-success);
     font-size: 1.15rem;
   }
 }
