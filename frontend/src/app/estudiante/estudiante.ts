@@ -79,11 +79,25 @@ export class Estudiante {
   public readonly navItems = signal<NavItem[]>([
     { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-grid-fill' },
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book' },
-    { id: 'asistente-ia', label: 'Asistente IA', icon: 'bi bi-robot' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text' },
     { id: 'progreso', label: 'Progreso', icon: 'bi bi-bar-chart' },
     { id: 'perfil', label: 'Perfil', icon: 'bi bi-person-circle' },
   ]);
+
+  // ── Panel Desplegable (Drawer) Asistente IA ─────────────────────────────
+  public readonly isAiDrawerOpen = signal<boolean>(false);
+
+  public toggleAiDrawer(): void {
+    this.isAiDrawerOpen.update((open) => !open);
+  }
+
+  public closeAiDrawer(): void {
+    this.isAiDrawerOpen.set(false);
+  }
+
+  public openAiDrawer(): void {
+    this.isAiDrawerOpen.set(true);
+  }
 
   // ── Usuario y Búsqueda ───────────────────────────────────────────────────
   public readonly studentName = signal<string>('Alejandro');

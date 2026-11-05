@@ -73,11 +73,13 @@
       [(searchQuery)]="searchQuery"
       [currentUser]="currentUser()"
       [currentRole]="currentRole()"
+      [isAiPanelOpen]="isAiPanelOpen()"
       (roleToggled)="toggleRole()"
+      (aiToggleClicked)="toggleAiPanel()"
     />
 
     <!-- Contenedor con Feed Central y Panel Lateral Derecho de Asistente -->
-    <div class="content-columns">
+    <div class="content-columns" [class.ai-collapsed]="!isAiPanelOpen()">
       <!-- ── COLUMNA CENTRAL: FEED DE DISCUSIÓN ── -->
       <main class="feed-column">
         <div class="feed-header">
@@ -125,13 +127,15 @@
       </main>
 
       <!-- NODO HIJO: Asistente IA, Temas Relacionados y Normas de Etiqueta -->
-      <app-foro-ai-widget
-        [aiSuggestion]="aiSuggestion()"
-        [relatedTopics]="relatedTopics()"
-        [etiquetteRules]="forumEtiquette"
-        (draftRequested)="handleAiDraftRequested($event)"
-        (topicSelected)="handleRelatedTopicSelected($event)"
-      />
+      @if (isAiPanelOpen()) {
+        <app-foro-ai-widget
+          [aiSuggestion]="aiSuggestion()"
+          [relatedTopics]="relatedTopics()"
+          [etiquetteRules]="forumEtiquette"
+          (draftRequested)="handleAiDraftRequested($event)"
+          (topicSelected)="handleRelatedTopicSelected($event)"
+        />
+      }
     </div>
   </div>
 

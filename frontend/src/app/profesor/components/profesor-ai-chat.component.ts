@@ -6,15 +6,31 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
   selector: 'app-profesor-ai-chat',
   imports: [FormsModule],
   template: `
-    <aside class="ai-assistant-panel" aria-label="Asistente de Inteligencia Artificial">
+    <aside
+      class="ai-assistant-panel"
+      [class.drawer-open]="isOpen()"
+      role="region"
+      aria-label="Asistente de Inteligencia Artificial"
+    >
       <div class="ai-header">
-        <div class="ai-icon-box">
-          <i class="bi bi-robot" aria-hidden="true"></i>
+        <div class="ai-header-titles-wrap">
+          <div class="ai-icon-box">
+            <i class="bi bi-robot" aria-hidden="true"></i>
+          </div>
+          <div class="ai-title-wrapper">
+            <h2 class="ai-title">Asistente Docente IA</h2>
+            <span class="ai-subtitle">Copiloto Inteligente DiscerIA</span>
+          </div>
         </div>
-        <div class="ai-title-wrapper">
-          <h2 class="ai-title">Asistente Docente IA</h2>
-          <span class="ai-subtitle">Copiloto Inteligente DiscerIA</span>
-        </div>
+        <button
+          type="button"
+          class="btn-close-drawer"
+          (click)="closeRequested.emit()"
+          aria-label="Cerrar panel de Asistente IA"
+          title="Cerrar Asistente"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
       </div>
 
       <div class="ai-body">
@@ -88,35 +104,89 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
   `,
   styles: [`
     .ai-assistant-panel {
-      width: var(--chat-panel-width, 360px);
-      min-width: var(--chat-panel-width, 360px);
+      width: 0;
+      min-width: 0;
       background-color: var(--color-bg-surface);
-      border-left: 1px solid var(--color-border);
+      border-left: none;
       display: flex;
       flex-direction: column;
-      padding: var(--space-5) var(--space-4) var(--space-4);
+      padding: 0;
       height: 100vh;
       position: sticky;
       top: 0;
-      z-index: 25;
+      z-index: 100;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: width var(--duration-normal) cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity var(--duration-fast) var(--ease-out-expo),
+                  padding var(--duration-fast) var(--ease-out-expo),
+                  border-left var(--duration-fast) var(--ease-out-expo);
+
+      &.drawer-open {
+        width: 380px;
+        min-width: 380px;
+        padding: var(--space-5) var(--space-4) var(--space-4);
+        opacity: 1;
+        pointer-events: auto;
+        border-left: 1px solid var(--color-border);
+        box-shadow: -6px 0 24px rgba(15, 23, 42, 0.06);
+      }
 
       @media (max-width: 1200px) {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
         width: 100%;
-        min-width: 100%;
-        height: auto;
-        position: static;
-        border-left: none;
-        border-top: 1px solid var(--color-border);
-        padding: var(--space-4);
+        max-width: 380px;
+        transform: translateX(100%);
+        opacity: 0;
+        box-shadow: -8px 0 32px rgba(15, 23, 42, 0.15);
+
+        &.drawer-open {
+          transform: translateX(0);
+          opacity: 1;
+          width: 100%;
+          min-width: 0;
+          padding: var(--space-4);
+        }
       }
     }
 
     .ai-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: var(--space-3);
       padding-bottom: var(--space-4);
       border-bottom: 1px solid var(--color-border);
+
+      .ai-header-titles-wrap {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .btn-close-drawer {
+        background: transparent;
+        border: none;
+        color: var(--color-slate-400);
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: var(--transition-fast);
+
+        &:hover {
+          background-color: var(--color-slate-100);
+          color: var(--color-slate-700);
+        }
+      }
 
       .ai-icon-box {
         width: 38px;
@@ -341,6 +411,7 @@ import { AiSuggestion, ChatMessage } from '../models/profesor.model';
   `],
 })
 export class ProfesorAiChatComponent {
+  public readonly isOpen = input<boolean>(false);
   public readonly chatMessages = input.required<readonly ChatMessage[]>();
   public readonly aiSuggestions = input.required<readonly AiSuggestion[]>();
   public readonly isAiThinking = input.required<boolean>();
@@ -349,6 +420,7 @@ export class ProfesorAiChatComponent {
 
   public readonly suggestionSelected = output<AiSuggestion>();
   public readonly messageSubmitted = output<string>();
+  public readonly closeRequested = output<void>();
 
   public onSubmit(): void {
     const text = this.inputText().trim();

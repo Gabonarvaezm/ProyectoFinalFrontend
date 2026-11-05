@@ -18,6 +18,19 @@ import { ForumAuthor, UserRole } from '../models/foro.model';
       </div>
 
       <div class="header-actions">
+        <!-- Botón Topbar Asistente IA (Opción 1: Barra Superior) -->
+        <button
+          type="button"
+          class="icon-btn btn-ai-toggle"
+          [class.active]="isAiPanelOpen()"
+          (click)="aiToggleClicked.emit()"
+          title="Asistente de Comunidad Context AI"
+          aria-label="Alternar Asistente de Comunidad"
+          [attr.aria-expanded]="isAiPanelOpen()"
+        >
+          <i class="bi bi-robot"></i>
+        </button>
+
         <button
           type="button"
           class="icon-btn"
@@ -149,6 +162,24 @@ import { ForumAuthor, UserRole } from '../models/foro.model';
         box-shadow: var(--focus-ring);
       }
 
+      &.btn-ai-toggle {
+        background: var(--color-slate-100);
+        color: var(--color-primary-700);
+
+        &:hover {
+          background: var(--color-primary-50);
+          color: var(--color-primary-800);
+          transform: translateY(-1px);
+        }
+
+        &.active {
+          background: var(--color-ai-gradient);
+          color: var(--color-white);
+          border-color: transparent;
+          box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+        }
+      }
+
       .notification-indicator {
         position: absolute;
         top: 8px;
@@ -208,7 +239,10 @@ export class ForoHeaderComponent {
   public readonly currentUser = input.required<ForumAuthor>();
   public readonly currentRole = input.required<UserRole>();
   public readonly notificationsCount = input<number>(2);
+  public readonly isAiPanelOpen = input<boolean>(true);
+
   public readonly roleToggled = output<void>();
+  public readonly aiToggleClicked = output<void>();
 
   public onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement;

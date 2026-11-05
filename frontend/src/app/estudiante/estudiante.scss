@@ -24,14 +24,16 @@
 
 // ── Área Principal de Contenido (Dashboard) ─────────────────────────────────
 .main-content {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
   padding: var(--space-6) var(--space-8);
-  max-width: var(--max-content-width);
+  max-width: 100%;
   width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  transition: all var(--duration-normal) var(--ease-out-expo);
 
   @media (max-width: 768px) {
     padding: var(--space-4);
@@ -525,27 +527,67 @@
   }
 }
 
-// ── Panel Lateral Derecho (Asistente IA Estudiante) ─────────────────────────
+
+.ai-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 95;
+  animation: fadeIn var(--duration-fast) var(--ease-out-expo);
+
+  @media (min-width: 1201px) {
+    display: none;
+  }
+}
+
+// ── Panel Lateral Derecho Desplegable (Drawer Asistente IA Estudiante) ───────
 .ai-sidebar {
-  width: var(--chat-panel-width, 360px);
-  min-width: var(--chat-panel-width, 360px);
+  width: 0;
+  min-width: 0;
   background-color: var(--color-bg-surface);
-  border-left: 1px solid var(--color-border);
+  border-left: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
   position: sticky;
   top: 0;
-  z-index: 25;
+  z-index: 100;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: width var(--duration-normal) cubic-bezier(0.16, 1, 0.3, 1),
+              opacity var(--duration-fast) var(--ease-out-expo),
+              border-left var(--duration-fast) var(--ease-out-expo);
+
+  &.drawer-open {
+    width: 380px;
+    min-width: 380px;
+    opacity: 1;
+    pointer-events: auto;
+    border-left: 1px solid var(--color-border);
+    box-shadow: -6px 0 24px rgba(15, 23, 42, 0.06);
+  }
 
   @media (max-width: 1200px) {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
     width: 100%;
-    min-width: 100%;
-    height: auto;
-    position: static;
-    border-left: none;
-    border-top: 1px solid var(--color-border);
+    max-width: 380px;
+    transform: translateX(100%);
+    opacity: 0;
+    box-shadow: -8px 0 32px rgba(15, 23, 42, 0.15);
+
+    &.drawer-open {
+      transform: translateX(0);
+      opacity: 1;
+      width: 100%;
+      min-width: 0;
+    }
   }
 }
 
@@ -553,8 +595,29 @@
   padding: var(--space-5) var(--space-4) var(--space-4);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
   border-bottom: 1px solid var(--color-border);
+
+  .btn-close-drawer {
+    background: transparent;
+    border: none;
+    color: var(--color-slate-400);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-slate-100);
+      color: var(--color-slate-700);
+    }
+  }
 
   .ai-header-icon {
     width: 38px;

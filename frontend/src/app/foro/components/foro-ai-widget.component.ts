@@ -82,10 +82,23 @@ import { CommunityAiSuggestion, RelatedTopic } from '../models/foro.model';
     </aside>
   `,
   styles: [`
+    :host {
+      display: block;
+      position: static;
+      width: 340px;
+      min-width: 300px;
+      max-width: 360px;
+      flex: 0 0 340px;
+      margin: 0;
+      padding: 0;
+    }
+
     .widgets-column {
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
+      position: static;
+      width: 100%;
     }
 
     .widget-card {
