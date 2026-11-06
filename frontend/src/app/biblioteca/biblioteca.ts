@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -8,7 +9,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { Book, BookCategory, CategoryFilter } from './models/book.model';
+import { Book, BookCategory, CategoryFilter, CreateBookDto } from './models/book.model';
 import { CATEGORIES, INITIAL_BOOKS } from './data/books.data';
 import {
   BibliotecaBookCardComponent,
@@ -16,6 +17,8 @@ import {
   BibliotecaDetailModalComponent,
   BibliotecaHeaderComponent,
 } from './components';
+import { LibroComponent } from '../libro/libro.component';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   imports: [
@@ -23,14 +26,16 @@ import {
     BibliotecaCategoryNavComponent,
     BibliotecaBookCardComponent,
     BibliotecaDetailModalComponent,
+    LibroComponent,
   ],
   selector: 'app-biblioteca',
   styleUrl: './biblioteca.scss',
   templateUrl: './biblioteca.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class Biblioteca implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly authService = inject(AuthService);
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
   // ── Inputs y Outputs Públicos del Módulo ──────────────────────────────────
@@ -40,11 +45,12 @@ export class Biblioteca implements OnInit {
   public readonly bookSelected = output<Book>();
   public readonly bookRecommended = output<Book>();
 
-  // ── Estado Reactivo Central (Signals Gestionados por el Padre) ───────────
+  // ── Estado Reactivo Central ───────────────────────────────────────────────
   public readonly searchQuery = signal<string>('');
   public readonly selectedCategory = signal<BookCategory>('all');
   public readonly selectedFormat = signal<string>('all');
   public readonly books = signal<Book[]>(INITIAL_BOOKS);
+
   public readonly categories = computed<CategoryFilter[]>(() => {
     const all = this.books();
     return CATEGORIES.map((cat) => ({
@@ -53,16 +59,32 @@ export class Biblioteca implements OnInit {
     }));
   });
 
-  /** Libro seleccionado para modal de lectura / detalle */
+  // ── Computed: Privilegios del docente ─────────────────────────────────────
+  public readonly isProfessor = computed(
+    () =>
+      this.userRole() === 'professor' ||
+      this.authService.currentUser()?.role === 'professor'
+  );
+
+  // ── Computed: Institución del usuario autenticado ─────────────────────────
+  public readonly userInstitution = computed(
+    () => this.authService.currentUser()?.institution ?? ''
+  );
+
+  // ── Estado del Modal de Creación (gestionado por el Padre) ───────────────
+  public readonly isCreateBookOpen = signal<boolean>(false);
+  public readonly isSavingBook = signal<boolean>(false);
+
+  // ── Estado del Modal de Detalle ───────────────────────────────────────────
   public readonly selectedBook = signal<Book | null>(null);
 
-  /** IDs de libros guardados en marcadores por el usuario */
+  /** IDs de libros en marcadores del usuario */
   public readonly bookmarkedIds = signal<Set<string>>(new Set(['bk-1', 'bk-3']));
 
-  /** Notificación flotante de feedback */
+  /** Toast de feedback flotante */
   public readonly toastFeedback = signal<string | null>(null);
 
-  // ── Señales Computadas (Computed Signals) ─────────────────────────────────
+  // ── Computed: Libros filtrados ────────────────────────────────────────────
   public readonly filteredBooks = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
     const cat = this.selectedCategory();
@@ -71,7 +93,6 @@ export class Biblioteca implements OnInit {
     return this.books().filter((book) => {
       const matchesCategory = cat === 'all' || book.category === cat;
       const matchesFormat = fmt === 'all' || book.format.toLowerCase() === fmt.toLowerCase();
-
       const matchesQuery =
         !query ||
         book.title.toLowerCase().includes(query) ||
@@ -100,15 +121,65 @@ export class Biblioteca implements OnInit {
     const initCat = this.initialCategory();
     if (initCat) {
       const match = this.categories().find(
-        (c) => c.id.toLowerCase() === initCat.toLowerCase() || c.label.toLowerCase().includes(initCat.toLowerCase())
+        (c) =>
+          c.id.toLowerCase() === initCat.toLowerCase() ||
+          c.label.toLowerCase().includes(initCat.toLowerCase())
       );
-      if (match) {
-        this.selectedCategory.set(match.id);
-      }
+      if (match) this.selectedCategory.set(match.id);
     }
   }
 
-  // ── Coordinación de Eventos y Comunicación entre Nodos Hijos ────────────
+  // ── Gestión del Modal de Creación (delegada al hijo LibroComponent) ───────
+
+  public openCreateBookModal(): void {
+    if (!this.isProfessor()) {
+      this.showToast('Acceso restringido: Solo los docentes pueden publicar libros.');
+      return;
+    }
+    this.isCreateBookOpen.set(true);
+  }
+
+  public closeCreateBookModal(): void {
+    this.isCreateBookOpen.set(false);
+  }
+
+  /**
+   * El padre recibe el DTO emitido por LibroComponent y lo persiste localmente.
+   * Esta es la única responsabilidad del padre en cuanto a la creación del libro.
+   */
+  public handleBookCreated(dto: CreateBookDto): void {
+    this.isSavingBook.set(true);
+
+    // Construcción del libro completo (el padre determina id, rating, etc.)
+    const categoryData = this.categories().find((c) => c.id === dto.category);
+    const newBook: Book = {
+      id: `bk-${Date.now()}`,
+      title: dto.title,
+      author: dto.author,
+      category: dto.category,
+      categoryLabel: categoryData?.label ?? 'Recurso Académico',
+      description: dto.description,
+      coverImage:
+        dto.coverImage?.trim() ||
+        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=400&q=80',
+      pages: dto.pages,
+      year: dto.year,
+      format: dto.format,
+      rating: 5.0,
+      reviewsCount: 0,
+      readsCount: 0,
+      institution: dto.institution ?? 'Comunidad Docente DiscerIA',
+      tags: dto.tags,
+      featured: false,
+    };
+
+    this.books.update((current) => [newBook, ...current]);
+    this.isCreateBookOpen.set(false);
+    this.isSavingBook.set(false);
+    this.showToast(`"${newBook.title}" publicado con éxito en el repositorio.`);
+  }
+
+  // ── Coordinación de Eventos entre Nodos Hijos ─────────────────────────────
 
   public setCategory(catId: BookCategory): void {
     this.selectedCategory.set(catId);
@@ -142,35 +213,26 @@ export class Biblioteca implements OnInit {
   }
 
   public toggleBookmark(book: Book, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+    event?.stopPropagation();
     const current = new Set(this.bookmarkedIds());
-    const isSaved = current.has(book.id);
-
-    if (isSaved) {
+    if (current.has(book.id)) {
       current.delete(book.id);
       this.showToast(`"${book.title}" eliminado de tus marcadores.`);
     } else {
       current.add(book.id);
       this.showToast(`"${book.title}" guardado en tus marcadores de estudio.`);
     }
-
     this.bookmarkedIds.set(current);
   }
 
   public onRecommend(book: Book, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+    event?.stopPropagation();
     this.bookRecommended.emit(book);
     this.showToast(`"${book.title}" recomendado a los alumnos de tu cohorte.`);
   }
 
   public onDownload(book: Book, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+    event?.stopPropagation();
     this.showToast(`Iniciando descarga en formato ${book.format}: ${book.title}`);
   }
 
@@ -184,9 +246,7 @@ export class Biblioteca implements OnInit {
 
   private showToast(msg: string): void {
     this.toastFeedback.set(msg);
-    const timer = setTimeout(() => {
-      this.toastFeedback.set(null);
-    }, 3200);
+    const timer = setTimeout(() => this.toastFeedback.set(null), 3200);
     this.timerIds.push(timer);
   }
 }
