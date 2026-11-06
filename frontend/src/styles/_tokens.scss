@@ -151,7 +151,7 @@
   --max-content-width: 1440px;
 }
 
-// ── Variables de Tema Oscuro (Dark Mode) ──────────────────────────────────────
+// ── Variables de Tema Oscuro (Dark Mode & Alto Contraste WCAG AA) ─────────────
 [data-theme='dark'],
 .dark-theme {
   // Superficies y Fondos
@@ -160,28 +160,73 @@
   --color-bg-surface-elevated: #1e293b;
   --color-bg-muted: #1e293b;
 
-  // Textos y Contraste
-  --color-text-main: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-text-muted: #94a3b8;
+  // Textos y Contraste Óptimo (Mapeo a tonos claros/blancos legibles #F8FAFC, #E2E8F0)
+  --color-text-main: #f8fafc;        // Blanco puro legible
+  --color-text-secondary: #e2e8f0;   // Gris muy claro (#E2E8F0) de alto contraste
+  --color-text-muted: #cbd5e1;       // Gris claro suave para metadatos y fechas
+
+  // Escala Completa Invertida para Textos, Etiquetas y Celdas de Tabla
+  --color-slate-900: #f8fafc;        // Títulos y encabezados principales (#F8FAFC)
+  --color-slate-800: #f1f5f9;        // Subtítulos y texto semi-destacado
+  --color-slate-700: #e2e8f0;        // Etiquetas de formulario, nombres y labels (#E2E8F0)
+  --color-slate-600: #e2e8f0;        // Textos secundarios, descripciones y celdas (#E2E8F0)
+  --color-slate-500: #cbd5e1;        // Encabezados de tabla (th) e iconos secundarios
+  --color-slate-400: #94a3b8;        // Placeholders e hints
+  --color-slate-300: #475569;        // Divisores y bordes activos
+  --color-slate-200: #334155;        // Bordes de tarjetas y contenedores
+  --color-slate-100: #1e293b;        // Fondos de hover, tags y botones secundarios
+  --color-slate-50: #131d31;         // Fondos sutiles (hover en filas de tablas, inputs)
+  --color-white: #ffffff;
 
   // Bordes
   --color-border: #334155;
   --color-border-subtle: #1e293b;
+  --color-border-focus: #60a5fa;
 
-  // Escala de Grises Invertida para Superficies Secundarias
-  --color-slate-50: #1e293b;
-  --color-slate-100: #334155;
-  --color-slate-200: #475569;
-  --color-slate-300: #64748b;
-  --color-slate-800: #e2e8f0;
-  --color-slate-900: #f8fafc;
+  // Primarios Adaptados (más luminosos para contraste sobre fondo oscuro)
+  --color-primary-50: rgba(37, 99, 235, 0.2);
+  --color-primary-100: rgba(37, 99, 235, 0.3);
+  --color-primary-200: rgba(59, 130, 246, 0.4);
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #3b82f6;
+  --color-primary-700: #60a5fa;
+  --color-primary-800: #93c5fd;
+  --color-primary-900: #bfdbfe;
+  --color-primary: var(--color-primary-700);
+  --color-primary-hover: var(--color-primary-800);
+  --color-primary-light: var(--color-primary-50);
+
+  // Acentos de IA adaptados
+  --color-ai-50: rgba(99, 102, 241, 0.2);
+  --color-ai-100: rgba(99, 102, 241, 0.3);
+  --color-ai-300: #c7d2fe;
+  --color-ai-gradient-subtle: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(99, 102, 241, 0.25) 100%);
+
+  // Alertas y Feedback con legibilidad garantizada
+  --color-success: #34d399;
+  --color-success-bg: rgba(16, 185, 129, 0.18);
+  --color-success-border: rgba(16, 185, 129, 0.4);
+
+  --color-danger: #f87171;
+  --color-danger-bg: rgba(239, 68, 68, 0.18);
+  --color-danger-border: rgba(239, 68, 68, 0.4);
+
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(245, 158, 11, 0.18);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
+
+  --color-info: #38bdf8;
+  --color-info-bg: rgba(2, 132, 199, 0.18);
+  --color-info-border: rgba(2, 132, 199, 0.4);
 
   // Sombras y Resplandor Adaptados
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
   --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
   --shadow-card-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.55);
 }

@@ -66,7 +66,6 @@ export class Profesor {
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text' },
     { id: 'progreso', label: 'Progreso', icon: 'bi bi-bar-chart' },
-    { id: 'configuracion', label: 'Configuración', icon: 'bi bi-gear' },
   ]);
 
   // ── Panel Desplegable (Drawer) Asistente IA ─────────────────────────────

@@ -1,0 +1,135 @@
+<div class="card-login anim-fade-up anim-stagger-1">
+  <div class="form-header">
+    <h2 class="form-title">Iniciar Sesión</h2>
+    <p class="form-subtitle">Ingresa tus credenciales institucionales para continuar.</p>
+  </div>
+
+  <!-- Alertas de estado animadas (locales o emitidas por el padre) -->
+  @if (errorMessage() || localErrorMessage()) {
+    <div @fadeInUp class="alert alert-danger" role="alert" aria-live="assertive">
+      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+      <span>{{ errorMessage() || localErrorMessage() }}</span>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div @fadeInUp class="alert alert-success d-flex-center" role="alert" aria-live="polite">
+      <app-lottie name="success" width="38px" height="38px" [loop]="false" ariaLabel="Éxito"></app-lottie>
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+
+  <!-- Formulario Reactivo -->
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
+    <!-- Campo: Correo Electrónico -->
+    <div class="form-group">
+      <label for="email" class="form-label">Correo Institucional</label>
+      <div class="input-wrapper" [class.has-error]="isFieldInvalid('email')">
+        <span class="input-icon" aria-hidden="true">
+          <i class="bi bi-envelope"></i>
+        </span>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-input"
+          [class.is-invalid]="isFieldInvalid('email')"
+          placeholder="estudiante@universidad.edu"
+          autocomplete="email"
+          [attr.aria-invalid]="isFieldInvalid('email')"
+          [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
+          required
+        />
+      </div>
+      @if (isFieldInvalid('email')) {
+        <span id="email-error" class="field-error" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          {{ getFieldError('email') }}
+        </span>
+      }
+    </div>
+
+    <!-- Campo: Contraseña -->
+    <div class="form-group">
+      <div class="label-row">
+        <label for="password" class="form-label">Contraseña</label>
+        <button
+          type="button"
+          (click)="onForgotPassword($event)"
+          class="forgot-password"
+        >
+          ¿Olvidaste tu contraseña?
+        </button>
+      </div>
+      <div class="input-wrapper" [class.has-error]="isFieldInvalid('password')">
+        <span class="input-icon" aria-hidden="true">
+          <i class="bi bi-lock"></i>
+        </span>
+        <input
+          [type]="showPassword() ? 'text' : 'password'"
+          id="password"
+          formControlName="password"
+          class="form-input"
+          [class.is-invalid]="isFieldInvalid('password')"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          [attr.aria-invalid]="isFieldInvalid('password')"
+          [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"
+          required
+        />
+        <button
+          type="button"
+          class="password-toggle-btn"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Ver contraseña'"
+        >
+          <i
+            class="bi"
+            [class.bi-eye]="!showPassword()"
+            [class.bi-eye-slash]="showPassword()"
+          ></i>
+        </button>
+      </div>
+      @if (isFieldInvalid('password')) {
+        <span id="password-error" class="field-error" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          {{ getFieldError('password') }}
+        </span>
+      }
+    </div>
+
+    <!-- Opción: Recordar sesión -->
+    <div class="remember-row">
+      <label class="checkbox-label" for="rememberMe">
+        <input
+          type="checkbox"
+          id="rememberMe"
+          formControlName="rememberMe"
+          class="checkbox-input"
+        />
+        <span class="checkbox-text">Recordar mi sesión en este equipo</span>
+      </label>
+    </div>
+
+    <!-- Botón Submit -->
+    <button
+      type="submit"
+      class="btn-primary"
+      [disabled]="isLoading()"
+    >
+      @if (isLoading()) {
+        <app-lottie name="loading" width="22px" height="22px" ariaLabel="Cargando"></app-lottie>
+        <span>Verificando credenciales...</span>
+      } @else {
+        <span>Ingresar a la Plataforma</span>
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+      }
+    </button>
+  </form>
+</div>
+
+<div class="form-footer">
+  <span>¿No tienes una cuenta universitaria? </span>
+  <a routerLink="/register" class="request-access-link">Registrarse</a>
+</div>
+

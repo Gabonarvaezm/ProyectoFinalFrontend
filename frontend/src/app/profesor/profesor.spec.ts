@@ -23,7 +23,8 @@ describe('Profesor Component', () => {
 
   it('debe inicializar las métricas y la navegación por defecto', () => {
     expect(component.activeNav()).toBe('dashboard');
-    expect(component.navItems().length).toBeGreaterThan(0);
+    expect(component.navItems().length).toBe(4);
+    expect(component.navItems().some((item) => item.id === 'configuracion')).toBe(false);
     expect(component.kpiMetrics().length).toBe(3);
     expect(component.students().length).toBeGreaterThanOrEqual(3);
   });

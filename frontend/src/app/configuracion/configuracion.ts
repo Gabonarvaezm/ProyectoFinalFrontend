@@ -26,11 +26,30 @@ import {
   FontSizePreference,
   UserPreferences,
 } from './models/configuracion.model';
+import {
+  ConfiguracionAparienciaComponent,
+  ConfiguracionCuentaComponent,
+  ConfiguracionHeaderComponent,
+  ConfiguracionIaComponent,
+  ConfiguracionLogoutModalComponent,
+  ConfiguracionNotificacionesComponent,
+  ConfiguracionTabsComponent,
+} from './components';
 
 @Component({
   selector: 'app-configuracion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ConfiguracionHeaderComponent,
+    ConfiguracionTabsComponent,
+    ConfiguracionCuentaComponent,
+    ConfiguracionAparienciaComponent,
+    ConfiguracionIaComponent,
+    ConfiguracionNotificacionesComponent,
+    ConfiguracionLogoutModalComponent,
+  ],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,7 +63,7 @@ export class ConfiguracionComponent {
 
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
-  // ── Inputs & Outputs (Patrón Smart/Dumb con Signals) ─────────────────────
+  // Inputs & Outputs (Patrón Smart/Dumb con Signals)
   public readonly user = input<User | null>(null);
   public readonly isEmbedded = input<boolean>(false);
 
@@ -52,7 +71,7 @@ export class ConfiguracionComponent {
   public readonly preferencesSaved = output<UserPreferences>();
   public readonly themeChanged = output<AppTheme>();
 
-  // ── Pestaña Activa de Configuración ──────────────────────────────────────
+  // Pestaña Activa de Configuración
   public readonly activeSection = signal<ConfigSectionId>('cuenta');
 
   public readonly sections: ConfigSection[] = [
@@ -82,17 +101,17 @@ export class ConfiguracionComponent {
     },
   ];
 
-  // ── Estado del Tema Actual desde ThemeService ─────────────────────────────
+  // Estado del Tema Actual desde ThemeService
   public readonly currentTheme = this.themeService.currentTheme;
   public readonly isDarkMode = this.themeService.isDarkMode;
 
-  // ── Confirmación de Logout Modal ─────────────────────────────────────────
+  // Confirmación de Logout Modal
   public readonly isLogoutConfirmOpen = signal<boolean>(false);
 
-  // ── Toast Feedback ───────────────────────────────────────────────────────
+  // Toast Feedback
   public readonly toastFeedback = signal<string | null>(null);
 
-  // ── Usuario Efectivo (input o fallback a AuthService) ─────────────────────
+  // Usuario Efectivo
   public readonly effectiveUser = computed<User>(() => {
     const inputUser = this.user();
     if (inputUser) return inputUser;
@@ -100,7 +119,6 @@ export class ConfiguracionComponent {
     const authUser = this.authService.currentUser();
     if (authUser) return authUser;
 
-    // Respaldo seguro desde localStorage en navegador
     if (isPlatformBrowser(this.platformId)) {
       try {
         const stored = localStorage.getItem('disceria_registered_user');
@@ -137,7 +155,7 @@ export class ConfiguracionComponent {
     return name.slice(0, 2).toUpperCase();
   });
 
-  // ── Formulario Reactivo de Preferencias ───────────────────────────────────
+  // Formulario Reactivo de Preferencias
   public readonly preferencesForm: FormGroup = this.fb.group({
     theme: [this.themeService.currentTheme(), [Validators.required]],
     emailNotifications: [true],
@@ -156,15 +174,10 @@ export class ConfiguracionComponent {
     });
   }
 
-  // ── Métodos de Acción ────────────────────────────────────────────────────
-
   public selectSection(id: ConfigSectionId): void {
     this.activeSection.set(id);
   }
 
-  /**
-   * Cambia el tema de la aplicación mediante ThemeService y notifica
-   */
   public selectTheme(theme: AppTheme): void {
     this.preferencesForm.patchValue({ theme });
     this.themeService.setTheme(theme);
@@ -183,9 +196,6 @@ export class ConfiguracionComponent {
     );
   }
 
-  /**
-   * Abre diálogo de confirmación para cerrar sesión
-   */
   public promptLogout(): void {
     this.isLogoutConfirmOpen.set(true);
   }
@@ -194,17 +204,11 @@ export class ConfiguracionComponent {
     this.isLogoutConfirmOpen.set(false);
   }
 
-  /**
-   * Ejecuta el cierre de sesión y notifica al componente padre
-   */
   public confirmLogout(): void {
     this.isLogoutConfirmOpen.set(false);
     this.logoutRequested.emit();
   }
 
-  /**
-   * Guarda las preferencias del formulario reactivo
-   */
   public savePreferences(): void {
     if (this.preferencesForm.invalid) {
       this.preferencesForm.markAllAsTouched();
@@ -225,4 +229,3 @@ export class ConfiguracionComponent {
     this.timerIds.push(timer);
   }
 }
-

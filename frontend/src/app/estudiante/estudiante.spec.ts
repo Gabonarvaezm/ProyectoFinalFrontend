@@ -27,7 +27,8 @@ describe('Estudiante', () => {
   it('debe inicializarse con el dashboard activo y el nombre del estudiante', () => {
     expect(component.activeNav()).toBe('dashboard');
     expect(component.studentName()).toBe('Alejandro');
-    expect(component.navItems().length).toBe(5);
+    expect(component.navItems().length).toBe(4);
+    expect(component.navItems().some((item) => item.id === 'configuracion')).toBe(false);
     expect(component.navItems().some((item) => item.id === 'asistente-ia')).toBe(false);
   });
 

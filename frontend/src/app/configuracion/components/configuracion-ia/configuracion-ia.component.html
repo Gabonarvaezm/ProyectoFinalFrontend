@@ -1,0 +1,34 @@
+<div class="section-pane fade-in" [formGroup]="form()">
+  <section class="card config-card" aria-labelledby="card-ai-title">
+    <div class="card-header">
+      <div class="header-icon-box icon-ai">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div>
+        <h2 id="card-ai-title" class="card-title">Personalización del Asistente IA</h2>
+        <p class="card-subtitle">Configura el tono pedagógico con el que DiscerIA te asiste.</p>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label" for="aiToneSelect">Estilo Pedagógico de Respuesta</label>
+      <select id="aiToneSelect" class="form-select" formControlName="aiTone">
+        <option value="detailed">Explicativo y Detallado (Paso a paso con ejemplos)</option>
+        <option value="concise">Conciso y Directo (Enfocado en respuestas rápidas)</option>
+        <option value="socratic">Método Socrático (Guía mediante preguntas reflexivas)</option>
+      </select>
+    </div>
+
+    <div class="switch-setting-row">
+      <div class="switch-text">
+        <span class="setting-title">Sugerencias Proactivas de Estudio</span>
+        <span class="setting-desc">El asistente sugiere temas complementarios según tu progreso.</span>
+      </div>
+      <label class="custom-switch" for="aiAutoSuggestionsSwitch">
+        <input type="checkbox" id="aiAutoSuggestionsSwitch" formControlName="aiAutoSuggestions" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </section>
+</div>
+

@@ -1,0 +1,58 @@
+<div class="section-pane fade-in" [formGroup]="form()">
+  <section class="card config-card" aria-labelledby="card-notif-title">
+    <div class="card-header">
+      <div class="header-icon-box icon-info">
+        <i class="bi bi-bell-fill"></i>
+      </div>
+      <div>
+        <h2 id="card-notif-title" class="card-title">Canales de Notificación</h2>
+        <p class="card-subtitle">Decide qué notificaciones deseas recibir y por qué medio.</p>
+      </div>
+    </div>
+
+    <div class="switch-setting-row">
+      <div class="switch-text">
+        <span class="setting-title">Notificaciones por Correo Electrónico</span>
+        <span class="setting-desc">Recibe resúmenes y alertas críticas en tu correo institucional.</span>
+      </div>
+      <label class="custom-switch" for="emailNotifSwitch">
+        <input type="checkbox" id="emailNotifSwitch" formControlName="emailNotifications" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-setting-row">
+      <div class="switch-text">
+        <span class="setting-title">Respuestas en Hilos del Foro</span>
+        <span class="setting-desc">Avisar cuando un docente o estudiante responda tus consultas.</span>
+      </div>
+      <label class="custom-switch" for="forumReplySwitch">
+        <input type="checkbox" id="forumReplySwitch" formControlName="forumReplyNotifications" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-setting-row">
+      <div class="switch-text">
+        <span class="setting-title">Alertas de Exámenes y Fechas Límite</span>
+        <span class="setting-desc">Recordatorios con 24 horas de antelación para evaluaciones.</span>
+      </div>
+      <label class="custom-switch" for="examAlertsSwitch">
+        <input type="checkbox" id="examAlertsSwitch" formControlName="examAlerts" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-setting-row">
+      <div class="switch-text">
+        <span class="setting-title">Informe Semanal de Progreso con IA</span>
+        <span class="setting-desc">Un reporte de síntesis con tus logros y áreas de mejora.</span>
+      </div>
+      <label class="custom-switch" for="weeklyAiSummarySwitch">
+        <input type="checkbox" id="weeklyAiSummarySwitch" formControlName="weeklyAiSummary" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </section>
+</div>
+
