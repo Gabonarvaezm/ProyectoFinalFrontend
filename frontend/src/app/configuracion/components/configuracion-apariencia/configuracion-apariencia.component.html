@@ -1,0 +1,134 @@
+<div class="section-pane fade-in" [formGroup]="form()">
+  <section class="card config-card" aria-labelledby="card-theme-title">
+    <div class="card-header">
+      <div class="header-icon-box icon-accent">
+        <i class="bi bi-palette-fill"></i>
+      </div>
+      <div>
+        <h2 id="card-theme-title" class="card-title">Preferencia de Tema</h2>
+        <p class="card-subtitle">Selecciona el modo visual que mejor se adapte a tu entorno de estudio.</p>
+      </div>
+    </div>
+
+    <!-- Selector de Modo Claro vs Modo Oscuro -->
+    <div class="theme-options-grid" role="radiogroup" aria-label="Preferencia de tema visual">
+      <!-- Opción Modo Claro -->
+      <div
+        class="theme-card light-preview"
+        [class.selected]="!isDarkMode()"
+        (click)="onSelectTheme('light')"
+        (keydown.enter)="onSelectTheme('light')"
+        (keydown.space)="$event.preventDefault(); onSelectTheme('light')"
+        tabindex="0"
+        role="radio"
+        [attr.aria-checked]="!isDarkMode()"
+      >
+        <div class="theme-preview-box preview-light">
+          <div class="preview-mock-header"></div>
+          <div class="preview-mock-body">
+            <div class="preview-mock-line"></div>
+            <div class="preview-mock-line short"></div>
+          </div>
+        </div>
+        <div class="theme-card-footer">
+          <div class="theme-title-row">
+            <i class="bi bi-sun-fill sun-icon"></i>
+            <span class="theme-name">Modo Claro</span>
+          </div>
+          <p class="theme-desc">Limpio y de alto contraste, ideal para el día y ambientes iluminados.</p>
+          <div class="selection-indicator">
+            @if (!isDarkMode()) {
+              <i class="bi bi-check-circle-fill"></i>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Opción Modo Oscuro -->
+      <div
+        class="theme-card dark-preview"
+        [class.selected]="isDarkMode()"
+        (click)="onSelectTheme('dark')"
+        (keydown.enter)="onSelectTheme('dark')"
+        (keydown.space)="$event.preventDefault(); onSelectTheme('dark')"
+        tabindex="0"
+        role="radio"
+        [attr.aria-checked]="isDarkMode()"
+      >
+        <div class="theme-preview-box preview-dark">
+          <div class="preview-mock-header"></div>
+          <div class="preview-mock-body">
+            <div class="preview-mock-line"></div>
+            <div class="preview-mock-line short"></div>
+          </div>
+        </div>
+        <div class="theme-card-footer">
+          <div class="theme-title-row">
+            <i class="bi bi-moon-stars-fill moon-icon"></i>
+            <span class="theme-name">Modo Oscuro</span>
+          </div>
+          <p class="theme-desc">Descansa la vista y ahorra batería durante sesiones prolongadas de estudio.</p>
+          <div class="selection-indicator">
+            @if (isDarkMode()) {
+              <i class="bi bi-check-circle-fill"></i>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Switch Rápido Toggle -->
+    <div class="quick-toggle-bar">
+      <div class="toggle-info">
+        <span class="toggle-title">Alternar rápidamente tema</span>
+        <span class="toggle-subtitle">Estado actual: <strong>{{ isDarkMode() ? 'Modo Oscuro' : 'Modo Claro' }}</strong></span>
+      </div>
+      <button
+        type="button"
+        class="theme-toggle-switch-btn"
+        [class.is-dark]="isDarkMode()"
+        (click)="onToggleTheme()"
+        aria-label="Alternar entre modo claro y modo oscuro"
+      >
+        <span class="switch-handle">
+          <i [class]="isDarkMode() ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"></i>
+        </span>
+        <span class="switch-label-text">{{ isDarkMode() ? 'Oscuro' : 'Claro' }}</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Accesibilidad y Tamaño de Fuente -->
+  <section class="card config-card" aria-labelledby="card-a11y-title">
+    <div class="card-header">
+      <div class="header-icon-box">
+        <i class="bi bi-type"></i>
+      </div>
+      <div>
+        <h2 id="card-a11y-title" class="card-title">Tipografía y Accesibilidad</h2>
+        <p class="card-subtitle">Personaliza la legibilidad del texto en exámenes y documentos.</p>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label" for="fontSizeSelect">Tamaño de Fuente Base</label>
+      <select id="fontSizeSelect" class="form-select" formControlName="fontSize">
+        <option value="sm">Pequeño (14px) — Mayor densidad de contenido</option>
+        <option value="base">Normal (16px) — Estándar recomendado</option>
+        <option value="lg">Grande (18px) — Mayor legibilidad y descanso visual</option>
+      </select>
+    </div>
+
+    <div class="switch-setting-row">
+      <div class="switch-text">
+        <span class="setting-title">Reducir animaciones</span>
+        <span class="setting-desc">Minimiza efectos de transición para mayor fluidez.</span>
+      </div>
+      <label class="custom-switch" for="reduceMotionSwitch">
+        <input type="checkbox" id="reduceMotionSwitch" formControlName="reduceMotion" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </section>
+</div>
+

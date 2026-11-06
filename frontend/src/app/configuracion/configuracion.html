@@ -1,357 +1,50 @@
 <div class="config-wrapper" [class.is-embedded]="isEmbedded()">
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 1. ENCABEZADO PRINCIPAL DE CONFIGURACIÓN                                -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <header class="config-header">
-    <div class="header-titles">
-      <div class="title-with-badge">
-        <h1 class="main-title">Configuración del Sistema</h1>
-        <span class="role-badge" [class.professor]="effectiveUser().role === 'professor'">
-          {{ effectiveUser().role === 'professor' ? 'Docente' : 'Estudiante' }}
-        </span>
-      </div>
-      <p class="main-subtitle">
-        Administra tus preferencias de cuenta, apariencia, privacidad y el comportamiento del Asistente IA.
-      </p>
-    </div>
-  </header>
+  <!-- 1. Componente Hijo: Encabezado y Badges de Rol -->
+  <app-configuracion-header [user]="effectiveUser()"></app-configuracion-header>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 2. BARRA DE PESTAÑAS HORIZONTALES (SECCIONES MODULARES)                 -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <nav class="config-nav-tabs" aria-label="Secciones de configuración">
-    @for (sec of sections; track sec.id) {
-      <button
-        type="button"
-        class="tab-btn"
-        [class.active]="activeSection() === sec.id"
-        (click)="selectSection(sec.id)"
-        [attr.aria-selected]="activeSection() === sec.id"
-      >
-        <i [class]="sec.icon + ' tab-icon'" aria-hidden="true"></i>
-        <span class="tab-label">{{ sec.label }}</span>
-      </button>
-    }
-  </nav>
+  <!-- 2. Componente Hijo: Navegación por Pestañas -->
+  <app-configuracion-tabs
+    [sections]="sections"
+    [activeSection]="activeSection()"
+    (sectionSelected)="selectSection($event)"
+  ></app-configuracion-tabs>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 3. CONTENIDO DE LA SECCIÓN ACTIVA CON FORMULARIO REACTIVO               -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 3. Formulario Orquestador de Preferencias -->
   <form [formGroup]="preferencesForm" (ngSubmit)="savePreferences()" class="config-content">
-
-    <!-- ── SECCIÓN 1: CUENTA Y GESTIÓN DE SESIÓN ── -->
+    <!-- Sección Cuenta -->
     @if (activeSection() === 'cuenta') {
-      <div class="section-pane fade-in">
-        <!-- Tarjeta de Perfil Institucional -->
-        <section class="card config-card profile-card" aria-labelledby="card-profile-title">
-          <div class="card-header">
-            <div class="header-icon-box">
-              <i class="bi bi-person-circle"></i>
-            </div>
-            <div>
-              <h2 id="card-profile-title" class="card-title">Perfil Institucional</h2>
-              <p class="card-subtitle">Datos asociados a tu matrícula y acreditación académica.</p>
-            </div>
-          </div>
-
-          <div class="profile-details-grid">
-            <div class="profile-avatar-wrap">
-              <div class="profile-avatar">{{ userInitials() }}</div>
-              <div class="profile-status-indicator" title="Sesión activa"></div>
-            </div>
-
-            <div class="profile-meta">
-              <h3 class="profile-name">{{ effectiveUser().fullName }}</h3>
-              <p class="profile-email">
-                <i class="bi bi-envelope-fill"></i>
-                <span>{{ effectiveUser().email }}</span>
-              </p>
-              <div class="profile-tags">
-                <span class="meta-tag">
-                  <i class="bi bi-building"></i>
-                  {{ effectiveUser().institution || 'Universidad Tecnológica' }}
-                </span>
-                <span class="meta-tag meta-tag-role">
-                  <i [class]="effectiveUser().role === 'professor' ? 'bi bi-person-workspace' : 'bi bi-mortarboard-fill'"></i>
-                  {{ effectiveUser().role === 'professor' ? 'Catedrático' : 'Estudiante Pregrado' }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Tarjeta de Gestión de Sesión y Seguridad -->
-        <section class="card config-card security-card" aria-labelledby="card-session-title">
-          <div class="card-header">
-            <div class="header-icon-box icon-danger">
-              <i class="bi bi-shield-lock-fill"></i>
-            </div>
-            <div>
-              <h2 id="card-session-title" class="card-title">Seguridad y Gestión de Sesión</h2>
-              <p class="card-subtitle">Controla el acceso seguro a tu cuenta y cierra tu sesión activa.</p>
-            </div>
-          </div>
-
-          <div class="session-info-row">
-            <div class="session-desc">
-              <span class="session-status-badge">
-                <span class="dot-live"></span> Sesión iniciada actualmente
-              </span>
-              <p class="session-hint">
-                Al cerrar sesión se limpiarán tus credenciales y datos temporales en este dispositivo.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              class="btn-danger-outline"
-              (click)="promptLogout()"
-              aria-label="Cerrar sesión actual de DiscerIA"
-            >
-              <i class="bi bi-box-arrow-right"></i>
-              <span>Cerrar Sesión</span>
-            </button>
-          </div>
-        </section>
-      </div>
+      <app-configuracion-cuenta
+        [user]="effectiveUser()"
+        [initials]="userInitials()"
+        (logoutClicked)="promptLogout()"
+      ></app-configuracion-cuenta>
     }
 
-    <!-- ── SECCIÓN 2: TEMA Y APARIENCIA (DARK MODE) ── -->
+    <!-- Sección Apariencia (Dark/Light) -->
     @if (activeSection() === 'apariencia') {
-      <div class="section-pane fade-in">
-        <section class="card config-card" aria-labelledby="card-theme-title">
-          <div class="card-header">
-            <div class="header-icon-box icon-accent">
-              <i class="bi bi-palette-fill"></i>
-            </div>
-            <div>
-              <h2 id="card-theme-title" class="card-title">Preferencia de Tema</h2>
-              <p class="card-subtitle">Selecciona el modo visual que mejor se adapte a tu entorno de estudio.</p>
-            </div>
-          </div>
-
-          <!-- Selector de Modo Claro vs Modo Oscuro -->
-          <div class="theme-options-grid" role="radiogroup" aria-label="Preferencia de tema visual">
-            <!-- Opción Modo Claro -->
-            <div
-              class="theme-card light-preview"
-              [class.selected]="!isDarkMode()"
-              (click)="selectTheme('light')"
-              (keydown.enter)="selectTheme('light')"
-              (keydown.space)="$event.preventDefault(); selectTheme('light')"
-              tabindex="0"
-              role="radio"
-              [attr.aria-checked]="!isDarkMode()"
-            >
-              <div class="theme-preview-box preview-light">
-                <div class="preview-mock-header"></div>
-                <div class="preview-mock-body">
-                  <div class="preview-mock-line"></div>
-                  <div class="preview-mock-line short"></div>
-                </div>
-              </div>
-              <div class="theme-card-footer">
-                <div class="theme-title-row">
-                  <i class="bi bi-sun-fill sun-icon"></i>
-                  <span class="theme-name">Modo Claro</span>
-                </div>
-                <p class="theme-desc">Limpio y de alto contraste, ideal para el día y ambientes iluminados.</p>
-                <div class="selection-indicator">
-                  @if (!isDarkMode()) {
-                    <i class="bi bi-check-circle-fill"></i>
-                  }
-                </div>
-              </div>
-            </div>
-
-            <!-- Opción Modo Oscuro -->
-            <div
-              class="theme-card dark-preview"
-              [class.selected]="isDarkMode()"
-              (click)="selectTheme('dark')"
-              (keydown.enter)="selectTheme('dark')"
-              (keydown.space)="$event.preventDefault(); selectTheme('dark')"
-              tabindex="0"
-              role="radio"
-              [attr.aria-checked]="isDarkMode()"
-            >
-              <div class="theme-preview-box preview-dark">
-                <div class="preview-mock-header"></div>
-                <div class="preview-mock-body">
-                  <div class="preview-mock-line"></div>
-                  <div class="preview-mock-line short"></div>
-                </div>
-              </div>
-              <div class="theme-card-footer">
-                <div class="theme-title-row">
-                  <i class="bi bi-moon-stars-fill moon-icon"></i>
-                  <span class="theme-name">Modo Oscuro</span>
-                </div>
-                <p class="theme-desc">Descansa la vista y ahorra batería durante sesiones prolongadas de estudio.</p>
-                <div class="selection-indicator">
-                  @if (isDarkMode()) {
-                    <i class="bi bi-check-circle-fill"></i>
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Switch Rápido Toggle -->
-          <div class="quick-toggle-bar">
-            <div class="toggle-info">
-              <span class="toggle-title">Alternar rápidamente tema</span>
-              <span class="toggle-subtitle">Estado actual: <strong>{{ isDarkMode() ? 'Modo Oscuro' : 'Modo Claro' }}</strong></span>
-            </div>
-            <button
-              type="button"
-              class="theme-toggle-switch-btn"
-              [class.is-dark]="isDarkMode()"
-              (click)="toggleTheme()"
-              aria-label="Alternar entre modo claro y modo oscuro"
-            >
-              <span class="switch-handle">
-                <i [class]="isDarkMode() ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"></i>
-              </span>
-              <span class="switch-label-text">{{ isDarkMode() ? 'Oscuro' : 'Claro' }}</span>
-            </button>
-          </div>
-        </section>
-
-        <!-- Accesibilidad y Tamaño de Fuente -->
-        <section class="card config-card" aria-labelledby="card-a11y-title">
-          <div class="card-header">
-            <div class="header-icon-box">
-              <i class="bi bi-type"></i>
-            </div>
-            <div>
-              <h2 id="card-a11y-title" class="card-title">Tipografía y Accesibilidad</h2>
-              <p class="card-subtitle">Personaliza la legibilidad del texto en exámenes y documentos.</p>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label class="form-label" for="fontSizeSelect">Tamaño de Fuente Base</label>
-            <select id="fontSizeSelect" class="form-select" formControlName="fontSize">
-              <option value="sm">Pequeño (14px) — Mayor densidad de contenido</option>
-              <option value="base">Normal (16px) — Estándar recomendado</option>
-              <option value="lg">Grande (18px) — Mayor legibilidad y descanso visual</option>
-            </select>
-          </div>
-
-          <div class="switch-setting-row">
-            <div class="switch-text">
-              <span class="setting-title">Reducir animaciones</span>
-              <span class="setting-desc">Minimiza efectos de transición para mayor fluidez.</span>
-            </div>
-            <label class="custom-switch" for="reduceMotionSwitch">
-              <input type="checkbox" id="reduceMotionSwitch" formControlName="reduceMotion" />
-              <span class="slider"></span>
-            </label>
-          </div>
-        </section>
-      </div>
+      <app-configuracion-apariencia
+        [form]="preferencesForm"
+        [isDarkMode]="isDarkMode()"
+        (themeSelected)="selectTheme($event)"
+        (themeToggled)="toggleTheme()"
+      ></app-configuracion-apariencia>
     }
 
-    <!-- ── SECCIÓN 3: ASISTENTE IA ── -->
+    <!-- Sección Asistente IA -->
     @if (activeSection() === 'ia') {
-      <div class="section-pane fade-in">
-        <section class="card config-card" aria-labelledby="card-ai-title">
-          <div class="card-header">
-            <div class="header-icon-box icon-ai">
-              <i class="bi bi-robot"></i>
-            </div>
-            <div>
-              <h2 id="card-ai-title" class="card-title">Personalización del Asistente IA</h2>
-              <p class="card-subtitle">Configura el tono pedagógico con el que DiscerIA te asiste.</p>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label class="form-label" for="aiToneSelect">Estilo Pedagógico de Respuesta</label>
-            <select id="aiToneSelect" class="form-select" formControlName="aiTone">
-              <option value="detailed">Explicativo y Detallado (Paso a paso con ejemplos)</option>
-              <option value="concise">Conciso y Directo (Enfocado en respuestas rápidas)</option>
-              <option value="socratic">Método Socrático (Guía mediante preguntas reflexivas)</option>
-            </select>
-          </div>
-
-          <div class="switch-setting-row">
-            <div class="switch-text">
-              <span class="setting-title">Sugerencias Proactivas de Estudio</span>
-              <span class="setting-desc">El asistente sugiere temas complementarios según tu progreso.</span>
-            </div>
-            <label class="custom-switch" for="aiAutoSuggestionsSwitch">
-              <input type="checkbox" id="aiAutoSuggestionsSwitch" formControlName="aiAutoSuggestions" />
-              <span class="slider"></span>
-            </label>
-          </div>
-        </section>
-      </div>
+      <app-configuracion-ia
+        [form]="preferencesForm"
+      ></app-configuracion-ia>
     }
 
-    <!-- ── SECCIÓN 4: NOTIFICACIONES ── -->
+    <!-- Sección Notificaciones -->
     @if (activeSection() === 'notificaciones') {
-      <div class="section-pane fade-in">
-        <section class="card config-card" aria-labelledby="card-notif-title">
-          <div class="card-header">
-            <div class="header-icon-box icon-info">
-              <i class="bi bi-bell-fill"></i>
-            </div>
-            <div>
-              <h2 id="card-notif-title" class="card-title">Canales de Notificación</h2>
-              <p class="card-subtitle">Decide qué notificaciones deseas recibir y por qué medio.</p>
-            </div>
-          </div>
-
-          <div class="switch-setting-row">
-            <div class="switch-text">
-              <span class="setting-title">Notificaciones por Correo Electrónico</span>
-              <span class="setting-desc">Recibe resúmenes y alertas críticas en tu correo institucional.</span>
-            </div>
-            <label class="custom-switch" for="emailNotifSwitch">
-              <input type="checkbox" id="emailNotifSwitch" formControlName="emailNotifications" />
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="switch-setting-row">
-            <div class="switch-text">
-              <span class="setting-title">Respuestas en Hilos del Foro</span>
-              <span class="setting-desc">Avisar cuando un docente o estudiante responda tus consultas.</span>
-            </div>
-            <label class="custom-switch" for="forumReplySwitch">
-              <input type="checkbox" id="forumReplySwitch" formControlName="forumReplyNotifications" />
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="switch-setting-row">
-            <div class="switch-text">
-              <span class="setting-title">Alertas de Exámenes y Fechas Límite</span>
-              <span class="setting-desc">Recordatorios con 24 horas de antelación para evaluaciones.</span>
-            </div>
-            <label class="custom-switch" for="examAlertsSwitch">
-              <input type="checkbox" id="examAlertsSwitch" formControlName="examAlerts" />
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="switch-setting-row">
-            <div class="switch-text">
-              <span class="setting-title">Informe Semanal de Progreso con IA</span>
-              <span class="setting-desc">Un reporte de síntesis con tus logros y áreas de mejora.</span>
-            </div>
-            <label class="custom-switch" for="weeklyAiSummarySwitch">
-              <input type="checkbox" id="weeklyAiSummarySwitch" formControlName="weeklyAiSummary" />
-              <span class="slider"></span>
-            </label>
-          </div>
-        </section>
-      </div>
+      <app-configuracion-notificaciones
+        [form]="preferencesForm"
+      ></app-configuracion-notificaciones>
     }
 
-    <!-- ── BARRA INFERIOR DE ACCIONES ── -->
+    <!-- Barra Inferior de Acciones Globales -->
     <div class="form-actions-bar">
       <div class="actions-hint">
         <i class="bi bi-shield-check"></i>
@@ -364,40 +57,14 @@
     </div>
   </form>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 4. DIÁLOGO MODAL ACCESIBLE DE CONFIRMACIÓN DE CIERRE DE SESIÓN         -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  @if (isLogoutConfirmOpen()) {
-    <div class="modal-backdrop" (click)="cancelLogout()" aria-hidden="true"></div>
-    <div
-      class="modal-dialog-card"
-      role="alertdialog"
-      aria-modal="true"
-      aria-labelledby="logout-dialog-title"
-      aria-describedby="logout-dialog-desc"
-    >
-      <div class="modal-icon-danger">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-      </div>
-      <h3 id="logout-dialog-title" class="modal-title">¿Cerrar sesión en DiscerIA?</h3>
-      <p id="logout-dialog-desc" class="modal-desc">
-        Estás a punto de cerrar tu sesión actual. Tendrás que volver a ingresar con tus credenciales institucionales.
-      </p>
-      <div class="modal-actions-row">
-        <button type="button" class="btn btn-outline" (click)="cancelLogout()">
-          Cancelar
-        </button>
-        <button type="button" class="btn btn-danger-solid" (click)="confirmLogout()">
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Sí, Cerrar Sesión</span>
-        </button>
-      </div>
-    </div>
-  }
+  <!-- 4. Componente Hijo: Diálogo Modal de Confirmación de Cierre de Sesión -->
+  <app-configuracion-logout-modal
+    [isOpen]="isLogoutConfirmOpen()"
+    (confirmed)="confirmLogout()"
+    (cancelled)="cancelLogout()"
+  ></app-configuracion-logout-modal>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 5. MENSAJE TOAST FLOTANTE DE RETROALIMENTACIÓN                         -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 5. Mensaje Toast Flotante de Retroalimentación -->
   @if (toastFeedback()) {
     <div class="toast-feedback" role="status" aria-live="polite">
       <i class="bi bi-check-circle-fill"></i>
@@ -405,4 +72,3 @@
     </div>
   }
 </div>
-

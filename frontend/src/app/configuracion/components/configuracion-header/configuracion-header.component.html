@@ -1,0 +1,17 @@
+<header class="config-header">
+  <div class="header-titles">
+    <div class="title-with-badge">
+      <h1 class="main-title">Configuración del Sistema</h1>
+      <span
+        class="role-badge"
+        [class.professor]="user().role === 'professor'"
+      >
+        {{ user().role === 'professor' ? 'Docente' : 'Estudiante' }}
+      </span>
+    </div>
+    <p class="main-subtitle">
+      Administra tus preferencias de cuenta, apariencia, privacidad y el comportamiento del Asistente IA.
+    </p>
+  </div>
+</header>
+
