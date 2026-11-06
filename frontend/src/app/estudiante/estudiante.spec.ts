@@ -27,7 +27,18 @@ describe('Estudiante', () => {
   it('debe inicializarse con el dashboard activo y el nombre del estudiante', () => {
     expect(component.activeNav()).toBe('dashboard');
     expect(component.studentName()).toBe('Alejandro');
-    expect(component.navItems().length).toBe(6);
+    expect(component.navItems().length).toBe(5);
+    expect(component.navItems().some((item) => item.id === 'asistente-ia')).toBe(false);
+  });
+
+  it('debe abrir y cerrar el drawer del asistente IA correctamente', () => {
+    expect(component.isAiDrawerOpen()).toBe(false);
+    component.toggleAiDrawer();
+    expect(component.isAiDrawerOpen()).toBe(true);
+    component.closeAiDrawer();
+    expect(component.isAiDrawerOpen()).toBe(false);
+    component.openAiDrawer();
+    expect(component.isAiDrawerOpen()).toBe(true);
   });
 
   it('debe cambiar de navegación lateral con selectNav', () => {

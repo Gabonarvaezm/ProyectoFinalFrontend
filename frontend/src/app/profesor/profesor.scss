@@ -22,7 +22,7 @@
 }
 
 .main-wrapper {
-  flex: 1;
+  flex: 1 1 0%;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -30,18 +30,34 @@
 }
 
 .dashboard-canvas {
-  flex: 1;
+  flex: 1 1 0%;
   padding: var(--space-6) var(--space-8);
-  max-width: var(--max-content-width);
+  max-width: 100%;
   width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  transition: all var(--duration-normal) var(--ease-out-expo);
 
   @media (max-width: 768px) {
     padding: var(--space-4);
     gap: var(--space-4);
+  }
+}
+
+
+.ai-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 95;
+  animation: fadeIn var(--duration-fast) var(--ease-out-expo);
+
+  @media (min-width: 1201px) {
+    display: none;
   }
 }
 

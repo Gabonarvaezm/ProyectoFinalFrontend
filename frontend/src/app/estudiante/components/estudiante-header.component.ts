@@ -18,6 +18,19 @@ import { Component, input, model, output } from '@angular/core';
       </div>
 
       <div class="header-actions">
+        <!-- Botón Topbar Asistente IA (Opción 1: Barra Superior) -->
+        <button
+          type="button"
+          class="btn-icon-action btn-ai-toggle"
+          [class.active]="isAiDrawerOpen()"
+          (click)="aiToggleClicked.emit()"
+          title="Asistente de Aprendizaje IA"
+          aria-label="Alternar Asistente de IA"
+          [attr.aria-expanded]="isAiDrawerOpen()"
+        >
+          <i class="bi bi-robot"></i>
+        </button>
+
         <button
           type="button"
           class="btn-icon-action"
@@ -143,6 +156,24 @@ import { Component, input, model, output } from '@angular/core';
         box-shadow: var(--focus-ring);
       }
 
+      &.btn-ai-toggle {
+        background: var(--color-slate-100);
+        color: var(--color-primary-700);
+
+        &:hover {
+          background: var(--color-primary-50);
+          color: var(--color-primary-800);
+          transform: translateY(-1px);
+        }
+
+        &.active {
+          background: var(--color-ai-gradient);
+          color: var(--color-white);
+          border-color: transparent;
+          box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+        }
+      }
+
       .notification-dot {
         position: absolute;
         top: 8px;
@@ -210,10 +241,12 @@ export class EstudianteHeaderComponent {
   public readonly studentName = input.required<string>();
   public readonly userInitials = input.required<string>();
   public readonly notificationsCount = input<number>(2);
+  public readonly isAiDrawerOpen = input<boolean>(false);
 
   public readonly searchChanged = output<string>();
   public readonly notificationsClicked = output<void>();
   public readonly profileClicked = output<void>();
+  public readonly aiToggleClicked = output<void>();
 
   public onSearch(val: string): void {
     this.searchQuery.set(val);

@@ -1,0 +1,86 @@
+<div class="chatbot-layout">
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 1. NODO HIJO: SIDEBAR DE SESIONES Y MODOS ACADÉMICOS                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <app-chatbot-sidebar
+    [sessions]="sessions()"
+    [activeSessionId]="activeSessionId()"
+    [activeMode]="activeMode()"
+    [modes]="modes()"
+    (sessionSelected)="handleSessionSelected($event)"
+    (modeSelected)="handleModeSelected($event)"
+    (newChatRequested)="handleNewChat()"
+    (clearHistoryRequested)="handleClearHistory()"
+  />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 2. ÁREA CENTRAL: HEADER + HILO DE MENSAJES + FORMULARIO REACTIVO       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <main class="chatbot-main-area">
+    <!-- Header Superior de la Conversación -->
+    <header class="chatbot-header">
+      <div class="header-left">
+        <div class="bot-status-indicator" title="Asistente activo en tiempo real">
+          <span class="status-pulse"></span>
+          <span class="status-label">DiscerIA Context AI v2.4</span>
+        </div>
+        <div class="header-mode-badge">
+          <i class="bi bi-mortarboard" aria-hidden="true"></i>
+          <span>Modo: <strong>{{ activeModeLabel() }}</strong></span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-header-action"
+          (click)="handleClearHistory()"
+          title="Reiniciar conversación actual"
+          aria-label="Reiniciar conversación"
+        >
+          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+          <span class="btn-text">Reiniciar Chat</span>
+        </button>
+
+        <a
+          routerLink="/estudiante"
+          class="btn-header-action"
+          title="Regresar al portal principal del estudiante"
+          aria-label="Ir a panel de estudiante"
+        >
+          <i class="bi bi-grid-fill" aria-hidden="true"></i>
+          <span class="btn-text">Portal Estudiante</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- NODO HIJO: Hilo de Mensajes y Burbujas de Consulta -->
+    <app-chatbot-messages
+      [messages]="messages()"
+      [isThinking]="isThinking()"
+      [activeModeLabel]="activeModeLabel()"
+      (copyText)="handleCopyText($event)"
+      (retryPrompt)="handleRetryPrompt($event)"
+    />
+
+    <!-- NODO HIJO: Formulario Reactivo y Entrada de Mensajes -->
+    <app-chatbot-input
+      [form]="chatForm"
+      [isThinking]="isThinking()"
+      [quickPrompts]="quickPrompts()"
+      [activeMode]="activeMode()"
+      (submitMessage)="handleSendMessage()"
+      (promptSelected)="handlePromptSelected($event)"
+    />
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 3. NOTIFICACIÓN TOAST FLOTANTE DE RETROALIMENTACIÓN                    -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (toastMessage()) {
+    <div class="toast-feedback" role="status" aria-live="polite">
+      <i class="bi bi-info-circle-fill toast-icon" aria-hidden="true"></i>
+      <span>{{ toastMessage() }}</span>
+    </div>
+  }
+</div>

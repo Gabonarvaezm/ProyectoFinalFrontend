@@ -1,34 +1,21 @@
 <div class="student-dashboard-layout">
   <!-- ── 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN - NODO HIJO PRESENTACIONAL) ── -->
-  <app-estudiante-sidebar
-    [navItems]="navItems()"
-    [(activeNav)]="activeNav"
-    [institution]="studentInstitution()"
-    (navSelected)="selectNav($event)"
-    (logoutClicked)="onLogout()"
-  />
+  <app-estudiante-sidebar [navItems]="navItems()" [(activeNav)]="activeNav" [institution]="studentInstitution()"
+    (navSelected)="selectNav($event)" (logoutClicked)="onLogout()" />
 
   <!-- ── 2. ÁREA CENTRAL DE CONTENIDO (DASHBOARD) ── -->
   <main class="main-content">
     <!-- Header Superior con Buscador y Notificaciones (NODO HIJO PRESENTACIONAL) -->
-    <app-estudiante-header
-      [(searchQuery)]="searchQuery"
-      [studentName]="studentName()"
-      [userInitials]="userInitials()"
-      [notificationsCount]="notificationsCount()"
-      (searchChanged)="onSearchChange($event)"
-      (notificationsClicked)="onNotificationsClick()"
-      (profileClicked)="selectNav('perfil')"
-    />
+    <app-estudiante-header [(searchQuery)]="searchQuery" [studentName]="studentName()" [userInitials]="userInitials()"
+      [notificationsCount]="notificationsCount()" [isAiDrawerOpen]="isAiDrawerOpen()"
+      (searchChanged)="onSearchChange($event)" (notificationsClicked)="onNotificationsClick()"
+      (profileClicked)="selectNav('perfil')" (aiToggleClicked)="toggleAiDrawer()" />
 
     @if (activeNav() === 'biblioteca') {
-      <app-biblioteca
-        [userRole]="'student'"
-        [initialCategory]="selectedSubjectCategory()"
-      ></app-biblioteca>
+    <app-biblioteca [userRole]="'student'" [initialCategory]="selectedSubjectCategory()"></app-biblioteca>
     } @else {
-      <!-- Saludo y Bienvenida -->
-      <section class="welcome-section">
+    <!-- Saludo y Bienvenida -->
+    <section class="welcome-section">
       <h1 class="welcome-title">¡Hola, {{ studentName() }}!</h1>
       <p class="welcome-subtitle">
         Tienes un <strong>85% de progreso</strong> en Biología esta semana. ¡Sigue así!
@@ -72,27 +59,17 @@
 
         <div class="subjects-grid">
           @for (subject of filteredSubjects(); track subject.id) {
-            <div
-              class="subject-card"
-              (click)="onSelectSubject(subject)"
-              (keydown.enter)="onSelectSubject(subject)"
-              (keydown.space)="$event.preventDefault(); onSelectSubject(subject)"
-              tabindex="0"
-              role="button"
-              [attr.aria-label]="subject.name + ': ' + subject.topic"
-            >
-              <div
-                class="subject-icon-wrap"
-                [style.background-color]="subject.badgeBg"
-                [style.color]="subject.iconColor"
-              >
-                <i [class]="subject.icon"></i>
-              </div>
-              <div class="subject-info">
-                <h3 class="subject-name">{{ subject.name }}</h3>
-                <span class="subject-topic">{{ subject.topic }}</span>
-              </div>
+          <div class="subject-card" (click)="onSelectSubject(subject)" (keydown.enter)="onSelectSubject(subject)"
+            (keydown.space)="$event.preventDefault(); onSelectSubject(subject)" tabindex="0" role="button"
+            [attr.aria-label]="subject.name + ': ' + subject.topic">
+            <div class="subject-icon-wrap" [style.background-color]="subject.badgeBg" [style.color]="subject.iconColor">
+              <i [class]="subject.icon"></i>
             </div>
+            <div class="subject-info">
+              <h3 class="subject-name">{{ subject.name }}</h3>
+              <span class="subject-topic">{{ subject.topic }}</span>
+            </div>
+          </div>
           }
         </div>
       </section>
@@ -131,12 +108,12 @@
             </div>
             <div class="chart-bars-wrap">
               @for (item of weeklyProgress(); track item.subject) {
-                <div class="bar-col">
-                  <div class="bar-track">
-                    <div class="bar-fill" [style.height.%]="item.percentage"></div>
-                  </div>
-                  <span class="bar-label">{{ item.subject }}</span>
+              <div class="bar-col">
+                <div class="bar-track">
+                  <div class="bar-fill" [style.height.%]="item.percentage"></div>
                 </div>
+                <span class="bar-label">{{ item.subject }}</span>
+              </div>
               }
             </div>
           </div>
@@ -155,54 +132,50 @@
 
       <div class="forum-questions-list">
         @for (q of forumQuestions(); track q.id) {
-          <div class="forum-item-card">
-            <div class="forum-author-avatar">
-              @if (!isAvatarBroken(q.id)) {
-                <img
-                  [src]="q.avatar"
-                  [alt]="'Avatar de ' + q.authorName"
-                  width="42"
-                  height="42"
-                  (error)="onAvatarError(q.id)"
-                />
-              } @else {
-                <div
-                  class="avatar-fallback"
-                  [style.background-color]="q.avatarFallbackBg"
-                  [style.color]="q.avatarFallbackColor"
-                  aria-hidden="true"
-                >
-                  {{ q.initials }}
-                </div>
-              }
+        <div class="forum-item-card">
+          <div class="forum-author-avatar">
+            @if (!isAvatarBroken(q.id)) {
+            <img [src]="q.avatar" [alt]="'Avatar de ' + q.authorName" width="42" height="42"
+              (error)="onAvatarError(q.id)" />
+            } @else {
+            <div class="avatar-fallback" [style.background-color]="q.avatarFallbackBg"
+              [style.color]="q.avatarFallbackColor" aria-hidden="true">
+              {{ q.initials }}
             </div>
+            }
+          </div>
 
-            <div class="forum-content">
-              <h3 class="forum-title">{{ q.title }}</h3>
-              <div class="forum-meta-row">
-                <span class="forum-tag" [class]="q.tagClass">
-                  <i [class]="q.tagIcon"></i>
-                  <span>{{ q.tagText }}</span>
-                </span>
-                <span class="forum-bullet">•</span>
-                <span class="forum-time">{{ q.timeAgo }} en {{ q.subject }}</span>
-              </div>
-            </div>
-
-            <div class="forum-action">
-              <button type="button" class="btn-outline-pill" (click)="onViewThread(q)">
-                Ver hilo
-              </button>
+          <div class="forum-content">
+            <h3 class="forum-title">{{ q.title }}</h3>
+            <div class="forum-meta-row">
+              <span class="forum-tag" [class]="q.tagClass">
+                <i [class]="q.tagIcon"></i>
+                <span>{{ q.tagText }}</span>
+              </span>
+              <span class="forum-bullet">•</span>
+              <span class="forum-time">{{ q.timeAgo }} en {{ q.subject }}</span>
             </div>
           </div>
+
+          <div class="forum-action">
+            <button type="button" class="btn-outline-pill" (click)="onViewThread(q)">
+              Ver hilo
+            </button>
+          </div>
+        </div>
         }
       </div>
     </section>
     }
   </main>
 
-  <!-- ── 3. PANEL LATERAL DERECHO (ASISTENTE IA) ── -->
-  <aside class="ai-sidebar" aria-label="Asistente de aprendizaje inteligente">
+  @if (isAiDrawerOpen()) {
+  <div class="ai-drawer-backdrop" (click)="closeAiDrawer()" aria-hidden="true"></div>
+  }
+
+  <!-- ── 4. PANEL LATERAL DERECHO DESPLEGABLE (DRAWER ASISTENTE IA) ── -->
+  <aside class="ai-sidebar" [class.drawer-open]="isAiDrawerOpen()" role="region"
+    aria-label="Asistente de aprendizaje inteligente">
     <div class="ai-header">
       <div class="ai-header-icon">
         <i class="bi bi-robot"></i>
@@ -211,6 +184,10 @@
         <h2 class="ai-main-title">Asistente de Aprendizaje IA</h2>
         <span class="ai-subtitle">Tu tutor inteligente</span>
       </div>
+      <button type="button" class="btn-close-drawer" (click)="closeAiDrawer()" aria-label="Cerrar panel de Asistente IA"
+        title="Cerrar Asistente">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
 
     <!-- Historial de Chat con IA -->
@@ -221,29 +198,29 @@
 
       <div class="chat-thread">
         @for (msg of chatMessages(); track msg.id) {
-          @if (msg.sender === 'user') {
-            <div class="chat-bubble-user">
-              <p class="bubble-text">{{ msg.text }}</p>
-            </div>
-          } @else {
-            <div class="chat-bubble-ai">
-              <div class="ai-avatar-tiny" aria-hidden="true">
-                <i class="bi bi-robot"></i>
-              </div>
-              <div class="ai-text-box">
-                <p class="bubble-text">{{ msg.text }}</p>
-              </div>
-            </div>
-          }
+        @if (msg.sender === 'user') {
+        <div class="chat-bubble-user">
+          <p class="bubble-text">{{ msg.text }}</p>
+        </div>
+        } @else {
+        <div class="chat-bubble-ai">
+          <div class="ai-avatar-tiny" aria-hidden="true">
+            <i class="bi bi-robot"></i>
+          </div>
+          <div class="ai-text-box">
+            <p class="bubble-text">{{ msg.text }}</p>
+          </div>
+        </div>
+        }
         }
 
         @if (isAiThinking()) {
-          <div class="ai-bubble-thinking">
-            <div class="dot-typing">
-              <span></span><span></span><span></span>
-            </div>
-            <span class="thinking-label">El tutor IA está razonando...</span>
+        <div class="ai-bubble-thinking">
+          <div class="dot-typing">
+            <span></span><span></span><span></span>
           </div>
+          <span class="thinking-label">El tutor IA está razonando...</span>
+        </div>
         }
       </div>
 
@@ -257,10 +234,10 @@
       <h3 class="quick-actions-heading">Acciones Rápidas</h3>
       <div class="quick-buttons-list">
         @for (action of quickActions(); track action.id) {
-          <button type="button" class="btn-ai-action" (click)="onQuickAction(action)">
-            <i [class]="action.icon"></i>
-            <span>{{ action.label }}</span>
-          </button>
+        <button type="button" class="btn-ai-action" (click)="onQuickAction(action)">
+          <i [class]="action.icon"></i>
+          <span>{{ action.label }}</span>
+        </button>
         }
       </div>
     </div>
@@ -268,20 +245,10 @@
     <!-- Barra Inferior de Entrada de Pregunta -->
     <div class="ai-input-container">
       <form class="ai-input-form" (submit)="submitAiMessage(); $event.preventDefault()">
-        <input
-          type="text"
-          class="ai-input-field"
-          placeholder="Escribe tu pregunta..."
-          [(ngModel)]="aiInputText"
-          name="aiInputText"
-          aria-label="Pregunta al tutor de IA"
-        />
-        <button
-          type="submit"
-          class="btn-send-ai"
-          [disabled]="!aiInputText() || isAiThinking()"
-          aria-label="Enviar mensaje a la IA"
-        >
+        <input type="text" class="ai-input-field" placeholder="Escribe tu pregunta..." [(ngModel)]="aiInputText"
+          name="aiInputText" aria-label="Pregunta al tutor de IA" />
+        <button type="submit" class="btn-send-ai" [disabled]="!aiInputText() || isAiThinking()"
+          aria-label="Enviar mensaje a la IA">
           <i class="bi bi-send-fill"></i>
         </button>
       </form>
@@ -290,9 +257,11 @@
 
   <!-- Toast flotante para feedback de acciones -->
   @if (toastMessage()) {
-    <div class="student-toast anim-fade-in" role="status" aria-live="polite">
-      <i class="bi bi-info-circle-fill"></i>
-      <span>{{ toastMessage() }}</span>
-    </div>
+  <div class="student-toast anim-fade-in" role="status" aria-live="polite">
+    <i class="bi bi-info-circle-fill"></i>
+    <span>{{ toastMessage() }}</span>
+  </div>
   }
 </div>
+<div>
+  <div>

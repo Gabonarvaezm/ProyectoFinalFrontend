@@ -10,8 +10,13 @@
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <div class="main-wrapper">
     <!-- Barra superior de búsqueda y perfil (NODO HIJO PRESENTACIONAL) -->
-    <app-profesor-header [(searchQuery)]="searchQuery" [notificationsCount]="1"
-      (notificationsClicked)="onNotificationsClick()" />
+    <app-profesor-header
+      [(searchQuery)]="searchQuery"
+      [notificationsCount]="1"
+      [isAiDrawerOpen]="isAiDrawerOpen()"
+      (notificationsClicked)="onNotificationsClick()"
+      (aiToggleClicked)="toggleAiDrawer()"
+    />
 
     <!-- Contenido Scrollable / Dashboard Canvas -->
     <main class="dashboard-canvas">
@@ -44,11 +49,22 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 3. PANEL LATERAL DERECHO (ASISTENTE IA - NODO HIJO PRESENTACIONAL)      -->
+  <!-- 3. PANEL DRAWER ASISTENTE IA                                             -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <app-profesor-ai-chat [chatMessages]="chatMessages()" [aiSuggestions]="aiSuggestions()"
-    [isAiThinking]="isAiThinking()" [(inputText)]="aiInputText" (suggestionSelected)="selectSuggestion($event)"
-    (messageSubmitted)="onSendAiMessage($event)" />
+  @if (isAiDrawerOpen()) {
+    <div class="ai-drawer-backdrop" (click)="closeAiDrawer()" aria-hidden="true"></div>
+  }
+
+  <app-profesor-ai-chat
+    [isOpen]="isAiDrawerOpen()"
+    [chatMessages]="chatMessages()"
+    [aiSuggestions]="aiSuggestions()"
+    [isAiThinking]="isAiThinking()"
+    [(inputText)]="aiInputText"
+    (suggestionSelected)="selectSuggestion($event)"
+    (messageSubmitted)="onSendAiMessage($event)"
+    (closeRequested)="closeAiDrawer()"
+  />
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- 4. MODAL DE REGISTRO DE ESTUDIANTE (NODO HIJO PRESENTACIONAL)          -->
@@ -64,4 +80,3 @@
   </div>
   }
 </div>
-<div>

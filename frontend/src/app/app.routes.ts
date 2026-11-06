@@ -31,6 +31,15 @@ export const routes: Routes = [
     loadComponent: () => import('./foro/foro').then((m) => m.Foro),
   },
   {
+    path: 'chatbot',
+    loadComponent: () => import('./chatbot/chatbot').then((m) => m.Chatbot),
+  },
+  {
+    path: 'asistente-ia',
+    redirectTo: 'chatbot',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     redirectTo: '',
   },
