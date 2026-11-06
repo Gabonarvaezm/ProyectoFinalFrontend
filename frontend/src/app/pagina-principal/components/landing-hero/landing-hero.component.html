@@ -1,0 +1,90 @@
+<section class="hero-section">
+  <div class="hero-container">
+    <!-- Columna Izquierda: Textos y CTAs -->
+    <div class="hero-text-col">
+      <h1 class="hero-title anim-fade-up">
+        Biblioteca Virtual y<br />
+        Chatbot con IA para<br />
+        Instituciones Públicas
+      </h1>
+
+      <p class="hero-description anim-fade-up anim-stagger-1">
+        DiscerIA es la plataforma de biblioteca virtual diseñada especialmente para docentes
+        y estudiantes de colegios y universidades públicas. Accede a miles de libros y guías
+        pedagógicas de libre acceso, y resuelve consultas académicas al instante con nuestro
+        chatbot con inteligencia artificial fundamentado en fuentes confiables.
+      </p>
+
+      <div class="hero-buttons anim-fade-up anim-stagger-2">
+        <a routerLink="/register" class="btn-enroll">Explorar Biblioteca</a>
+        <a href="#beneficios" class="btn-whatis">
+          <span class="play-icon-wrap" aria-hidden="true">
+            <i class="bi bi-robot"></i>
+          </span>
+          <span>Conocer el Chatbot IA</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Estudiante en Arco con Badges Flotantes -->
+    <div class="hero-visual-col anim-fade-up anim-stagger-2">
+      <div class="hero-arch-card">
+        <!-- Fondo en Arco Estilizado -->
+        <div class="arch-bg" aria-hidden="true"></div>
+
+        <!-- Imagen Principal de Estudiante de Institución Pública -->
+        <img
+          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=80"
+          alt="Estudiante universitaria en biblioteca virtual con material de estudio"
+          class="student-photo"
+          loading="eager"
+        />
+
+        <!-- Badge Flotante 1: Libros y Recursos (Superior Izquierda) -->
+        <div class="floating-badge badge-courses anim-float">
+          <div class="badge-icon-circle blue" aria-hidden="true">
+            <i class="bi bi-journal-bookmark-fill"></i>
+          </div>
+          <div class="badge-text-group">
+            <span class="badge-val">+50k</span>
+            <span class="badge-lbl">Libros y Recursos</span>
+          </div>
+        </div>
+
+        <!-- Badge Flotante 2: Instituciones Públicas (Superior Derecha) -->
+        <div class="floating-badge badge-students anim-float anim-stagger-2">
+          <div class="badge-text-group">
+            <span class="badge-val">+100</span>
+            <span class="badge-lbl">Instituciones Públicas</span>
+          </div>
+          <div class="avatars-cluster" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=60&q=80" alt="" />
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=60&q=80" alt="" />
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=60&q=80" alt="" />
+          </div>
+        </div>
+
+        <!-- Badge Flotante 3: Chatbot con IA Activo (Inferior Izquierda) -->
+        <div class="floating-badge badge-class anim-scale-in anim-stagger-3">
+          <div class="class-badge-header">
+            <div class="class-avatar" aria-hidden="true">
+              <app-lottie name="ai-thinking" width="34px" height="34px" ariaLabel="Chatbot con IA activo"></app-lottie>
+            </div>
+            <div class="class-info">
+              <span class="class-title">Chatbot con IA Activo</span>
+              <div class="class-stars" aria-label="Calificación 5 estrellas">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+              </div>
+            </div>
+          </div>
+          <a routerLink="/register" class="btn-join-now">Consultar IA</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

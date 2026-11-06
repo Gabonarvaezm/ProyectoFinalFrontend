@@ -1,8 +1,7 @@
-export * from './profesor-sidebar.component';
-export * from './profesor-header.component';
-export * from './profesor-kpi-cards.component';
-export * from './profesor-student-table.component';
-export * from './profesor-activity-feed.component';
-export * from './profesor-ai-chat.component';
-export * from './profesor-create-student-modal.component';
-
+export * from './profesor-sidebar/profesor-sidebar.component';
+export * from './profesor-header/profesor-header.component';
+export * from './profesor-kpi-cards/profesor-kpi-cards.component';
+export * from './profesor-student-table/profesor-student-table.component';
+export * from './profesor-activity-feed/profesor-activity-feed.component';
+export * from './profesor-ai-chat/profesor-ai-chat.component';
+export * from './profesor-create-student-modal/profesor-create-student-modal.component';

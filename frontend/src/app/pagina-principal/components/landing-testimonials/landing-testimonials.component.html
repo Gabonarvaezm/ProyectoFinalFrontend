@@ -1,0 +1,62 @@
+<section class="testimonials-section">
+  <div class="testimonials-container">
+    <div class="section-header-center">
+      <h2 class="testimonials-title">Testimonios de Docentes y Estudiantes</h2>
+      <p class="testimonials-subtitle">
+        Experiencias reales de la comunidad educativa pública que fortalece su enseñanza, estudio e investigación
+        gracias a la biblioteca virtual y el chatbot con inteligencia artificial de DiscerIA.
+      </p>
+    </div>
+
+    <!-- Grid de Tarjetas de Testimonio -->
+    <div class="testimonials-grid">
+      @for (testimonial of testimonials(); track testimonial.id) {
+        <div class="testimonial-card anim-fade-up">
+          <div class="testimonial-header">
+            <img [src]="testimonial.avatar" [alt]="testimonial.name" class="testimonial-avatar" width="44" height="44" loading="lazy" />
+            <div class="testimonial-author-meta">
+              <h4 class="author-name">{{ testimonial.name }}</h4>
+              <span class="author-role">{{ testimonial.role }}</span>
+            </div>
+          </div>
+
+          <div class="testimonial-stars" aria-label="Calificación 5 estrellas">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+          </div>
+
+          <p class="testimonial-text">
+            "{{ testimonial.text }}"
+          </p>
+        </div>
+      }
+    </div>
+
+    <!-- Paginación del Carrusel -->
+    <div class="carousel-pagination">
+      <button
+        type="button"
+        class="page-arrow"
+        (click)="prevClicked.emit()"
+        aria-label="Testimonios anteriores"
+      >
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <span class="page-indicator">
+        {{ currentPage() < 10 ? '0' + currentPage() : currentPage() }} / {{ totalPages() }}
+      </span>
+      <button
+        type="button"
+        class="page-arrow"
+        (click)="nextClicked.emit()"
+        aria-label="Testimonios siguientes"
+      >
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</section>
+

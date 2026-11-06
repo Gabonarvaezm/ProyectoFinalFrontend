@@ -15,6 +15,7 @@
       [notificationsCount]="1"
       [isAiDrawerOpen]="isAiDrawerOpen()"
       (notificationsClicked)="onNotificationsClick()"
+      (configClicked)="selectNav('configuracion')"
       (aiToggleClicked)="toggleAiDrawer()"
     />
 
@@ -22,6 +23,12 @@
     <main class="dashboard-canvas">
       @if (activeNav() === 'biblioteca') {
       <app-biblioteca [userRole]="'professor'" (bookRecommended)="onBookRecommended($event)"></app-biblioteca>
+      } @else if (activeNav() === 'configuracion' || activeNav() === 'perfil') {
+      <app-configuracion
+        [user]="currentUser()"
+        [isEmbedded]="true"
+        (logoutRequested)="onLogout()"
+      />
       } @else {
       <!-- Banner de Bienvenida -->
       <section class="welcome-card" aria-label="Bienvenida al docente">

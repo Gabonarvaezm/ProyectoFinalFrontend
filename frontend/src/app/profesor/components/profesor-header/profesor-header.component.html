@@ -1,0 +1,59 @@
+<header class="top-header">
+  <div class="search-box">
+    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+    <input
+      #searchInput
+      type="search"
+      class="search-input"
+      placeholder="Buscar estudiantes, exámenes o cursos..."
+      [value]="searchQuery()"
+      (input)="onSearchChange(searchInput.value)"
+      aria-label="Buscar estudiantes o exámenes"
+    />
+  </div>
+
+  <div class="header-actions">
+    <!-- Botón Topbar Asistente IA (Opción 1: Barra Superior) -->
+    <button
+      type="button"
+      class="icon-button btn-ai-toggle"
+      [class.active]="isAiDrawerOpen()"
+      (click)="aiToggleClicked.emit()"
+      title="Asistente Docente IA"
+      aria-label="Alternar Asistente Docente IA"
+      [attr.aria-expanded]="isAiDrawerOpen()"
+    >
+      <i class="bi bi-robot"></i>
+    </button>
+
+    <button
+      type="button"
+      class="icon-button"
+      (click)="notificationsClicked.emit()"
+      aria-label="Notificaciones"
+      title="Notificaciones"
+    >
+      <i class="bi bi-bell"></i>
+      @if (notificationsCount() > 0) {
+        <span class="notification-indicator"></span>
+      }
+    </button>
+
+    <button
+      type="button"
+      class="icon-button"
+      (click)="configClicked.emit()"
+      aria-label="Configuración"
+      title="Configuración"
+    >
+      <i class="bi bi-gear"></i>
+    </button>
+
+    <div class="user-profile-badge" [title]="teacherName()">
+      <div class="avatar-circle">
+        <span class="avatar-initials">{{ teacherInitials() }}</span>
+      </div>
+    </div>
+  </div>
+</header>
+

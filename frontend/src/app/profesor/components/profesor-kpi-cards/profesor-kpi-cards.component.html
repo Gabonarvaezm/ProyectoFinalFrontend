@@ -1,0 +1,14 @@
+<section class="kpi-section" aria-label="Métricas generales calculadas">
+  @for (kpi of kpiMetrics(); track kpi.id) {
+    <div class="kpi-card" [class]="'variant-' + kpi.variant">
+      <div class="kpi-header">
+        <span class="kpi-label">{{ kpi.label }}</span>
+        <div class="kpi-icon-pill" [class]="kpi.variant">
+          <i [class]="kpi.icon" aria-hidden="true"></i>
+        </div>
+      </div>
+      <div class="kpi-value">{{ kpi.value }}</div>
+    </div>
+  }
+</section>
+

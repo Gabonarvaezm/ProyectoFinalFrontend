@@ -1,0 +1,84 @@
+@if (isOpen()) {
+<div class="ai-drawer-backdrop" (click)="closeRequested.emit()" aria-hidden="true"></div>
+}
+
+<aside class="ai-sidebar" [class.drawer-open]="isOpen()" role="region"
+  aria-label="Asistente de aprendizaje inteligente">
+  <div class="ai-header">
+    <div class="ai-header-icon">
+      <i class="bi bi-robot"></i>
+    </div>
+    <div class="ai-header-titles">
+      <h2 class="ai-main-title">Asistente de Aprendizaje IA</h2>
+      <span class="ai-subtitle">Tu tutor inteligente</span>
+    </div>
+    <button type="button" class="btn-close-drawer" (click)="closeRequested.emit()"
+      aria-label="Cerrar panel de Asistente IA" title="Cerrar Asistente">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Historial de Chat con IA -->
+  <div class="ai-chat-body">
+    <div class="date-divider">
+      <span>HOY</span>
+    </div>
+
+    <div class="chat-thread">
+      @for (msg of chatMessages(); track msg.id) {
+      @if (msg.sender === 'user') {
+      <div class="chat-bubble-user">
+        <p class="bubble-text">{{ msg.text }}</p>
+      </div>
+      } @else {
+      <div class="chat-bubble-ai">
+        <div class="ai-avatar-tiny" aria-hidden="true">
+          <i class="bi bi-robot"></i>
+        </div>
+        <div class="ai-text-box">
+          <p class="bubble-text">{{ msg.text }}</p>
+        </div>
+      </div>
+      }
+      }
+
+      @if (isAiThinking()) {
+      <div class="ai-bubble-thinking">
+        <div class="dot-typing">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="thinking-label">El tutor IA está razonando...</span>
+      </div>
+      }
+    </div>
+
+    <div class="ai-disclaimer">
+      <span>Contenido generado por IA - Verifique información importante.</span>
+    </div>
+  </div>
+
+  <!-- Acciones Rápidas del Tutor IA -->
+  <div class="ai-quick-actions-box">
+    <h3 class="quick-actions-heading">Acciones Rápidas</h3>
+    <div class="quick-buttons-list">
+      @for (action of quickActions(); track action.id) {
+      <button type="button" class="btn-ai-action" (click)="onActionClick(action)">
+        <i [class]="action.icon"></i>
+        <span>{{ action.label }}</span>
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- Barra Inferior de Entrada de Pregunta -->
+  <div class="ai-input-container">
+    <form class="ai-input-form" (submit)="onSubmit(); $event.preventDefault()">
+      <input type="text" class="ai-input-field" placeholder="Escribe tu pregunta..." [ngModel]="inputText()"
+        (ngModelChange)="inputText.set($event)" name="aiInputText" aria-label="Pregunta al tutor de IA" />
+      <button type="submit" class="btn-send-ai" [disabled]="!inputText() || isAiThinking()"
+        aria-label="Enviar mensaje a la IA">
+        <i class="bi bi-send-fill"></i>
+      </button>
+    </form>
+  </div>
+</aside>

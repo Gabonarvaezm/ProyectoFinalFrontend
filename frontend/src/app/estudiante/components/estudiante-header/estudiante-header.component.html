@@ -1,0 +1,67 @@
+<header class="top-header">
+  <div class="search-bar-wrap">
+    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+    <input
+      #studSearch
+      type="search"
+      class="search-input"
+      placeholder="Buscar lecciones, libros, conceptos o evaluaciones..."
+      [value]="searchQuery()"
+      (input)="onSearch(studSearch.value)"
+      aria-label="Buscar en la plataforma educativa"
+    />
+  </div>
+
+  <div class="header-actions">
+    <!-- Botón Topbar Asistente IA (Opción 1: Barra Superior) -->
+    <button
+      type="button"
+      class="btn-icon-action btn-ai-toggle"
+      [class.active]="isAiDrawerOpen()"
+      (click)="aiToggleClicked.emit()"
+      title="Asistente de Aprendizaje IA"
+      aria-label="Alternar Asistente de IA"
+      [attr.aria-expanded]="isAiDrawerOpen()"
+    >
+      <i class="bi bi-robot"></i>
+    </button>
+
+    <button
+      type="button"
+      class="btn-icon-action"
+      (click)="notificationsClicked.emit()"
+      [attr.aria-label]="notificationsCount() + ' notificaciones pendientes'"
+      title="Notificaciones de tareas y foros"
+    >
+      <i class="bi bi-bell"></i>
+      @if (notificationsCount() > 0) {
+        <span class="notification-dot" aria-hidden="true"></span>
+      }
+    </button>
+
+    <button
+      type="button"
+      class="btn-icon-action"
+      (click)="configClicked.emit()"
+      aria-label="Configuración y Preferencias"
+      title="Configuración"
+    >
+      <i class="bi bi-gear"></i>
+    </button>
+
+    <div
+      class="user-profile-badge"
+      (click)="profileClicked.emit()"
+      tabindex="0"
+      role="button"
+      aria-label="Perfil del estudiante"
+    >
+      <div class="user-avatar-initials">{{ userInitials() }}</div>
+      <div class="user-info-text">
+        <span class="user-greeting">Hola de nuevo,</span>
+        <span class="user-name">{{ studentName() }}</span>
+      </div>
+    </div>
+  </div>
+</header>
+

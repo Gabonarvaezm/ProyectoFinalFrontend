@@ -1,0 +1,204 @@
+:host {
+  display: block;
+  position: static;
+  width: 340px;
+  min-width: 300px;
+  max-width: 360px;
+  flex: 0 0 340px;
+  margin: 0;
+  padding: 0;
+}
+
+.widgets-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: static;
+  width: 100%;
+}
+
+.widget-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Tarjeta Asistente IA ── */
+.ai-assistant-widget {
+  border-color: #c7d2fe;
+  background: linear-gradient(180deg, var(--color-ai-50) 0%, var(--color-bg-surface) 40%);
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.ai-badge-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-ai-gradient);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+
+.widget-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-slate-900);
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.widget-subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-ai-600);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ai-kicker {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  color: var(--color-ai-700);
+  margin-bottom: var(--space-2);
+}
+
+.ai-suggestion-box {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-ai-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-xs);
+
+  .suggestion-text {
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-base);
+    color: var(--color-slate-700);
+    margin: 0 0 var(--space-3);
+  }
+}
+
+.ai-draft-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ai-600);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: gap var(--duration-fast) var(--ease-out-expo), color var(--duration-fast) var(--ease-out-expo);
+
+  &:hover {
+    color: var(--color-primary-800);
+    gap: var(--space-2);
+    text-decoration: underline;
+  }
+}
+
+/* ── Encabezado Estándar para Tarjetas 2 y 3 ── */
+.widget-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+
+  .widget-icon {
+    font-size: 0.95rem;
+    color: var(--color-slate-400);
+  }
+
+  .widget-title-sm {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.05em;
+    color: var(--color-slate-500);
+    margin: 0;
+  }
+}
+
+/* ── Tarjeta Temas Relacionados ── */
+.related-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.related-item {
+  .related-link-btn {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0.6rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    transition: background-color var(--duration-fast) var(--ease-out-expo);
+
+    &:hover {
+      background-color: var(--color-slate-50);
+
+      .related-title {
+        color: var(--color-primary-600);
+      }
+    }
+
+    .related-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-slate-900);
+      line-height: var(--line-height-tight);
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .related-meta {
+      font-size: var(--font-size-xs);
+      color: var(--color-slate-400);
+    }
+  }
+}
+
+/* ── Tarjeta Normas de Etiqueta ── */
+.etiquette-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.etiquette-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-700);
+  line-height: var(--line-height-base);
+
+  .etiquette-check {
+    color: var(--color-primary-600);
+    font-size: 0.95rem;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+}
+

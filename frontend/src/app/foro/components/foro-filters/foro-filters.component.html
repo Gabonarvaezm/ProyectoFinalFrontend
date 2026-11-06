@@ -1,0 +1,28 @@
+<section class="filters-section" aria-label="Filtros de temas académicos">
+  <div class="topic-search-wrap">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input
+      type="text"
+      class="topic-search-input"
+      placeholder="Buscar por tema..."
+      [value]="searchQuery()"
+      (input)="onSearchInput($event)"
+      aria-label="Filtrar por tema"
+    />
+  </div>
+
+  <div class="subject-pills-row" role="group" aria-label="Filtro de materias académicas">
+    @for (subj of subjects(); track subj) {
+      <button
+        type="button"
+        class="subject-pill"
+        [class.active]="selectedSubject() === subj"
+        (click)="onSelectSubject(subj)"
+        [attr.aria-pressed]="selectedSubject() === subj"
+      >
+        {{ subj }}
+      </button>
+    }
+  </div>
+</section>
+

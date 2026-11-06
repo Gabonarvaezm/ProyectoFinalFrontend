@@ -1,0 +1,44 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Landing Partners Ribbon Component Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+$gradient-ribbon: linear-gradient(90deg, #1e3a8a 0%, #1d4ed8 35%, #2563eb 70%, #0284c7 100%);
+
+.partners-ribbon {
+  background: $gradient-ribbon;
+  padding: 1.5rem 0;
+  color: var(--color-white);
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.25);
+
+  .partners-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .partner-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.01em;
+    opacity: 0.95;
+    transition: opacity var(--duration-fast) ease, transform var(--duration-fast) ease;
+
+    i {
+      font-size: 1.25rem;
+    }
+
+    &:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+  }
+}
+

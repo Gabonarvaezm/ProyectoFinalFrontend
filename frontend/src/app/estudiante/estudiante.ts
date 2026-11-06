@@ -17,48 +17,52 @@ import {
   STORAGE_KEYS,
 } from '../core/models/auth.model';
 import { Biblioteca } from '../biblioteca/biblioteca';
+import { ConfiguracionComponent } from '../configuracion/configuracion';
 import {
+  EstudianteAiDrawerComponent,
+  EstudianteContinueCourseComponent,
+  EstudianteExamCardComponent,
+  EstudianteForumPreviewComponent,
   EstudianteHeaderComponent,
   EstudianteSidebarComponent,
+  EstudianteSubjectsGridComponent,
 } from './components';
 import {
   AI_DEFAULT_FALLBACK_REPLY,
   AI_KNOWLEDGE_BASE,
   SUBJECT_CATEGORY_MAP,
 } from './constants/estudiante.constants';
+import {
+  ActiveCourse,
+  ForumQuestion,
+  LibrarySubject,
+  PracticeExam,
+  WeeklyProgressItem,
+} from './models/estudiante.model';
 
-export type { ChatMessage, NavItem, QuickAction };
-
-export interface LibrarySubject {
-  id: string;
-  name: string;
-  topic: string;
-  icon: string;
-  badgeBg: string;
-  iconColor: string;
-}
-
-export interface ForumQuestion {
-  id: string;
-  title: string;
-  tagText: string;
-  tagClass: 'badge-teacher' | 'badge-students';
-  tagIcon: string;
-  timeAgo: string;
-  subject: string;
-  authorName: string;
-  avatar: string;
-  avatarFallbackBg: string;
-  avatarFallbackColor: string;
-  initials: string;
-}
+export type {
+  ActiveCourse,
+  ChatMessage,
+  ForumQuestion,
+  LibrarySubject,
+  NavItem,
+  PracticeExam,
+  QuickAction,
+  WeeklyProgressItem,
+};
 
 @Component({
   imports: [
     FormsModule,
     Biblioteca,
-    EstudianteHeaderComponent,
+    ConfiguracionComponent,
     EstudianteSidebarComponent,
+    EstudianteHeaderComponent,
+    EstudianteContinueCourseComponent,
+    EstudianteSubjectsGridComponent,
+    EstudianteExamCardComponent,
+    EstudianteForumPreviewComponent,
+    EstudianteAiDrawerComponent,
   ],
   selector: 'app-estudiante',
   styleUrl: './estudiante.scss',
@@ -72,6 +76,8 @@ export class Estudiante {
 
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
+  public readonly currentUser = this.authService.currentUser;
+
   // ── Navegación Lateral ───────────────────────────────────────────────────
   public readonly activeNav = signal<string>('dashboard');
   public readonly selectedSubjectCategory = signal<string | null>(null);
@@ -81,7 +87,7 @@ export class Estudiante {
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text' },
     { id: 'progreso', label: 'Progreso', icon: 'bi bi-bar-chart' },
-    { id: 'perfil', label: 'Perfil', icon: 'bi bi-person-circle' },
+    { id: 'configuracion', label: 'Configuración', icon: 'bi bi-gear' },
   ]);
 
   // ── Panel Desplegable (Drawer) Asistente IA ─────────────────────────────
@@ -373,6 +379,10 @@ export class Estudiante {
     } else {
       this.sendAiMessage(`Ayuda con: ${action.label}`);
     }
+  }
+
+  public onSendAiMessage(text: string): void {
+    this.sendAiMessage(text);
   }
 
   public submitAiMessage(): void {

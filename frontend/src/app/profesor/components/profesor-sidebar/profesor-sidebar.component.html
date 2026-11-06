@@ -1,0 +1,47 @@
+<aside class="sidebar" aria-label="Navegación principal">
+  <div class="sidebar-header">
+    <a routerLink="/" class="brand-link" title="Ir a la página principal" aria-label="Ir a inicio de DiscerIA">
+      <div class="brand-logo-wrap">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">DiscerIA</span>
+          <span class="brand-sub">Portal Docente</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      @for (item of navItems(); track item.id) {
+        <li class="nav-item">
+          <button
+            type="button"
+            class="nav-button"
+            [class.active]="activeNav() === item.id"
+            (click)="onSelectNav(item.id)"
+            [attr.aria-current]="activeNav() === item.id ? 'page' : null"
+          >
+            <i [class]="item.icon" aria-hidden="true"></i>
+            <span>{{ item.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button
+      type="button"
+      class="btn-new-analysis"
+      (click)="newAnalysis.emit()"
+      aria-label="Iniciar nuevo análisis académico"
+    >
+      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+      <span>Nuevo Análisis</span>
+    </button>
+  </div>
+</aside>
+

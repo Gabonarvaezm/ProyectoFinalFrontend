@@ -1,0 +1,261 @@
+<article class="post-card" [class.expanded]="isExpanded()">
+  <!-- Cabecera de la Publicación -->
+  <div class="post-header">
+    <div class="post-author-wrap">
+      @if (post().author.avatar) {
+        <img
+          [src]="post().author.avatar"
+          [alt]="post().author.name"
+          class="author-avatar"
+        />
+      } @else {
+        <div class="author-avatar-fallback">
+          <i class="bi bi-person"></i>
+        </div>
+      }
+      <div class="author-meta">
+        <span class="author-name">{{ post().author.name }}</span>
+        <span class="meta-separator">•</span>
+        <span class="post-time">{{ post().createdAt }}</span>
+      </div>
+    </div>
+
+    <div class="post-badges">
+      <span class="subject-tag" [attr.data-subject]="post().subject">
+        {{ post().subject }}
+      </span>
+
+      @if (post().isTeacherVerified) {
+        <span class="badge-teacher-verified" title="Esta respuesta contiene verificación de un profesor">
+          <i class="bi bi-patch-check-fill"></i>
+          <span>Verificado por Docente</span>
+        </span>
+      }
+
+      @if (post().isUnanswered) {
+        <span class="badge-unanswered" title="Aún no cuenta con una solución validada">
+          Sin responder
+        </span>
+      }
+    </div>
+  </div>
+
+  <!-- Título y Contenido de la Duda -->
+  <div class="post-body">
+    <h2 class="post-title">
+      <button
+        type="button"
+        class="post-title-btn"
+        (click)="onToggleExpand()"
+        [attr.aria-expanded]="isExpanded()"
+      >
+        {{ post().title }}
+      </button>
+    </h2>
+    <p class="post-excerpt">{{ post().content }}</p>
+
+    @if (post().academicReference) {
+      <div class="academic-cite-box">
+        <i class="bi bi-journal-bookmark-fill cite-icon"></i>
+        <span class="cite-text">
+          <strong>Referencia sugerida:</strong> {{ post().academicReference }}
+        </span>
+      </div>
+    }
+  </div>
+
+  <!-- Barra Inferior de Métricas e Interacciones -->
+  <footer class="post-footer">
+    <div class="footer-left">
+      <!-- Botón Respuestas -->
+      <button
+        type="button"
+        class="stat-action-btn"
+        [class.active]="isExpanded()"
+        (click)="onToggleExpand()"
+        aria-label="Ver respuestas del tema"
+        [attr.aria-expanded]="isExpanded()"
+      >
+        <i class="bi bi-chat-left-text"></i>
+        <span>{{ post().repliesCount }} respuestas</span>
+      </button>
+
+      <!-- Botón Helpful / Útil -->
+      <button
+        type="button"
+        class="stat-action-btn"
+        [class.active-helpful]="post().userHasVotedHelpful"
+        (click)="onHelpfulClick()"
+        aria-label="Marcar como útil"
+      >
+        <i [class]="post().userHasVotedHelpful ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
+        <span>{{ post().helpfulCount }} útil</span>
+      </button>
+    </div>
+
+    <div class="footer-right">
+      <span class="views-stat" title="Número de lecturas">
+        <i class="bi bi-eye"></i>
+        <span>{{ post().viewsCount }} vistas</span>
+      </span>
+    </div>
+  </footer>
+
+  <!-- ── HILO EXPANDIDO DE RESPUESTAS & FORMULARIO REACTIVO ── -->
+  @if (isExpanded()) {
+    <div class="thread-expanded-container">
+      <!-- Lista de Respuestas Académicas Existentes -->
+      <div class="replies-section">
+        <h3 class="replies-title">
+          Respuestas Académicas ({{ post().replies.length }})
+        </h3>
+
+        @if (post().replies.length === 0) {
+          <p class="no-replies-msg">
+            Aún no hay respuestas en esta discusión. Sé el primero en contribuir académicamente.
+          </p>
+        }
+
+        @for (reply of post().replies; track reply.id) {
+          <div class="reply-card" [class.reply-verified]="reply.isTeacherVerified">
+            <div class="reply-header">
+              <div class="reply-author-info">
+                @if (reply.author.avatar) {
+                  <img
+                    [src]="reply.author.avatar"
+                    [alt]="reply.author.name"
+                    class="reply-avatar"
+                  />
+                } @else {
+                  <div class="reply-avatar-initials">{{ reply.author.initials }}</div>
+                }
+                <div>
+                  <div class="reply-name-row">
+                    <span class="reply-author-name">{{ reply.author.name }}</span>
+                    @if (reply.author.role === 'professor') {
+                      <span class="docente-tag">Docente</span>
+                    }
+                  </div>
+                  <span class="reply-time">{{ reply.createdAt }} • {{ reply.author.institution }}</span>
+                </div>
+              </div>
+
+              @if (reply.isTeacherVerified) {
+                <div class="verified-stamp">
+                  <i class="bi bi-patch-check-fill"></i> Solución Verificada
+                </div>
+              }
+            </div>
+
+            <div class="reply-body">
+              <p>{{ reply.content }}</p>
+              @if (reply.academicReference) {
+                <div class="reply-reference">
+                  <i class="bi bi-quote"></i>
+                  <span>{{ reply.academicReference }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="reply-footer">
+              <button
+                type="button"
+                class="reply-helpful-btn"
+                [class.active]="reply.userHasVotedHelpful"
+                (click)="onReplyHelpfulClick(reply)"
+              >
+                <i [class]="reply.userHasVotedHelpful ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
+                <span>{{ reply.helpfulCount }} útil</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Formulario Reactivo para Responder a la Discusión -->
+      <form
+        [formGroup]="replyForm"
+        (ngSubmit)="onReplySubmit()"
+        class="reply-form"
+        novalidate
+      >
+        <h4 class="reply-form-title">
+          <i class="bi bi-pencil-square"></i>
+          <span>Agregar tu Aporte Académico</span>
+        </h4>
+
+        <!-- Campo Contenido de la Respuesta -->
+        <div class="form-group">
+          <label [for]="'reply-content-' + post().id" class="form-label">
+            Tu explicación o demostración
+          </label>
+          <textarea
+            [id]="'reply-content-' + post().id"
+            formControlName="content"
+            class="form-textarea"
+            rows="4"
+            placeholder="Escribe una respuesta académica rigurosa, clara y justificada..."
+            [class.is-invalid]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched"
+            [attr.aria-invalid]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched ? true : null"
+            [attr.aria-describedby]="replyForm.get('content')?.invalid && replyForm.get('content')?.touched ? ('reply-content-error-' + post().id) : null"
+          ></textarea>
+
+          @if (replyForm.get('content')?.invalid && replyForm.get('content')?.touched) {
+            <p [id]="'reply-content-error-' + post().id" class="form-error-msg" role="alert">
+              <i class="bi bi-exclamation-circle"></i>
+              La respuesta debe tener al menos 10 caracteres.
+            </p>
+          }
+        </div>
+
+        <!-- Campo Referencia Académica Opcional -->
+        <div class="form-group">
+          <label [for]="'reply-reference-' + post().id" class="form-label">
+            Cita bibliográfica o fuente académica (Opcional recomendado)
+          </label>
+          <input
+            type="text"
+            [id]="'reply-reference-' + post().id"
+            formControlName="academicReference"
+            class="form-input"
+            placeholder="Ej. Stewart, J. Cálculo Trascendentes Tempranas, Cap. 7"
+          />
+        </div>
+
+        <!-- Opción exclusiva para Docentes: Certificar Respuesta -->
+        @if (currentRole() === 'professor') {
+          <div class="form-checkbox-group">
+            <label class="checkbox-label" [for]="'reply-verified-' + post().id">
+              <input
+                type="checkbox"
+                [id]="'reply-verified-' + post().id"
+                formControlName="markAsTeacherVerified"
+                class="custom-checkbox"
+              />
+              <span class="checkbox-text">
+                <strong>Certificar como Solución Oficial Docente</strong>
+                <small>Otorga credencial de validación docente a esta solución</small>
+              </span>
+            </label>
+          </div>
+        }
+
+        <!-- Botón Enviar Respuesta -->
+        <div class="reply-form-actions">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="replyForm.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-sm"></span> Publicando...
+            } @else {
+              <i class="bi bi-send-fill"></i> Publicar Respuesta
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</article>
+

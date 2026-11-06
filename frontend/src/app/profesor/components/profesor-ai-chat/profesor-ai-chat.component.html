@@ -1,0 +1,96 @@
+<aside
+  class="ai-assistant-panel"
+  [class.drawer-open]="isOpen()"
+  role="region"
+  aria-label="Asistente de Inteligencia Artificial"
+>
+  <div class="ai-header">
+    <div class="ai-header-titles-wrap">
+      <div class="ai-icon-box">
+        <i class="bi bi-robot" aria-hidden="true"></i>
+      </div>
+      <div class="ai-title-wrapper">
+        <h2 class="ai-title">Asistente Docente IA</h2>
+        <span class="ai-subtitle">Copiloto Inteligente DiscerIA</span>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="btn-close-drawer"
+      (click)="closeRequested.emit()"
+      aria-label="Cerrar panel de Asistente IA"
+      title="Cerrar Asistente"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="ai-body">
+    <!-- Tarjeta de Sugerencias Rápidas -->
+    <div class="suggestions-card">
+      <h3 class="suggestions-prompt">¿En qué puedo asistirte hoy?</h3>
+
+      <div class="suggestions-list">
+        @for (sug of aiSuggestions(); track sug.id) {
+          <button
+            type="button"
+            class="btn-suggestion"
+            (click)="suggestionSelected.emit(sug)"
+            [disabled]="isAiThinking()"
+          >
+            <i [class]="sug.icon" aria-hidden="true"></i>
+            <span>{{ sug.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Historial de Conversación con el Asistente -->
+    <div class="chat-thread" aria-live="polite">
+      @for (msg of chatMessages(); track msg.id) {
+        <div class="chat-bubble" [class]="msg.sender">
+          <div class="bubble-sender-name">
+            {{ msg.sender === 'user' ? 'Tú' : 'Asistente IA' }}
+          </div>
+          <p class="bubble-text">{{ msg.text }}</p>
+        </div>
+      }
+
+      @if (isAiThinking()) {
+        <div class="chat-bubble ai thinking" aria-label="El asistente está redactando una respuesta">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Barra de Entrada del Chat con IA -->
+  <div class="ai-footer">
+    <form class="ai-input-form" (ngSubmit)="onSubmit()">
+      <input
+        #chatInput
+        type="text"
+        class="ai-input"
+        placeholder="Pregunta a la IA sobre tus alumnos..."
+        [value]="inputText()"
+        (input)="inputText.set(chatInput.value)"
+        name="chatText"
+        [disabled]="isAiThinking()"
+        aria-label="Pregunta al Asistente del Profesor"
+        autocomplete="off"
+      />
+      <button
+        type="submit"
+        class="btn-ai-send"
+        [disabled]="!inputText().trim() || isAiThinking()"
+        aria-label="Enviar mensaje a la IA"
+        title="Enviar"
+      >
+        <i class="bi bi-send" aria-hidden="true"></i>
+      </button>
+    </form>
+  </div>
+</aside>
+

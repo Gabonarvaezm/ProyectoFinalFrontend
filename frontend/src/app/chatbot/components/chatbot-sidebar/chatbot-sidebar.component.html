@@ -1,0 +1,103 @@
+<aside class="chatbot-sidebar" aria-label="Historial y configuración del Chatbot">
+  <!-- Encabezado con Brand de DiscerIA y botón Nuevo Chat -->
+  <div class="sidebar-top">
+    <a routerLink="/" class="brand-link" aria-label="Ir al inicio de DiscerIA">
+      <div class="brand-icon">
+        <i class="bi bi-robot" aria-hidden="true"></i>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Discer<span class="brand-accent">IA</span></span>
+        <span class="brand-sub">Academic AI Assistant</span>
+      </div>
+    </a>
+
+    <button
+      type="button"
+      class="btn-new-chat"
+      (click)="newChatRequested.emit()"
+      aria-label="Iniciar una nueva sesión de consulta académica"
+    >
+      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+      <span>Nueva Consulta</span>
+    </button>
+  </div>
+
+  <!-- Selector de Modo Académico de la IA -->
+  <div class="modes-section">
+    <span class="section-title">MODO DE ASISTENCIA</span>
+    <div class="modes-grid" role="group" aria-label="Seleccionar modo de asistencia">
+      @for (m of modes(); track m.id) {
+        <button
+          type="button"
+          class="mode-card-btn"
+          [class.active]="activeMode() === m.id"
+          (click)="modeSelected.emit(m.id)"
+          [title]="m.description"
+          [attr.aria-pressed]="activeMode() === m.id"
+        >
+          <i [class]="m.icon + ' mode-icon'" aria-hidden="true"></i>
+          <div class="mode-info">
+            <span class="mode-label">{{ m.label }}</span>
+            <span class="mode-desc">{{ m.description }}</span>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Historial de Conversaciones Recientes -->
+  <div class="sessions-section">
+    <div class="sessions-header">
+      <span class="section-title">SESIONES RECIENTES</span>
+      @if (sessions().length > 0) {
+        <button
+          type="button"
+          class="btn-clear-history"
+          (click)="clearHistoryRequested.emit()"
+          title="Limpiar todas las conversaciones"
+          aria-label="Limpiar historial"
+        >
+          <i class="bi bi-trash3" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+
+    <ul class="sessions-list" aria-label="Lista de conversaciones recientes">
+      @for (session of sessions(); track session.id) {
+        <li class="session-item">
+          <button
+            type="button"
+            class="session-btn"
+            [class.active]="activeSessionId() === session.id"
+            (click)="sessionSelected.emit(session.id)"
+            [attr.aria-current]="activeSessionId() === session.id ? 'true' : null"
+          >
+            <i class="bi bi-chat-left-text session-icon" aria-hidden="true"></i>
+            <div class="session-meta">
+              <span class="session-title">{{ session.title }}</span>
+              <span class="session-preview">{{ session.lastMessage }}</span>
+            </div>
+          </button>
+        </li>
+      } @empty {
+        <li class="empty-sessions">
+          <i class="bi bi-chat-square-dots" aria-hidden="true"></i>
+          <span>No hay sesiones archivadas</span>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Pie con Navegación Rápida -->
+  <div class="sidebar-bottom">
+    <a routerLink="/estudiante" class="nav-back-link">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      <span>Volver al Dashboard</span>
+    </a>
+    <a routerLink="/foro" class="nav-back-link">
+      <i class="bi bi-chat-square-quote" aria-hidden="true"></i>
+      <span>Ir a Foros</span>
+    </a>
+  </div>
+</aside>
+

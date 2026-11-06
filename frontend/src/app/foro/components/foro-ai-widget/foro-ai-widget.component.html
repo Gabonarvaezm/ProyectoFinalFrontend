@@ -1,0 +1,75 @@
+<aside class="widgets-column" aria-label="Asistente inteligente y recursos del foro">
+  <!-- Tarjeta 1: Asistente de Comunidad - DiscerIA Context AI -->
+  <section class="widget-card ai-assistant-widget">
+    <div class="widget-header ai-header">
+      <div class="ai-badge-icon">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div>
+        <h3 class="widget-title">Asistente de Comunidad</h3>
+        <span class="widget-subtitle">DiscerIA Context AI</span>
+      </div>
+    </div>
+
+    <div class="ai-widget-content">
+      <span class="ai-kicker">SUGERENCIAS DE RESPUESTAS</span>
+      <div class="ai-suggestion-box">
+        <p class="suggestion-text">
+          {{ aiSuggestion().summary }}
+        </p>
+        <button
+          type="button"
+          class="ai-draft-link"
+          (click)="onDraftClick()"
+          aria-label="Insertar borrador de respuesta sugerido por IA"
+        >
+          <span>Insertar borrador</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tarjeta 2: Temas Relacionados (Related Topics) -->
+  <section class="widget-card related-topics-widget">
+    <div class="widget-header">
+      <i class="bi bi-chat-left-dots widget-icon"></i>
+      <h3 class="widget-title-sm">TEMAS RELACIONADOS</h3>
+    </div>
+
+    <ul class="related-list">
+      @for (topic of relatedTopics(); track topic.id) {
+        <li class="related-item">
+          <button
+            type="button"
+            class="related-link-btn"
+            (click)="onTopicClick(topic)"
+          >
+            <span class="related-title">{{ topic.title }}</span>
+            <span class="related-meta">
+              {{ topic.subject }} • {{ topic.activeThreads }} hilos activos
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- Tarjeta 3: Normas de Etiqueta del Foro (Forum Etiquette) -->
+  <section class="widget-card etiquette-widget">
+    <div class="widget-header">
+      <i class="bi bi-info-circle widget-icon"></i>
+      <h3 class="widget-title-sm">NORMAS DEL FORO</h3>
+    </div>
+
+    <ul class="etiquette-list">
+      @for (rule of etiquetteRules(); track rule) {
+        <li class="etiquette-item">
+          <i class="bi bi-check2-circle etiquette-check"></i>
+          <span>{{ rule }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+</aside>
+

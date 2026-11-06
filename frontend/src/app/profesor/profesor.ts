@@ -5,6 +5,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../core/services/auth.service';
 import { ProfesorService } from '../core/services/profesor.service';
 import {
   AiSuggestion,
@@ -19,6 +20,7 @@ import {
 } from './models/profesor.model';
 import { Biblioteca } from '../biblioteca/biblioteca';
 import { Book } from '../biblioteca/models/book.model';
+import { ConfiguracionComponent } from '../configuracion/configuracion';
 import {
   ProfesorActivityFeedComponent,
   ProfesorAiChatComponent,
@@ -32,6 +34,7 @@ import {
 @Component({
   imports: [
     Biblioteca,
+    ConfiguracionComponent,
     ProfesorSidebarComponent,
     ProfesorHeaderComponent,
     ProfesorKpiCardsComponent,
@@ -46,11 +49,14 @@ import {
 })
 export class Profesor {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly profesorService = inject(ProfesorService);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
   private timerIds: ReturnType<typeof setTimeout>[] = [];
+
+  public readonly currentUser = this.authService.currentUser;
 
   // ── Navegación Lateral ───────────────────────────────────────────────────
   public readonly activeNav = signal<string>('dashboard');
@@ -60,7 +66,7 @@ export class Profesor {
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text' },
     { id: 'progreso', label: 'Progreso', icon: 'bi bi-bar-chart' },
-    { id: 'perfil', label: 'Perfil', icon: 'bi bi-person-circle' },
+    { id: 'configuracion', label: 'Configuración', icon: 'bi bi-gear' },
   ]);
 
   // ── Panel Desplegable (Drawer) Asistente IA ─────────────────────────────
@@ -162,7 +168,24 @@ export class Profesor {
       this.router.navigate(['/foro']);
       return;
     }
+    if (navId === 'perfil') {
+      this.activeNav.set('perfil');
+      this.showToast('Perfil y Preferencias de Docente');
+      return;
+    }
     this.activeNav.set(navId);
+  }
+
+  /**
+   * Cierre de sesión seguro y redirección al Login
+   */
+  public onLogout(): void {
+    this.authService.logout();
+    this.showToast('Cerrando sesión. Redirigiendo al inicio de sesión...');
+    const timer = setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 800);
+    this.timerIds.push(timer);
   }
 
   public onSearchChange(eventOrValue: Event | string): void {

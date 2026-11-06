@@ -1,0 +1,66 @@
+<header class="top-header">
+  <div class="header-search-wrap">
+    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+    <input
+      type="search"
+      class="header-search-input"
+      placeholder="Buscar discusiones, dudas o publicaciones..."
+      [value]="searchQuery()"
+      (input)="onSearchInput($event)"
+      aria-label="Buscar en los foros académicos"
+    />
+  </div>
+
+  <div class="header-actions">
+    <!-- Botón Topbar Asistente IA (Opción 1: Barra Superior) -->
+    <button
+      type="button"
+      class="icon-btn btn-ai-toggle"
+      [class.active]="isAiPanelOpen()"
+      (click)="aiToggleClicked.emit()"
+      title="Asistente de Comunidad Context AI"
+      aria-label="Alternar Asistente de Comunidad"
+      [attr.aria-expanded]="isAiPanelOpen()"
+    >
+      <i class="bi bi-robot"></i>
+    </button>
+
+    <button
+      type="button"
+      class="icon-btn"
+      aria-label="Notificaciones del foro"
+      title="Respuestas académicas recientes"
+    >
+      <i class="bi bi-bell"></i>
+      @if (notificationsCount() > 0) {
+        <span class="notification-indicator"></span>
+      }
+      <span class="visually-hidden">Tienes notificaciones académicas nuevas</span>
+    </button>
+
+    <button
+      type="button"
+      class="icon-btn"
+      aria-label="Configuración de preferencias"
+      title="Configuración"
+    >
+      <i class="bi bi-gear"></i>
+    </button>
+
+    <div
+      class="user-profile-badge"
+      [title]="currentUser().name + ' (' + (currentUser().roleTitle || currentUser().role) + ')'"
+    >
+      @if (currentUser().avatar) {
+        <img
+          [src]="currentUser().avatar"
+          [alt]="currentUser().name"
+          class="user-avatar"
+        />
+      } @else {
+        <div class="user-avatar-initials">{{ currentUser().initials }}</div>
+      }
+    </div>
+  </div>
+</header>
+
