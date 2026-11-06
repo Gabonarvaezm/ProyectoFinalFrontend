@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Biblioteca } from './biblioteca';
-import { Book } from './models/book.model';
+import { Book, CreateBookDto } from './models/book.model';
 
 describe('Biblioteca Component', () => {
   let component: Biblioteca;
@@ -140,5 +140,67 @@ describe('Biblioteca Component', () => {
 
     component.onDownload(book, dummyEvent);
     expect(component.toastFeedback()).toContain('Iniciando descarga');
+  });
+
+  // ── Pruebas de Integración de LibroComponent y Seguridad por Roles ───────
+
+  it('debe verificar que isProfessor es false por defecto para estudiantes', () => {
+    expect(component.isProfessor()).toBe(false);
+  });
+
+  it('debe reconocer permisos de profesor cuando userRole es "professor"', () => {
+    const profFixture = TestBed.createComponent(Biblioteca);
+    profFixture.componentRef.setInput('userRole', 'professor');
+    profFixture.detectChanges();
+
+    expect(profFixture.componentInstance.isProfessor()).toBe(true);
+  });
+
+  it('debe bloquear la apertura del modal de creación a usuarios que no sean profesores', () => {
+    expect(component.isProfessor()).toBe(false);
+    component.openCreateBookModal();
+
+    expect(component.isCreateBookOpen()).toBe(false);
+    expect(component.toastFeedback()).toContain('Acceso restringido');
+  });
+
+  it('debe permitir abrir y cerrar el modal de creación si el usuario es profesor', () => {
+    const profFixture = TestBed.createComponent(Biblioteca);
+    profFixture.componentRef.setInput('userRole', 'professor');
+    profFixture.detectChanges();
+
+    const profComp = profFixture.componentInstance;
+    profComp.openCreateBookModal();
+    expect(profComp.isCreateBookOpen()).toBe(true);
+
+    profComp.closeCreateBookModal();
+    expect(profComp.isCreateBookOpen()).toBe(false);
+  });
+
+  it('debe agregar el nuevo libro al catálogo cuando handleBookCreated es invocado', () => {
+    const initialCount = component.books().length;
+    const dto: CreateBookDto = {
+      title: 'Neurociencia Cognitiva y Aprendizaje',
+      author: 'Dr. Santiago Ramón',
+      category: 'ciencias',
+      format: 'PDF',
+      description: 'Estudio de los mecanismos neuronales involucrados en la adquisición de conocimiento.',
+      pages: 350,
+      year: 2024,
+      tags: ['Cerebro', 'Neurociencia', 'Aprendizaje'],
+      coverImage: 'https://ejemplo.com/neuro.jpg',
+      institution: 'Universidad Central',
+    };
+
+    component.handleBookCreated(dto);
+
+    expect(component.books().length).toBe(initialCount + 1);
+    const addedBook = component.books()[0];
+    expect(addedBook.title).toBe(dto.title);
+    expect(addedBook.author).toBe(dto.author);
+    expect(addedBook.category).toBe(dto.category);
+    expect(addedBook.pages).toBe(350);
+    expect(component.isCreateBookOpen()).toBe(false);
+    expect(component.toastFeedback()).toContain('publicado con éxito');
   });
 });

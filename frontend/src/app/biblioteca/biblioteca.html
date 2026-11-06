@@ -1,11 +1,13 @@
 <div class="biblioteca-container">
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 1. NODO HIJO: ENCABEZADO Y BUSCADOR PRINCIPAL                           -->
+  <!-- 1. NODO HIJO: ENCABEZADO CON BUSCADOR Y BOTÓN DOCENTE                   -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <app-biblioteca-header
     [(searchQuery)]="searchQuery"
     [(selectedFormat)]="selectedFormat"
+    [isProfessor]="isProfessor()"
     (formatChanged)="onFormatChanged($event)"
+    (createBookClicked)="openCreateBookModal()"
   />
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -95,7 +97,23 @@
   />
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 6. NOTIFICACIÓN TOAST FLOTANTE                                          -->
+  <!-- 6. NODO HIJO: MODAL REACTIVO DE CREACIÓN DE LIBRO (SOLO PROFESORES)     -->
+  <!-- Patrón Padre–Hijo: el padre gestiona el estado; el hijo renderiza el    -->
+  <!-- formulario y emite el DTO validado de vuelta al padre.                  -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (isProfessor()) {
+    <app-libro
+      [isOpen]="isCreateBookOpen()"
+      [isSubmitting]="isSavingBook()"
+      [categories]="categories()"
+      [userInstitution]="userInstitution()"
+      (closeModal)="closeCreateBookModal()"
+      (bookCreated)="handleBookCreated($event)"
+    />
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 7. NOTIFICACIÓN TOAST FLOTANTE                                          -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   @if (toastFeedback()) {
     <div class="toast-feedback" role="status" aria-live="polite">
