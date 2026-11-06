@@ -1,0 +1,79 @@
+<header class="biblioteca-header">
+  <div class="header-titles">
+    <div class="header-badge">
+      <i class="bi bi-book-half" aria-hidden="true"></i>
+      <span>Repositorio Académico Abierto</span>
+    </div>
+    <h1 class="biblioteca-title">Biblioteca Digital Universitaria</h1>
+    <p class="biblioteca-subtitle">
+      Explora y consulta libremente material bibliográfico de alta calidad académica, 
+      diseñado para el fortalecimiento de la educación pública.
+    </p>
+  </div>
+
+  <!-- Barra de Búsqueda y Filtros Rápidos -->
+  <div class="search-filters-bar">
+    <div class="search-input-wrapper">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input
+        #libSearch
+        type="search"
+        class="search-field"
+        placeholder="Buscar por título, autor, asignatura o palabras clave..."
+        [value]="searchQuery()"
+        (input)="onSearchInput(libSearch.value)"
+        aria-label="Buscar libros en el repositorio"
+      />
+      @if (searchQuery()) {
+        <button
+          type="button"
+          class="btn-clear-search"
+          (click)="onClearSearch()"
+          aria-label="Limpiar búsqueda"
+        >
+          <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+
+    <!-- Filtro por formato -->
+    <div class="format-filter-group" role="group" aria-label="Filtrar por formato">
+      <button
+        type="button"
+        class="format-pill"
+        [class.active]="selectedFormat() === 'all'"
+        (click)="onSetFormat('all')"
+      >
+        Todos
+      </button>
+      <button
+        type="button"
+        class="format-pill"
+        [class.active]="selectedFormat() === 'pdf'"
+        (click)="onSetFormat('pdf')"
+      >
+        <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+        PDF
+      </button>
+      <button
+        type="button"
+        class="format-pill"
+        [class.active]="selectedFormat() === 'epub'"
+        (click)="onSetFormat('epub')"
+      >
+        <i class="bi bi-journal-text" aria-hidden="true"></i>
+        ePub
+      </button>
+      <button
+        type="button"
+        class="format-pill"
+        [class.active]="selectedFormat() === 'interactivo'"
+        (click)="onSetFormat('interactivo')"
+      >
+        <i class="bi bi-display" aria-hidden="true"></i>
+        Interactivo
+      </button>
+    </div>
+  </div>
+</header>
+

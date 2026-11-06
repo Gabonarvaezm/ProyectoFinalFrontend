@@ -16,38 +16,9 @@ import { LOTTIE_PRESETS, LottiePreset } from './lottie-presets';
 
 @Component({
   selector: 'app-lottie',
-  standalone: true,
+  templateUrl: './lottie.component.html',
+  styleUrl: './lottie.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div
-      #lottieContainer
-      class="lottie-host-wrapper"
-      role="img"
-      [attr.aria-label]="ariaLabel()"
-      [style.width]="width()"
-      [style.height]="height()"
-    ></div>
-  `,
-  styles: `
-    :host {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 0;
-    }
-
-    .lottie-host-wrapper {
-      display: inline-block;
-      overflow: hidden;
-      max-width: 100%;
-    }
-
-    .lottie-host-wrapper svg {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
-    }
-  `,
 })
 export class LottieComponent {
   private readonly platformId = inject(PLATFORM_ID);

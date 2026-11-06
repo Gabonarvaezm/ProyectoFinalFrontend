@@ -1,0 +1,147 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Landing Benefits Component Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+.benefits-section {
+  padding: 4.5rem 0 5.5rem;
+  background-color: var(--color-bg-surface);
+
+  .benefits-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 4.5rem;
+    align-items: center;
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+      gap: 3.5rem;
+    }
+  }
+
+  // Cuadrante 2x2 de Estudiantes
+  .quadrant-card-wrapper {
+    position: relative;
+    max-width: 440px;
+    margin: 0 auto;
+    border-radius: 36px;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(29, 78, 216, 0.05) 0%, rgba(2, 132, 199, 0.05) 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+
+    .quadrant-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .quadrant-item {
+      aspect-ratio: 1;
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform var(--duration-normal) ease;
+      }
+
+      &:hover img {
+        transform: scale(1.05);
+      }
+
+      &.quadrant-1 {
+        background-color: var(--color-primary-50);
+      }
+      &.quadrant-2 {
+        background-color: #f0fdf4;
+      }
+      &.quadrant-3 {
+        background-color: #f0f9ff;
+      }
+      &.quadrant-4 {
+        background-color: var(--color-slate-50);
+      }
+    }
+  }
+
+  // Columna de Beneficios
+  .benefits-info-col {
+    .benefits-title {
+      font-size: 2.75rem;
+      font-weight: var(--font-weight-extrabold);
+      color: var(--color-slate-900);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 2.25rem;
+
+      @media (max-width: 640px) {
+        font-size: 2.15rem;
+      }
+
+      .highlight-primary,
+      .highlight-pink {
+        color: var(--color-primary-700);
+      }
+    }
+
+    .benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    .benefit-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+
+      &.blue-soft,
+      &.purple-soft {
+        background: var(--color-primary-50);
+        color: var(--color-primary-700);
+      }
+
+      &.cyan-soft,
+      &.pink-soft {
+        background: #f0f9ff;
+        color: var(--color-info);
+      }
+    }
+
+    .benefit-content {
+      .benefit-item-title {
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
+        margin-bottom: 0.35rem;
+      }
+
+      .benefit-item-desc {
+        font-size: var(--font-size-sm);
+        line-height: 1.6;
+        color: var(--color-slate-600);
+        margin: 0;
+      }
+    }
+  }
+}
+

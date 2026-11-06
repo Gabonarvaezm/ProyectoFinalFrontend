@@ -34,23 +34,6 @@
     </div>
 
     <div class="sidebar-bottom">
-      <!-- Selector interactivo de Rol para pruebas de Estudiante / Docente -->
-      <div class="role-selector-card">
-        <div class="role-badge" [class.professor]="currentRole() === 'professor'">
-          <i [class]="currentRole() === 'professor' ? 'bi bi-person-workspace' : 'bi bi-mortarboard'"></i>
-          <span>Modo: {{ currentRole() === 'professor' ? 'Docente' : 'Estudiante' }}</span>
-        </div>
-        <button
-          type="button"
-          class="role-switch-btn"
-          (click)="toggleRole()"
-          title="Alternar entre perfil de Estudiante y Docente para probar permisos académicos"
-        >
-          <i class="bi bi-arrow-repeat"></i>
-          <span>Cambiar rol</span>
-        </button>
-      </div>
-
       <!-- Botón de Acción Principal (+ Nueva Consulta Académica) -->
       <button
         type="button"

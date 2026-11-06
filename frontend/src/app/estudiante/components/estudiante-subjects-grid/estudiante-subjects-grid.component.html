@@ -1,0 +1,31 @@
+<section class="library-section" aria-label="Biblioteca digital del estudiante">
+  <div class="section-title-row">
+    <h2 class="section-heading">Biblioteca Digital</h2>
+    <button type="button" class="btn-link-action" (click)="viewAllRequested.emit()">
+      Ver todo
+    </button>
+  </div>
+
+  <div class="subjects-grid">
+    @for (subject of subjects(); track subject.id) {
+      <div
+        class="subject-card"
+        (click)="subjectSelected.emit(subject)"
+        (keydown.enter)="subjectSelected.emit(subject)"
+        (keydown.space)="$event.preventDefault(); subjectSelected.emit(subject)"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="subject.name + ': ' + subject.topic"
+      >
+        <div class="subject-icon-wrap" [style.background-color]="subject.badgeBg" [style.color]="subject.iconColor">
+          <i [class]="subject.icon"></i>
+        </div>
+        <div class="subject-info">
+          <h3 class="subject-name">{{ subject.name }}</h3>
+          <span class="subject-topic">{{ subject.topic }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+

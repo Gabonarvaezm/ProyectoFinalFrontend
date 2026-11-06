@@ -1,0 +1,41 @@
+<div class="side-column">
+  <!-- Actividad Reciente -->
+  <section class="card-section activity-card" aria-labelledby="heading-recent-activity">
+    <div class="card-header">
+      <h2 id="heading-recent-activity" class="card-title">Actividad Reciente</h2>
+    </div>
+
+    <ul class="activity-list">
+      @for (act of activities(); track act.id) {
+        <li class="activity-item">
+          <div class="activity-icon-badge" [class]="act.iconType">
+            <i [class]="act.icon" aria-hidden="true"></i>
+          </div>
+          <div class="activity-details">
+            <p class="activity-desc">{{ act.description }}</p>
+            <span class="activity-time">{{ act.timeAgo }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- Acciones Rápidas -->
+  <section class="card-section quick-actions-card" aria-label="Acciones rápidas">
+    <h3 class="quick-actions-title">ACCIONES RÁPIDAS</h3>
+    <div class="actions-stack">
+      @for (action of quickActions(); track action.id) {
+        <button
+          type="button"
+          class="btn-quick-action"
+          [class.primary]="action.primary"
+          (click)="quickActionTriggered.emit(action)"
+        >
+          <i [class]="action.icon" aria-hidden="true"></i>
+          <span>{{ action.label }}</span>
+        </button>
+      }
+    </div>
+  </section>
+</div>
+

@@ -1,0 +1,66 @@
+<header class="navbar">
+  <div class="nav-container">
+    <!-- Logo de Marca con Icono Robot DiscerIA -->
+    <a routerLink="/" class="brand-logo" aria-label="DiscerIA - Biblioteca Virtual para Instituciones Públicas">
+      <div class="brand-robot-icon" aria-hidden="true">
+        <i class="bi bi-robot"></i>
+      </div>
+      <span class="brand-name">Discer<span class="brand-dot">IA</span></span>
+    </a>
+
+    <!-- Menú de Navegación Desktop -->
+    <nav class="nav-links" aria-label="Navegación principal">
+      <div class="nav-dropdown">
+        <a href="#biblioteca" class="nav-item">
+          <span>Biblioteca</span>
+          <i class="bi bi-chevron-down nav-chevron" aria-hidden="true"></i>
+        </a>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#docentes" class="nav-item">
+          <span>Docentes</span>
+          <i class="bi bi-chevron-down nav-chevron" aria-hidden="true"></i>
+        </a>
+      </div>
+      <div class="nav-dropdown">
+        <a href="#beneficios" class="nav-item">
+          <span>Beneficios</span>
+          <i class="bi bi-chevron-down nav-chevron" aria-hidden="true"></i>
+        </a>
+      </div>
+      <a href="#contacto" class="nav-item">Contacto</a>
+    </nav>
+
+    <!-- Botones de Acción Desktop -->
+    <div class="nav-actions">
+      <a routerLink="/login" class="btn-signin">Iniciar Sesión</a>
+      <a routerLink="/register" class="btn-freetrial">Acceso Institucional</a>
+
+      <!-- Botón Hamburguesa Móvil Accesible -->
+      <button
+        type="button"
+        class="mobile-menu-toggle"
+        (click)="toggleMobileMenu.emit()"
+        [attr.aria-expanded]="mobileMenuOpen()"
+        [attr.aria-label]="mobileMenuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'"
+      >
+        <i class="bi" [class.bi-list]="!mobileMenuOpen()" [class.bi-x-lg]="mobileMenuOpen()"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Menú Desplegable Móvil -->
+  @if (mobileMenuOpen()) {
+    <nav class="mobile-dropdown anim-fade-down" aria-label="Menú móvil">
+      <a href="#biblioteca" class="mobile-link" (click)="closeMobileMenu.emit()">Biblioteca</a>
+      <a href="#docentes" class="mobile-link" (click)="closeMobileMenu.emit()">Docentes</a>
+      <a href="#beneficios" class="mobile-link" (click)="closeMobileMenu.emit()">Beneficios</a>
+      <a href="#contacto" class="mobile-link" (click)="closeMobileMenu.emit()">Contacto</a>
+      <div class="mobile-actions">
+        <a routerLink="/login" class="btn-signin w-full" (click)="closeMobileMenu.emit()">Iniciar Sesión</a>
+        <a routerLink="/register" class="btn-freetrial w-full" (click)="closeMobileMenu.emit()">Acceso Institucional</a>
+      </div>
+    </nav>
+  }
+</header>
+

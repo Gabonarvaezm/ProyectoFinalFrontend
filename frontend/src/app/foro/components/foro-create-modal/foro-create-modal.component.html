@@ -1,0 +1,136 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop"
+    (click)="onBackdropClick()"
+    (keydown.escape)="onClose()"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+  >
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon">
+            <i class="bi bi-pencil-square"></i>
+          </div>
+          <div>
+            <h2 id="modal-title" class="modal-title">Nueva Publicación Académica</h2>
+            <p class="modal-subtitle">
+              Comparte tu consulta para debate colaborativo con estudiantes y catedráticos.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="modal-close-btn"
+          (click)="onClose()"
+          aria-label="Cerrar ventana"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </header>
+
+      <form [formGroup]="postForm" (ngSubmit)="onSubmit()" novalidate class="modal-body">
+        <!-- Campo Título -->
+        <div class="form-group">
+          <label for="post-title" class="form-label">
+            Título o Pregunta de la Discusión <span class="required-star">*</span>
+          </label>
+          <input
+            type="text"
+            id="post-title"
+            formControlName="title"
+            class="form-input"
+            placeholder="Ej. ¿Cómo resuelvo integrales por partes?"
+            [class.is-invalid]="postForm.get('title')?.invalid && postForm.get('title')?.touched"
+            [attr.aria-invalid]="postForm.get('title')?.invalid && postForm.get('title')?.touched ? true : null"
+            [attr.aria-describedby]="postForm.get('title')?.invalid && postForm.get('title')?.touched ? 'post-title-error' : null"
+          />
+          @if (postForm.get('title')?.invalid && postForm.get('title')?.touched) {
+            <p id="post-title-error" class="form-error-msg" role="alert">
+              <i class="bi bi-exclamation-circle"></i>
+              El título debe tener entre 8 y 120 caracteres.
+            </p>
+          }
+        </div>
+
+        <!-- Campo Materia / Categoría -->
+        <div class="form-group">
+          <label for="post-subject" class="form-label">
+            Materia o Disciplina Académica <span class="required-star">*</span>
+          </label>
+          <select id="post-subject" formControlName="subject" class="form-select">
+            <option value="Matemáticas">Matemáticas</option>
+            <option value="Ciencias">Ciencias</option>
+            <option value="Historia">Historia</option>
+            <option value="Lenguaje">Lenguaje</option>
+            <option value="Tecnología">Tecnología</option>
+          </select>
+        </div>
+
+        <!-- Campo Contenido Detallado -->
+        <div class="form-group">
+          <label for="post-content" class="form-label">
+            Descripción detallada de la duda o problema <span class="required-star">*</span>
+          </label>
+          <textarea
+            id="post-content"
+            formControlName="content"
+            class="form-textarea"
+            rows="5"
+            placeholder="Explica qué has intentado, tus premisas o las dudas puntuales..."
+            [class.is-invalid]="postForm.get('content')?.invalid && postForm.get('content')?.touched"
+            [attr.aria-invalid]="postForm.get('content')?.invalid && postForm.get('content')?.touched ? true : null"
+            [attr.aria-describedby]="postForm.get('content')?.invalid && postForm.get('content')?.touched ? 'post-content-error' : null"
+          ></textarea>
+          @if (postForm.get('content')?.invalid && postForm.get('content')?.touched) {
+            <p id="post-content-error" class="form-error-msg" role="alert">
+              <i class="bi bi-exclamation-circle"></i>
+              La descripción debe tener al menos 20 caracteres para aportar contexto académico suficiente.
+            </p>
+          }
+        </div>
+
+        <!-- Campo Referencia Bibliográfica -->
+        <div class="form-group">
+          <label for="post-reference" class="form-label">
+            Referencia Bibliográfica / Texto de Consulta
+          </label>
+          <input
+            type="text"
+            id="post-reference"
+            formControlName="academicReference"
+            class="form-input"
+            placeholder="Ej. Stewart, J. (2016). Cálculo Trascendentes Tempranas."
+          />
+          <span class="form-hint">
+            Citar la bibliografía facilita a los profesores y compañeros validar la duda con precisión.
+          </span>
+        </div>
+
+        <footer class="modal-footer">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="onClose()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="postForm.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-sm"></span> Publicando...
+            } @else {
+              <i class="bi bi-check-lg"></i> Publicar en el Foro
+            }
+          </button>
+        </footer>
+      </form>
+    </div>
+  </div>
+}
+

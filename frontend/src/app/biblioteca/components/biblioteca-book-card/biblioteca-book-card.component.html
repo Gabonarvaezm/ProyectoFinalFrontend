@@ -1,0 +1,100 @@
+<article
+  class="book-card"
+  (click)="onCardClick()"
+  (keydown.enter)="onCardClick()"
+  tabindex="0"
+  [attr.aria-label]="'Detalles de ' + book().title"
+>
+  <!-- Portada Visual Simulada con Gradiente Temático -->
+  <div class="card-cover-wrapper" [class]="'cover-theme-' + (book().coverTheme || 'blue')">
+    @if (book().featured) {
+      <span class="badge-featured" title="Recurso destacado por el comité docente">
+        <i class="bi bi-star-fill" aria-hidden="true"></i>
+        <span>Destacado</span>
+      </span>
+    }
+
+    <button
+      type="button"
+      class="btn-bookmark"
+      [class.bookmarked]="isBookmarked()"
+      (click)="onBookmark($event)"
+      [attr.aria-label]="isBookmarked() ? 'Quitar de marcadores' : 'Guardar en marcadores'"
+    >
+      <i [class]="isBookmarked() ? 'bi bi-bookmark-fill' : 'bi bi-bookmark'" aria-hidden="true"></i>
+    </button>
+
+    <div class="cover-content">
+      <i class="bi bi-journal-richtext cover-icon" aria-hidden="true"></i>
+      <span class="cover-topic">{{ book().subject || book().categoryLabel }}</span>
+    </div>
+
+    <span class="format-tag">
+      {{ book().format.toUpperCase() }}
+    </span>
+  </div>
+
+  <!-- Metadatos y Detalles del Libro -->
+  <div class="card-body">
+    <div class="card-header-meta">
+      <span class="category-name">{{ book().category.toUpperCase() }}</span>
+      <div class="rating-box" [attr.aria-label]="'Calificación: ' + book().rating + ' de 5'">
+        <i class="bi bi-star-fill star-icon" aria-hidden="true"></i>
+        <span class="rating-val">{{ book().rating }}</span>
+      </div>
+    </div>
+
+    <h3 class="book-title">{{ book().title }}</h3>
+    <p class="book-author">Por <strong>{{ book().author }}</strong></p>
+    <p class="book-description">{{ book().description }}</p>
+
+    <!-- Etiquetas Temáticas -->
+    <div class="book-tags" aria-label="Temas clave">
+      @for (tag of book().tags; track tag) {
+        <span class="tag-pill">{{ tag }}</span>
+      }
+    </div>
+
+    <!-- Pie de Tarjeta con Métricas e Institución -->
+    <div class="card-footer-meta">
+      <div class="institution-meta" [title]="book().institution">
+        <i class="bi bi-bank" aria-hidden="true"></i>
+        <span class="inst-text">{{ book().institution }}</span>
+      </div>
+      <span class="pages-meta">{{ book().pages }} págs.</span>
+    </div>
+  </div>
+
+  <!-- Barra de Acciones de la Tarjeta -->
+  <div class="card-action-bar">
+    @if (userRole() === 'professor') {
+      <button
+        type="button"
+        class="btn-card-action btn-recommend"
+        (click)="onRecommend($event)"
+        title="Recomendar esta lectura a los alumnos"
+      >
+        <i class="bi bi-share-fill" aria-hidden="true"></i>
+        <span>Recomendar</span>
+      </button>
+    }
+    <button
+      type="button"
+      class="btn-card-action btn-download"
+      (click)="onDownload($event)"
+      title="Descargar libro gratuito"
+    >
+      <i class="bi bi-cloud-arrow-down" aria-hidden="true"></i>
+      <span>Descargar</span>
+    </button>
+    <button
+      type="button"
+      class="btn-card-action btn-read-primary"
+      (click)="onCardClick()"
+    >
+      <i class="bi bi-book-half" aria-hidden="true"></i>
+      <span>Consultar</span>
+    </button>
+  </div>
+</article>
+

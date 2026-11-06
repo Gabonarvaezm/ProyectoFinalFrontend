@@ -1,0 +1,149 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Estudiante Forum Preview Component Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+.forums-section {
+  width: 100%;
+
+  .section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+
+    .section-heading {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-slate-900);
+      margin: 0;
+    }
+
+    .btn-link-action {
+      color: var(--color-primary-700);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: var(--color-primary-800);
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .forum-questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .forum-item-card {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    box-shadow: var(--shadow-xs);
+    transition: var(--transition-fast);
+
+    &:hover {
+      border-color: var(--color-slate-300);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .forum-author-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .avatar-fallback {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-xs);
+      }
+    }
+
+    .forum-content {
+      flex: 1;
+
+      .forum-title {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
+        margin: 0 0 var(--space-1) 0;
+      }
+
+      .forum-meta-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--font-size-xs);
+        color: var(--color-slate-500);
+
+        .forum-bullet {
+          color: var(--color-slate-300);
+        }
+      }
+    }
+
+    .forum-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+
+      &.badge-teacher {
+        background-color: var(--color-success-bg);
+        color: var(--color-success);
+        border: 1px solid var(--color-success-border);
+      }
+
+      &.badge-students {
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-700);
+        border: 1px solid var(--color-primary-200);
+      }
+    }
+
+    .forum-action {
+      .btn-outline-pill {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-slate-700);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        padding: 0.4rem 1rem;
+        border-radius: var(--radius-full);
+        cursor: pointer;
+        transition: var(--transition-fast);
+
+        &:hover {
+          background-color: var(--color-slate-100);
+          border-color: var(--color-slate-400);
+          color: var(--color-primary-700);
+        }
+      }
+    }
+  }
+}
+

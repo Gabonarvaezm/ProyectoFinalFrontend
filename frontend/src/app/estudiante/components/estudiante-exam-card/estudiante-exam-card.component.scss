@@ -1,0 +1,140 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Estudiante Exam & Progress Card Component Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+.side-cards-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.practice-exam-card {
+  background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+  color: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+
+  .exam-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-white);
+    margin: 0 0 var(--space-1) 0;
+  }
+
+  .exam-subtitle {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-primary-200);
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .exam-meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--font-size-xs);
+    color: var(--color-primary-100);
+    margin-bottom: var(--space-4);
+
+    .exam-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+  }
+
+  .btn-start-exam {
+    width: 100%;
+    background-color: var(--color-white);
+    color: var(--color-primary-800);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-xs);
+    transition: var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-primary-50);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.weekly-progress-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+
+  .progress-card-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-900);
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .chart-mockup {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-3);
+    height: 120px;
+
+    .chart-y-axis {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      font-size: 0.65rem;
+      color: var(--color-slate-400);
+      padding-bottom: 1.25rem;
+    }
+
+    .chart-bars-wrap {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 100%;
+      gap: var(--space-2);
+    }
+
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-1);
+      height: 100%;
+      flex: 1;
+
+      .bar-track {
+        flex: 1;
+        width: 18px;
+        background-color: var(--color-slate-100);
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+
+        .bar-fill {
+          width: 100%;
+          background: var(--color-ai-gradient);
+          border-radius: var(--radius-full);
+          transition: height var(--duration-slow) var(--ease-out-expo);
+        }
+      }
+
+      .bar-label {
+        font-size: 0.65rem;
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-500);
+      }
+    }
+  }
+}
+

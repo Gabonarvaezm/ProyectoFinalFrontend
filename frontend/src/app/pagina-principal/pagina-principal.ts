@@ -1,18 +1,39 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { fadeInUp } from '../shared/animations';
-import { LottieComponent } from '../shared/components/lottie';
 import { Course, Testimonial } from './models/landing.model';
 import { FEATURED_COURSES, TESTIMONIALS_DATA } from './data/landing.data';
+import {
+  LandingNavbarComponent,
+  LandingHeroComponent,
+  LandingPartnersComponent,
+  LandingSearchComponent,
+  LandingBenefitsComponent,
+  LandingCoursesComponent,
+  LandingDocentesComponent,
+  LandingTestimonialsComponent,
+  LandingFooterComponent,
+} from './components';
 
 export type { Course, Testimonial };
 
 @Component({
-  imports: [RouterLink, LottieComponent],
   selector: 'app-pagina-principal',
+  standalone: true,
+  imports: [
+    LandingNavbarComponent,
+    LandingHeroComponent,
+    LandingPartnersComponent,
+    LandingSearchComponent,
+    LandingBenefitsComponent,
+    LandingCoursesComponent,
+    LandingDocentesComponent,
+    LandingTestimonialsComponent,
+    LandingFooterComponent,
+  ],
   styleUrl: './pagina-principal.scss',
   templateUrl: './pagina-principal.html',
   animations: [fadeInUp],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginaPrincipal {
   /** Control del menú móvil responsive */

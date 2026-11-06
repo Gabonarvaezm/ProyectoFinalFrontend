@@ -181,48 +181,6 @@
   border-top: 1px solid var(--color-border);
 }
 
-.role-selector-card {
-  background-color: var(--color-slate-50);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.625rem 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.role-badge {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-primary-700);
-
-  &.professor {
-    color: var(--color-ai-600);
-  }
-}
-
-.role-switch-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-slate-500);
-  font-size: var(--font-size-xs);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.45rem;
-  border-radius: var(--radius-sm);
-  transition: var(--transition-fast);
-
-  &:hover {
-    background-color: var(--color-slate-200);
-    color: var(--color-slate-900);
-  }
-}
-
 .new-topic-btn {
   display: flex;
   align-items: center;
