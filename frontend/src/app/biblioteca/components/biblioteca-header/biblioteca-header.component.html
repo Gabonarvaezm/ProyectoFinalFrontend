@@ -1,14 +1,32 @@
 <header class="biblioteca-header">
-  <div class="header-titles">
-    <div class="header-badge">
-      <i class="bi bi-book-half" aria-hidden="true"></i>
-      <span>Repositorio Académico Abierto</span>
+  <div class="header-top-row">
+    <div class="header-titles">
+      <div class="header-badge">
+        <i class="bi bi-book-half" aria-hidden="true"></i>
+        <span>Repositorio Académico Abierto</span>
+      </div>
+      <h1 class="biblioteca-title">Biblioteca Digital Universitaria</h1>
+      <p class="biblioteca-subtitle">
+        Explora y consulta libremente material bibliográfico de alta calidad académica,
+        diseñado para el fortalecimiento de la educación pública.
+      </p>
     </div>
-    <h1 class="biblioteca-title">Biblioteca Digital Universitaria</h1>
-    <p class="biblioteca-subtitle">
-      Explora y consulta libremente material bibliográfico de alta calidad académica, 
-      diseñado para el fortalecimiento de la educación pública.
-    </p>
+
+    <!-- Botón visible SOLO para profesores -->
+    @if (isProfessor()) {
+      <div class="header-action-wrap">
+        <button
+          type="button"
+          class="btn-publish-book"
+          (click)="createBookClicked.emit()"
+          aria-label="Publicar nuevo libro en el repositorio"
+          title="Publicar nuevo recurso académico"
+        >
+          <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+          <span>Publicar Libro</span>
+        </button>
+      </div>
+    }
   </div>
 
   <!-- Barra de Búsqueda y Filtros Rápidos -->
@@ -76,4 +94,3 @@
     </div>
   </div>
 </header>
-
