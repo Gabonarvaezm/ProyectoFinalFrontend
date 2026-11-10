@@ -1,0 +1,560 @@
+// profesor-notifications-drawer.component.scss
+// Panel lateral derecho para notificaciones académicas del docente.
+// Maquetación Flexbox/Grid consumiendo exclusivamente tokens del Design System de DiscerIA.
+
+:host {
+  display: contents;
+}
+
+.notifications-drawer {
+  width: 0;
+  min-width: 0;
+  background-color: var(--color-bg-surface);
+  border-left: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: width var(--duration-normal) cubic-bezier(0.16, 1, 0.3, 1),
+              opacity var(--duration-fast) var(--ease-out-expo),
+              padding var(--duration-fast) var(--ease-out-expo),
+              border-left var(--duration-fast) var(--ease-out-expo);
+
+  &.drawer-open {
+    width: 420px;
+    min-width: 420px;
+    padding: var(--space-5) var(--space-4) var(--space-4);
+    opacity: 1;
+    pointer-events: auto;
+    border-left: 1px solid var(--color-border);
+    box-shadow: -6px 0 24px rgba(15, 23, 42, 0.06);
+  }
+
+  @media (max-width: 1200px) {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 100%;
+    max-width: 420px;
+    transform: translateX(100%);
+    opacity: 0;
+    box-shadow: -8px 0 32px rgba(15, 23, 42, 0.18);
+    transition: transform var(--duration-normal) cubic-bezier(0.16, 1, 0.3, 1),
+                opacity var(--duration-fast) var(--ease-out-expo);
+
+    &.drawer-open {
+      transform: translateX(0);
+      opacity: 1;
+      width: 100%;
+      min-width: 0;
+      padding: var(--space-4);
+    }
+  }
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+  }
+}
+
+// ── 1. Cabecera del Panel ───────────────────────────────────────────────────
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+
+  .header-titles-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+
+    .header-icon-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-50);
+      color: var(--color-primary-700);
+      border: 1px solid var(--color-primary-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    .header-text-block {
+      min-width: 0;
+
+      .drawer-title {
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
+        margin: 0;
+        line-height: var(--line-height-tight);
+      }
+
+      .drawer-subtitle {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+        margin: 0.15rem 0 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        strong {
+          color: var(--color-primary-700);
+          font-weight: var(--font-weight-bold);
+        }
+      }
+    }
+  }
+
+  .header-actions-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex-shrink: 0;
+
+    .btn-mark-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.65rem;
+      background-color: var(--color-slate-100);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-slate-700);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: var(--transition-fast);
+
+      &:hover {
+        background-color: var(--color-primary-50);
+        border-color: var(--color-primary-200);
+        color: var(--color-primary-700);
+      }
+    }
+
+    .btn-close-drawer {
+      background: transparent;
+      border: none;
+      color: var(--color-slate-400);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: var(--transition-fast);
+
+      &:hover {
+        background-color: var(--color-slate-100);
+        color: var(--color-slate-900);
+      }
+    }
+  }
+}
+
+// ── 2. Barra de Filtros ──────────────────────────────────────────────────────
+.filters-bar {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-3) 0 var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-pill {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 0.35rem 0.65rem;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-slate-600);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    transition: var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-slate-100);
+      color: var(--color-slate-900);
+    }
+
+    &.active {
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-700);
+      border-color: var(--color-primary-200);
+      font-weight: var(--font-weight-bold);
+
+      .pill-badge {
+        background-color: var(--color-primary-700);
+        color: var(--color-white);
+      }
+    }
+
+    .pill-badge {
+      font-size: 0.6875rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--radius-full);
+      background-color: var(--color-slate-200);
+      color: var(--color-slate-700);
+      font-weight: var(--font-weight-bold);
+      line-height: 1;
+
+      &.badge-unread {
+        background-color: var(--color-danger);
+        color: var(--color-white);
+      }
+    }
+  }
+}
+
+// ── 3. Lista de Notificaciones ───────────────────────────────────────────────
+.notifications-list {
+  flex: 1 1 0%;
+  overflow-y: auto;
+  padding: var(--space-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-slate-300);
+    border-radius: var(--radius-full);
+  }
+}
+
+// Estado Vacío (Empty State)
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  margin: auto 0;
+
+  .empty-icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-slate-100);
+    color: var(--color-slate-400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: var(--space-3);
+  }
+
+  .empty-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-800);
+    margin: 0 0 var(--space-1);
+  }
+
+  .empty-desc {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    max-width: 260px;
+    margin: 0;
+    line-height: var(--line-height-base);
+  }
+}
+
+// Tarjeta Individual de Notificación
+.notification-card {
+  position: relative;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--duration-fast) var(--ease-out-expo);
+  outline: none;
+
+  &:hover {
+    border-color: var(--color-primary-300);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+
+    .card-quick-actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+    border-color: var(--color-primary-600);
+  }
+
+  &.unread {
+    background-color: var(--color-primary-50);
+    border-color: var(--color-primary-200);
+
+    .card-title {
+      font-weight: var(--font-weight-bold);
+      color: var(--color-slate-900);
+    }
+  }
+
+  .card-unread-dot {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-danger);
+    box-shadow: 0 0 0 2px var(--color-white);
+  }
+
+  .card-main-row {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+
+  // Avatar Emisor
+  .card-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+
+    &.avatar-student {
+      background-color: var(--color-primary-100);
+      color: var(--color-primary-700);
+      border: 1px solid var(--color-primary-300);
+    }
+
+    &.avatar-teacher {
+      background-color: var(--color-ai-100);
+      color: var(--color-ai-700);
+      border: 1px solid var(--color-ai-300);
+    }
+  }
+
+  // Cuerpo de la Notificación
+  .card-body {
+    flex: 1 1 0%;
+    min-width: 0;
+
+    .card-meta-top {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.2rem;
+
+      .card-author {
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-slate-900);
+      }
+
+      .card-role-badge {
+        font-size: 0.6875rem;
+        padding: 0.08rem 0.45rem;
+        border-radius: var(--radius-full);
+        font-weight: var(--font-weight-semibold);
+
+        &.badge-student {
+          background-color: var(--color-primary-100);
+          color: var(--color-primary-800);
+        }
+
+        &.badge-teacher {
+          background-color: var(--color-ai-100);
+          color: var(--color-ai-700);
+        }
+      }
+
+      .card-time {
+        font-size: 0.6875rem;
+        color: var(--color-text-muted);
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+      }
+    }
+
+    .card-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-slate-800);
+      margin: 0 0 0.2rem;
+      line-height: var(--line-height-tight);
+    }
+
+    .card-message {
+      font-size: var(--font-size-xs);
+      color: var(--color-slate-600);
+      margin: 0 0 var(--space-2);
+      line-height: var(--line-height-base);
+    }
+
+    .card-meta-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+
+      .card-category-pill {
+        font-size: 0.6875rem;
+        color: var(--color-slate-600);
+        background-color: var(--color-slate-100);
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+
+        i {
+          font-size: 0.65rem;
+          color: var(--color-slate-400);
+        }
+      }
+
+      .card-action-link {
+        font-size: 0.725rem;
+        font-weight: var(--font-weight-bold);
+        color: var(--color-primary-700);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15rem;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  // Acciones Rápidas Flotantes
+  .card-quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-fast) var(--ease-out-expo);
+    flex-shrink: 0;
+
+    .btn-action-icon {
+      background: transparent;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-slate-400);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: var(--transition-fast);
+
+      &:hover {
+        background-color: var(--color-slate-100);
+        color: var(--color-slate-700);
+      }
+
+      &.btn-action-delete:hover {
+        background-color: var(--color-danger-bg);
+        color: var(--color-danger);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .card-quick-actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+// ── 4. Pie del Panel ────────────────────────────────────────────────────────
+.drawer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+
+  .footer-summary {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .btn-footer-mark-read {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    background-color: var(--color-slate-100);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-slate-700);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: var(--transition-fast);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-primary-50);
+      border-color: var(--color-primary-200);
+      color: var(--color-primary-700);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+

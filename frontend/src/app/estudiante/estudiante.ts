@@ -24,6 +24,7 @@ import {
   EstudianteExamCardComponent,
   EstudianteForumPreviewComponent,
   EstudianteHeaderComponent,
+  EstudianteNotificationsDrawerComponent,
   EstudianteSidebarComponent,
   EstudianteSubjectsGridComponent,
 } from './components';
@@ -37,6 +38,7 @@ import {
   ForumQuestion,
   LibrarySubject,
   PracticeExam,
+  StudentNotification,
   WeeklyProgressItem,
 } from './models/estudiante.model';
 
@@ -48,6 +50,7 @@ export type {
   NavItem,
   PracticeExam,
   QuickAction,
+  StudentNotification,
   WeeklyProgressItem,
 };
 
@@ -63,9 +66,10 @@ export type {
     EstudianteExamCardComponent,
     EstudianteForumPreviewComponent,
     EstudianteAiDrawerComponent,
+    EstudianteNotificationsDrawerComponent,
   ],
   selector: 'app-estudiante',
-  styleUrl: './estudiante.scss',
+  styleUrls: ['./estudiante.scss'],
   templateUrl: './estudiante.html',
 })
 export class Estudiante {
@@ -104,12 +108,88 @@ export class Estudiante {
     this.isAiDrawerOpen.set(true);
   }
 
+  // ── Panel Desplegable (Drawer) Notificaciones Académicas ──────────────────
+  public readonly isNotificationsDrawerOpen = signal<boolean>(false);
+
+  public toggleNotificationsDrawer(): void {
+    this.isNotificationsDrawerOpen.update((open) => !open);
+  }
+
+  public closeNotificationsDrawer(): void {
+    this.isNotificationsDrawerOpen.set(false);
+  }
+
+  public openNotificationsDrawer(): void {
+    this.isNotificationsDrawerOpen.set(true);
+  }
+
+  // ── Notificaciones del Estudiante (Tareas, Avisos y Foros) ────────────────
+  public readonly notifications = signal<StudentNotification[]>([
+    {
+      id: 'notif-1',
+      type: 'task',
+      title: 'Nueva Tarea Asignada: Biología Celular',
+      message: 'El Prof. García asignó la actividad "Reporte de Mitosis y Meiosis" para completar en el foro.',
+      authorName: 'Prof. García',
+      authorRole: 'professor',
+      authorInitials: 'PG',
+      timeAgo: 'Hace 30 min',
+      read: false,
+      subject: 'Ciencias',
+      actionRoute: '/foro',
+    },
+    {
+      id: 'notif-2',
+      type: 'forum_reply',
+      title: 'Respuesta Docente en Foro',
+      message: 'El Prof. Martínez respondió tu consulta sobre la regla LIATE en integración por partes.',
+      authorName: 'Prof. Martínez',
+      authorRole: 'professor',
+      authorInitials: 'PM',
+      timeAgo: 'Hace 2 horas',
+      read: false,
+      subject: 'Matemáticas',
+      actionRoute: '/foro',
+    },
+    {
+      id: 'notif-3',
+      type: 'teacher_announcement',
+      title: 'Nuevo Material en Biblioteca',
+      message: 'La docente publicó un compendio de ejercicios clave para el próximo examen de Ciencias.',
+      authorName: 'Prof. Laura Gómez',
+      authorRole: 'professor',
+      authorInitials: 'LG',
+      timeAgo: 'Ayer',
+      read: true,
+      subject: 'Ciencias',
+      actionRoute: '/biblioteca',
+    },
+    {
+      id: 'notif-4',
+      type: 'forum_reply',
+      title: 'Intervención de compañero en Historia',
+      message: 'Mateo Gómez aportó una síntesis sobre el impacto de la Revolución Industrial.',
+      authorName: 'Mateo Gómez',
+      authorRole: 'student',
+      authorInitials: 'MG',
+      timeAgo: 'Hace 5 horas',
+      read: true,
+      subject: 'Historia',
+      actionRoute: '/foro',
+    },
+  ]);
+
+  /** Conteo derivado de avisos y tareas no leídas */
+  public readonly unreadNotificationsCount = computed(
+    () => this.notifications().filter((n) => !n.read).length
+  );
+  public readonly notificationsCount = this.unreadNotificationsCount;
+
   // ── Usuario y Búsqueda ───────────────────────────────────────────────────
   public readonly studentName = signal<string>('Alejandro');
   public readonly studentEmail = signal<string>('');
   public readonly studentInstitution = signal<string>('Institución Pública');
   public readonly searchQuery = signal<string>('');
-  public readonly notificationsCount = signal<number>(2);
 
   /** Iniciales calculadas dinámicamente para el avatar fallback */
   public readonly userInitials = computed(() => {
@@ -332,7 +412,10 @@ export class Estudiante {
   }
 
   public onContinueCourse(): void {
-    this.showToast(`Continuando: ${this.currentCourse().title}`);
+    this.showToast(
+      `Redirigiendo al foro para completar tareas de ${this.currentCourse().title}...`
+    );
+    this.router.navigate(['/foro']);
   }
 
   public onSearchChange(val: string): void {
@@ -340,7 +423,42 @@ export class Estudiante {
   }
 
   public onNotificationsClick(): void {
-    this.showToast('Tienes 2 tareas y foros pendientes de revisión.');
+    this.toggleNotificationsDrawer();
+  }
+
+  public onMarkNotificationAsRead(id: string): void {
+    this.notifications.update((list) =>
+      list.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  }
+
+  public onToggleNotificationRead(id: string): void {
+    this.notifications.update((list) =>
+      list.map((n) => (n.id === id ? { ...n, read: !n.read } : n))
+    );
+  }
+
+  public onMarkAllNotificationsAsRead(): void {
+    this.notifications.update((list) => list.map((n) => ({ ...n, read: true })));
+    this.showToast('Todas las notificaciones marcadas como leídas.');
+  }
+
+  public onDeleteNotification(id: string): void {
+    this.notifications.update((list) => list.filter((n) => n.id !== id));
+    this.showToast('Notificación eliminada de tu bandeja.');
+  }
+
+  public onNotificationSelected(item: StudentNotification): void {
+    if (item.actionRoute) {
+      if (item.actionRoute.startsWith('/')) {
+        this.router.navigate([item.actionRoute]);
+      } else {
+        this.selectNav(item.actionRoute);
+      }
+      this.closeNotificationsDrawer();
+    } else {
+      this.showToast(`Notificación: ${item.title}`);
+    }
   }
 
   public onStartExam(): void {
@@ -365,7 +483,8 @@ export class Estudiante {
   }
 
   public onViewThread(question: ForumQuestion): void {
-    this.showToast(`Abriendo hilo: "${question.title}"`);
+    this.showToast(`Abriendo hilo en el foro: "${question.title}"`);
+    this.router.navigate(['/foro']);
   }
 
   public onQuickAction(action: QuickAction): void {

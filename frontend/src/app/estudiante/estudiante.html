@@ -17,6 +17,7 @@
       [userInitials]="userInitials()"
       [notificationsCount]="notificationsCount()"
       [isAiDrawerOpen]="isAiDrawerOpen()"
+      [isNotificationsDrawerOpen]="isNotificationsDrawerOpen()"
       (searchChanged)="onSearchChange($event)"
       (notificationsClicked)="onNotificationsClick()"
       (profileClicked)="selectNav('perfil')"
@@ -85,6 +86,26 @@
     (closeRequested)="closeAiDrawer()"
     (messageSubmitted)="onSendAiMessage($event)"
     (quickActionTriggered)="onQuickAction($event)"
+  />
+
+  <!-- ── 4. PANEL LATERAL DERECHO DESPLEGABLE (NOTIFICACIONES Y TAREAS) ── -->
+  @if (isNotificationsDrawerOpen()) {
+    <div
+      class="notifications-drawer-backdrop"
+      (click)="closeNotificationsDrawer()"
+      aria-hidden="true"
+    ></div>
+  }
+
+  <app-estudiante-notifications-drawer
+    [isOpen]="isNotificationsDrawerOpen()"
+    [notifications]="notifications()"
+    (closeRequested)="closeNotificationsDrawer()"
+    (markAsRead)="onMarkNotificationAsRead($event)"
+    (toggleRead)="onToggleNotificationRead($event)"
+    (markAllAsRead)="onMarkAllNotificationsAsRead()"
+    (deleteNotification)="onDeleteNotification($event)"
+    (notificationSelected)="onNotificationSelected($event)"
   />
 
   <!-- Toast flotante para feedback de acciones -->

@@ -13,6 +13,7 @@ export class EstudianteHeaderComponent {
   public readonly userInitials = input.required<string>();
   public readonly notificationsCount = input<number>(2);
   public readonly isAiDrawerOpen = input<boolean>(false);
+  public readonly isNotificationsDrawerOpen = input<boolean>(false);
 
   public readonly searchChanged = output<string>();
   public readonly notificationsClicked = output<void>();

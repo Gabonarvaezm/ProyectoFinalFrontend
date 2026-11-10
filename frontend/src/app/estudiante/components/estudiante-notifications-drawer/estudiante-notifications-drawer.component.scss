@@ -1,0 +1,504 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Drawer de Notificaciones y Tareas del Estudiante
+// Fidelidad estética estricta con tokens globales SCSS
+// ─────────────────────────────────────────────────────────────────────────────
+
+:host {
+  display: contents;
+}
+
+.notifications-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 100vw;
+  background-color: var(--color-bg-surface);
+  border-left: 1px solid var(--color-border);
+  box-shadow: var(--shadow-xl);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--duration-normal) var(--ease-out-expo);
+  visibility: hidden;
+
+  &.drawer-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  @media (max-width: 480px) {
+    width: 100vw;
+  }
+}
+
+// ── 1. Cabecera ──────────────────────────────────────────────────────────────
+.drawer-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  background-color: var(--color-bg-surface);
+}
+
+.header-titles-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.header-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+  flex-shrink: 0;
+}
+
+.header-text-block {
+  display: flex;
+  flex-direction: column;
+
+  .drawer-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-900);
+    margin: 0;
+    line-height: var(--line-height-tight);
+  }
+
+  .drawer-subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin: 2px 0 0 0;
+
+    strong {
+      color: var(--color-primary-700);
+      font-weight: var(--font-weight-bold);
+    }
+  }
+}
+
+.header-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn-mark-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-600);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    background: var(--color-primary-100);
+    color: var(--color-primary-800);
+  }
+}
+
+.btn-close-drawer {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    background-color: var(--color-slate-100);
+    color: var(--color-slate-900);
+  }
+}
+
+// ── 2. Barra de Filtros ──────────────────────────────────────────────────────
+.filters-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-bg-app);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration-fast);
+
+  i {
+    font-size: 0.85rem;
+  }
+
+  .pill-badge {
+    background: var(--color-slate-100);
+    color: var(--color-slate-700);
+    padding: 1px 6px;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+
+    &.badge-unread {
+      background: var(--color-primary-600);
+      color: var(--color-white);
+    }
+  }
+
+  &:hover {
+    background: var(--color-slate-50);
+    border-color: var(--color-border-focus);
+    color: var(--color-slate-900);
+  }
+
+  &.active {
+    background: var(--color-primary-600);
+    border-color: var(--color-primary-600);
+    color: var(--color-white);
+
+    .pill-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: var(--color-white);
+    }
+  }
+}
+
+// ── 3. Lista de Notificaciones ───────────────────────────────────────────────
+.notifications-scroll-area {
+  flex: 1 1 0%;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg-app);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+
+  .empty-icon-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-slate-100);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: var(--space-3);
+  }
+
+  .empty-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-slate-900);
+    margin: 0 0 var(--space-1) 0;
+  }
+
+  .empty-desc {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    max-width: 260px;
+    margin: 0;
+  }
+}
+
+.notifications-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.notification-item {
+  position: relative;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-3);
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    border-color: var(--color-primary-400);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+
+  &.unread {
+    background-color: #fcfdff;
+    border-color: var(--color-primary-300);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: -1px;
+      width: 4px;
+      height: calc(100% - 28px);
+      background-color: var(--color-primary-600);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+  }
+}
+
+.author-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+
+  .author-img {
+    border-radius: var(--radius-full);
+    object-fit: cover;
+  }
+
+  .author-initials {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-100);
+    color: var(--color-primary-800);
+    font-weight: var(--font-weight-bold);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.teacher-avatar {
+      background: #eef2ff;
+      color: #3730a3;
+    }
+  }
+
+  .role-badge-icon {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: var(--color-white);
+    border: 2px solid var(--color-bg-surface);
+
+    &.teacher {
+      background-color: var(--color-primary-600);
+    }
+
+    &.student {
+      background-color: #059669;
+    }
+  }
+}
+
+.item-content {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.item-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: 4px;
+}
+
+.type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-semibold);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+
+  &.pill-type-task {
+    background-color: #ecfdf5;
+    color: #047857;
+  }
+
+  &.pill-type-forum_reply {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  &.pill-type-teacher_announcement {
+    background-color: #fef3c7;
+    color: #b45309;
+  }
+}
+
+.time-ago {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.item-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-slate-900);
+  margin: 0 0 2px 0;
+  line-height: var(--line-height-snug);
+}
+
+.item-message {
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-600);
+  margin: 0 0 var(--space-2) 0;
+  line-height: var(--line-height-normal);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-meta-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: 0.725rem;
+  color: var(--color-text-secondary);
+}
+
+.author-label {
+  strong {
+    color: var(--color-slate-800);
+  }
+
+  .meta-separator {
+    margin: 0 4px;
+  }
+
+  .subject-tag {
+    color: var(--color-primary-600);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+.action-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-primary-600);
+  font-weight: var(--font-weight-semibold);
+
+  i {
+    font-size: 0.75rem;
+    transition: transform var(--duration-fast);
+  }
+
+  &:hover i {
+    transform: translateX(2px);
+  }
+}
+
+.item-action-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0.7;
+  transition: opacity var(--duration-fast);
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.btn-icon-item {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    background-color: var(--color-slate-100);
+    color: var(--color-slate-900);
+  }
+
+  &.active-read {
+    color: #10b981;
+  }
+
+  &.btn-delete:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+}
+
+// ── 4. Pie de Información ────────────────────────────────────────────────────
+.drawer-footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.725rem;
+  color: var(--color-text-secondary);
+
+  i {
+    color: var(--color-primary-600);
+    font-size: 0.85rem;
+  }
+}
+

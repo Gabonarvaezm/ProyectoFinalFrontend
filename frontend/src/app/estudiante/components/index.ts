@@ -5,3 +5,4 @@ export * from './estudiante-subjects-grid/estudiante-subjects-grid.component';
 export * from './estudiante-exam-card/estudiante-exam-card.component';
 export * from './estudiante-forum-preview/estudiante-forum-preview.component';
 export * from './estudiante-ai-drawer/estudiante-ai-drawer.component';
+export * from './estudiante-notifications-drawer/estudiante-notifications-drawer.component';

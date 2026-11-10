@@ -53,4 +53,68 @@ describe('ProfesorService', () => {
     expect(service.totalStudents()).toBe(initialCount - 1);
     expect(service.students().some((s) => s.id === student.id)).toBe(false);
   });
+
+  // ── Pruebas de Notificaciones ────────────────────────────────────────────
+
+  it('debe inicializar la lista de notificaciones y el conteo no leído', () => {
+    expect(service.notifications().length).toBeGreaterThanOrEqual(4);
+    expect(service.unreadNotificationsCount()).toBeGreaterThan(0);
+  });
+
+  it('debe marcar una notificación como leída con markNotificationAsRead', () => {
+    const unread = service.notifications().find((n) => !n.read);
+    expect(unread).toBeDefined();
+
+    if (unread) {
+      service.markNotificationAsRead(unread.id);
+      const updated = service.notifications().find((n) => n.id === unread.id);
+      expect(updated?.read).toBe(true);
+    }
+  });
+
+  it('debe alternar el estado de lectura de una notificación', () => {
+    const notif = service.notifications()[0];
+    const initialStatus = notif.read;
+
+    service.toggleNotificationRead(notif.id);
+    expect(service.notifications().find((n) => n.id === notif.id)?.read).toBe(!initialStatus);
+
+    service.toggleNotificationRead(notif.id);
+    expect(service.notifications().find((n) => n.id === notif.id)?.read).toBe(initialStatus);
+  });
+
+  it('debe marcar todas las notificaciones como leídas', () => {
+    service.markAllNotificationsAsRead();
+    expect(service.unreadNotificationsCount()).toBe(0);
+    expect(service.notifications().every((n) => n.read)).toBe(true);
+  });
+
+  it('debe eliminar una notificación de la lista', () => {
+    const target = service.notifications()[0];
+    const countBefore = service.notifications().length;
+
+    service.deleteNotification(target.id);
+    expect(service.notifications().length).toBe(countBefore - 1);
+    expect(service.notifications().some((n) => n.id === target.id)).toBe(false);
+  });
+
+  it('debe agregar una nueva notificación a la lista', () => {
+    const countBefore = service.notifications().length;
+
+    const added = service.addNotification({
+      type: 'student_reply',
+      title: 'Nueva Duda',
+      message: 'Un alumno hizo una pregunta.',
+      timeAgo: 'Hace 1 min',
+      read: false,
+      authorName: 'Estudiante Test',
+      authorRole: 'student',
+      authorInitials: 'ET',
+      category: 'General',
+    });
+
+    expect(added.id).toBeDefined();
+    expect(service.notifications().length).toBe(countBefore + 1);
+    expect(service.notifications()[0].title).toBe('Nueva Duda');
+  });
 });

@@ -12,8 +12,9 @@
     <!-- Barra superior de búsqueda y perfil (NODO HIJO PRESENTACIONAL) -->
     <app-profesor-header
       [(searchQuery)]="searchQuery"
-      [notificationsCount]="1"
+      [notificationsCount]="unreadNotificationsCount()"
       [isAiDrawerOpen]="isAiDrawerOpen()"
+      [isNotificationsDrawerOpen]="isNotificationsDrawerOpen()"
       (notificationsClicked)="onNotificationsClick()"
       (configClicked)="selectNav('configuracion')"
       (aiToggleClicked)="toggleAiDrawer()"
@@ -74,7 +75,25 @@
   />
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 4. MODAL DE REGISTRO DE ESTUDIANTE (NODO HIJO PRESENTACIONAL)          -->
+  <!-- 4. PANEL DRAWER NOTIFICACIONES ACADÉMICAS                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (isNotificationsDrawerOpen()) {
+    <div class="notifications-drawer-backdrop" (click)="closeNotificationsDrawer()" aria-hidden="true"></div>
+  }
+
+  <app-profesor-notifications-drawer
+    [isOpen]="isNotificationsDrawerOpen()"
+    [notifications]="notifications()"
+    (closeRequested)="closeNotificationsDrawer()"
+    (markAsRead)="onMarkNotificationAsRead($event)"
+    (toggleRead)="onToggleNotificationRead($event)"
+    (markAllAsRead)="onMarkAllNotificationsAsRead()"
+    (deleteNotification)="onDeleteNotification($event)"
+    (notificationSelected)="onNotificationSelected($event)"
+  />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 5. MODAL DE REGISTRO DE ESTUDIANTE (NODO HIJO PRESENTACIONAL)          -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <app-profesor-create-student-modal [isOpen]="isRegisterModalOpen()" [isSubmitting]="isSubmittingStudent()"
     (closeModal)="closeRegisterModal()" (studentSubmitted)="onRegisterStudentSubmit($event)" />

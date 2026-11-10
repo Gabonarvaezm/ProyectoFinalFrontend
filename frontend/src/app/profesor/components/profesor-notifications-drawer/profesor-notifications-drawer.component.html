@@ -1,0 +1,235 @@
+<aside
+  class="notifications-drawer"
+  [class.drawer-open]="isOpen()"
+  role="region"
+  aria-label="Panel lateral de notificaciones académicas"
+>
+  <!-- ── 1. Cabecera del Panel ───────────────────────────────────────────── -->
+  <header class="drawer-header">
+    <div class="header-titles-wrap">
+      <div class="header-icon-badge">
+        <i class="bi bi-bell-fill" aria-hidden="true"></i>
+      </div>
+      <div class="header-text-block">
+        <h2 class="drawer-title">Notificaciones</h2>
+        <p class="drawer-subtitle">
+          @if (unreadCount() > 0) {
+            <span>Tienes <strong>{{ unreadCount() }}</strong> pendiente{{ unreadCount() > 1 ? 's' : '' }}</span>
+          } @else {
+            <span>Al día con tu actividad escolar</span>
+          }
+        </p>
+      </div>
+    </div>
+
+    <div class="header-actions-wrap">
+      @if (unreadCount() > 0) {
+        <button
+          type="button"
+          class="btn-mark-all"
+          (click)="onMarkAllAsRead()"
+          title="Marcar todas como leídas"
+          aria-label="Marcar todas como leídas"
+        >
+          <i class="bi bi-check2-all" aria-hidden="true"></i>
+          <span>Marcar todo</span>
+        </button>
+      }
+      <button
+        type="button"
+        class="btn-close-drawer"
+        (click)="onClose()"
+        aria-label="Cerrar panel de notificaciones"
+        title="Cerrar panel"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── 2. Barra de Filtros Rápidos ──────────────────────────────────────── -->
+  <nav class="filters-bar" aria-label="Filtrar tipo de notificación">
+    <button
+      type="button"
+      class="filter-pill"
+      [class.active]="activeFilter() === 'all'"
+      (click)="setFilter('all')"
+      aria-label="Ver todas las notificaciones"
+    >
+      <span>Todas</span>
+      <span class="pill-badge">{{ notifications().length }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="filter-pill"
+      [class.active]="activeFilter() === 'unread'"
+      (click)="setFilter('unread')"
+      aria-label="Ver solo no leídas"
+    >
+      <span>No leídas</span>
+      @if (unreadCount() > 0) {
+        <span class="pill-badge badge-unread">{{ unreadCount() }}</span>
+      }
+    </button>
+
+    <button
+      type="button"
+      class="filter-pill"
+      [class.active]="activeFilter() === 'students'"
+      (click)="setFilter('students')"
+      aria-label="Filtrar respuestas de estudiantes"
+    >
+      <i class="bi bi-people" aria-hidden="true"></i>
+      <span>Alumnos</span>
+      <span class="pill-badge">{{ studentsCount() }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="filter-pill"
+      [class.active]="activeFilter() === 'teachers'"
+      (click)="setFilter('teachers')"
+      aria-label="Filtrar publicaciones de colegas"
+    >
+      <i class="bi bi-mortarboard" aria-hidden="true"></i>
+      <span>Colegas</span>
+      <span class="pill-badge">{{ teachersCount() }}</span>
+    </button>
+  </nav>
+
+  <!-- ── 3. Lista de Notificaciones ───────────────────────────────────────── -->
+  <div class="notifications-list" role="feed" aria-label="Historial de notificaciones">
+    @if (filteredNotifications().length === 0) {
+      <div class="empty-state" role="status">
+        <div class="empty-icon-circle">
+          <i class="bi bi-bell-slash" aria-hidden="true"></i>
+        </div>
+        <h3 class="empty-title">Sin notificaciones</h3>
+        <p class="empty-desc">
+          @if (activeFilter() === 'unread') {
+            ¡Excelente! Has revisado todas tus notificaciones pendientes.
+          } @else if (activeFilter() === 'students') {
+            No hay respuestas recientes de estudiantes en este filtro.
+          } @else if (activeFilter() === 'teachers') {
+            No hay publicaciones compartidas de otros docentes en este filtro.
+          } @else {
+            No tienes notificaciones registradas en este momento.
+          }
+        </p>
+      </div>
+    } @else {
+      @for (item of filteredNotifications(); track item.id) {
+        <article
+          class="notification-card"
+          [class.unread]="!item.read"
+          [class.card-student]="item.authorRole === 'student'"
+          [class.card-teacher]="item.authorRole === 'professor'"
+          (click)="onNotificationItemClick(item)"
+          role="article"
+          tabindex="0"
+          (keydown.enter)="onNotificationItemClick(item)"
+          (keydown.space)="onNotificationItemClick(item)"
+        >
+          <!-- Indicador visual de no leído -->
+          @if (!item.read) {
+            <span class="card-unread-dot" title="No leída" aria-hidden="true"></span>
+          }
+
+          <div class="card-main-row">
+            <!-- Avatar / Icono del Emisor -->
+            <div
+              class="card-avatar"
+              [class.avatar-student]="item.authorRole === 'student'"
+              [class.avatar-teacher]="item.authorRole === 'professor'"
+              aria-hidden="true"
+            >
+              @if (item.authorRole === 'student') {
+                <i class="bi bi-person-fill"></i>
+              } @else {
+                <i class="bi bi-mortarboard-fill"></i>
+              }
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="card-body">
+              <div class="card-meta-top">
+                <span class="card-author">{{ item.authorName }}</span>
+                <span
+                  class="card-role-badge"
+                  [class.badge-student]="item.authorRole === 'student'"
+                  [class.badge-teacher]="item.authorRole === 'professor'"
+                >
+                  {{ item.authorRole === 'student' ? 'Estudiante' : 'Docente' }}
+                </span>
+                <span class="card-time">
+                  <i class="bi bi-clock" aria-hidden="true"></i>
+                  {{ item.timeAgo }}
+                </span>
+              </div>
+
+              <h4 class="card-title">{{ item.title }}</h4>
+              <p class="card-message">{{ item.message }}</p>
+
+              <div class="card-meta-bottom">
+                <span class="card-category-pill">
+                  <i class="bi bi-bookmark-fill" aria-hidden="true"></i>
+                  {{ item.category }}
+                </span>
+
+                @if (item.actionLabel) {
+                  <span class="card-action-link">
+                    <span>{{ item.actionLabel }}</span>
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Acciones Rápidas (Marcar / Eliminar) -->
+            <div class="card-quick-actions" (click)="$event.stopPropagation()">
+              <button
+                type="button"
+                class="btn-action-icon"
+                (click)="onToggleRead(item, $event)"
+                [title]="item.read ? 'Marcar como no leída' : 'Marcar como leída'"
+                [attr.aria-label]="item.read ? 'Marcar como no leída' : 'Marcar como leída'"
+              >
+                <i [class]="item.read ? 'bi bi-envelope' : 'bi bi-envelope-open'" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="btn-action-icon btn-action-delete"
+                (click)="onDelete(item.id, $event)"
+                title="Eliminar notificación"
+                aria-label="Eliminar notificación"
+              >
+                <i class="bi bi-trash3" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    }
+  </div>
+
+  <!-- ── 4. Pie del Panel ────────────────────────────────────────────────── -->
+  <footer class="drawer-footer">
+    <div class="footer-summary">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      <span>Mostrando {{ filteredNotifications().length }} de {{ notifications().length }}</span>
+    </div>
+
+    @if (unreadCount() > 0) {
+      <button
+        type="button"
+        class="btn-footer-mark-read"
+        (click)="onMarkAllAsRead()"
+      >
+        <i class="bi bi-check2-circle" aria-hidden="true"></i>
+        <span>Marcar todo leído</span>
+      </button>
+    }
+  </footer>
+</aside>
+
