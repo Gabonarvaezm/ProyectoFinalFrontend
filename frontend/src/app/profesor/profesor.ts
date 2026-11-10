@@ -17,6 +17,7 @@ import {
   RecentActivity,
   StudentProgress,
   StudentStatus,
+  TeacherNotification,
 } from './models/profesor.model';
 import { Biblioteca } from '../biblioteca/biblioteca';
 import { Book } from '../biblioteca/models/book.model';
@@ -27,6 +28,7 @@ import {
   ProfesorCreateStudentModalComponent,
   ProfesorHeaderComponent,
   ProfesorKpiCardsComponent,
+  ProfesorNotificationsDrawerComponent,
   ProfesorSidebarComponent,
   ProfesorStudentTableComponent,
 } from './components';
@@ -42,6 +44,7 @@ import {
     ProfesorActivityFeedComponent,
     ProfesorAiChatComponent,
     ProfesorCreateStudentModalComponent,
+    ProfesorNotificationsDrawerComponent,
   ],
   selector: 'app-profesor',
   styleUrl: './profesor.scss',
@@ -73,7 +76,11 @@ export class Profesor {
   public readonly isAiDrawerOpen = signal<boolean>(false);
 
   public toggleAiDrawer(): void {
-    this.isAiDrawerOpen.update((open) => !open);
+    const next = !this.isAiDrawerOpen();
+    if (next) {
+      this.isNotificationsDrawerOpen.set(false); // Cierra notificaciones para evitar superposición
+    }
+    this.isAiDrawerOpen.set(next);
   }
 
   public closeAiDrawer(): void {
@@ -81,7 +88,31 @@ export class Profesor {
   }
 
   public openAiDrawer(): void {
+    this.isNotificationsDrawerOpen.set(false);
     this.isAiDrawerOpen.set(true);
+  }
+
+  // ── Panel Desplegable (Drawer) Notificaciones Académicas ─────────────────
+  public readonly isNotificationsDrawerOpen = signal<boolean>(false);
+
+  public readonly notifications = this.profesorService.notifications;
+  public readonly unreadNotificationsCount = this.profesorService.unreadNotificationsCount;
+
+  public toggleNotificationsDrawer(): void {
+    const next = !this.isNotificationsDrawerOpen();
+    if (next) {
+      this.isAiDrawerOpen.set(false); // Cierra asistente IA para evitar superposición
+    }
+    this.isNotificationsDrawerOpen.set(next);
+  }
+
+  public closeNotificationsDrawer(): void {
+    this.isNotificationsDrawerOpen.set(false);
+  }
+
+  public openNotificationsDrawer(): void {
+    this.isAiDrawerOpen.set(false);
+    this.isNotificationsDrawerOpen.set(true);
   }
 
   // ── Estado Compartido desde ProfesorService ──────────────────────────────
@@ -198,7 +229,7 @@ export class Profesor {
   }
 
   public onNotificationsClick(): void {
-    this.showToast('Tienes 1 notificación académica pendiente.');
+    this.toggleNotificationsDrawer();
   }
 
   public triggerQuickAction(action: QuickAction): void {
@@ -216,6 +247,39 @@ export class Profesor {
   // ── Gestión de Recomendaciones de Biblioteca ─────────────────────────────
   public onBookRecommended(book: Book): void {
     this.showToast(`"${book.title}" ha sido añadido a las lecturas recomendadas para tu clase.`);
+  }
+
+  // ── Gestión de Notificaciones ────────────────────────────────────────────
+
+  public onMarkNotificationAsRead(id: string): void {
+    this.profesorService.markNotificationAsRead(id);
+  }
+
+  public onToggleNotificationRead(id: string): void {
+    this.profesorService.toggleNotificationRead(id);
+  }
+
+  public onMarkAllNotificationsAsRead(): void {
+    this.profesorService.markAllNotificationsAsRead();
+    this.showToast('Todas las notificaciones marcadas como leídas.');
+  }
+
+  public onDeleteNotification(id: string): void {
+    this.profesorService.deleteNotification(id);
+    this.showToast('Notificación eliminada de tu bandeja.');
+  }
+
+  public onNotificationSelected(item: TeacherNotification): void {
+    if (item.actionRoute) {
+      if (item.actionRoute.startsWith('/')) {
+        this.router.navigate([item.actionRoute]);
+      } else {
+        this.selectNav(item.actionRoute);
+      }
+      this.closeNotificationsDrawer();
+    } else {
+      this.showToast(`Notificación: ${item.title}`);
+    }
   }
 
   // ── Gestión del Modal de Registro ────────────────────────────────────────
@@ -243,113 +307,97 @@ export class Profesor {
     } else {
       if (this.studentForm.invalid) {
         this.studentForm.markAllAsTouched();
-        this.showToast('Por favor completa todos los campos del estudiante.');
         return;
       }
-      const formValue = this.studentForm.value;
       payload = {
-        studentName: formValue.studentName,
-        email: formValue.email,
-        topic: formValue.topic,
-        score: Number(formValue.score),
-        status: formValue.status,
+        studentName: this.studentForm.value.studentName.trim(),
+        email: this.studentForm.value.email.trim(),
+        topic: this.studentForm.value.topic.trim(),
+        score: Number(this.studentForm.value.score),
+        status: this.studentForm.value.status as StudentStatus,
       };
     }
 
-    this.isSubmittingStudent.set(true);
-    const newStudent = this.profesorService.registerStudent(payload);
-    this.isSubmittingStudent.set(false);
+    this.profesorService.registerStudent(payload);
     this.closeRegisterModal();
-    this.showToast(`¡Estudiante ${newStudent.studentName} registrado exitosamente!`);
+    this.showToast(`Estudiante "${payload.studentName}" registrado con éxito.`);
   }
 
   public onDeleteStudent(student: StudentProgress, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+    if (event) event.stopPropagation();
     this.profesorService.deleteStudent(student.id);
-    this.showToast(`Estudiante ${student.studentName} eliminado.`);
+    this.showToast(`Estudiante ${student.studentName} eliminado de la cohorte.`);
   }
 
-  // ── Lógica del Asistente de IA (Conectada al Estado Real) ────────────────
+  // ── Asistente Docente IA ─────────────────────────────────────────────────
 
   public selectSuggestion(suggestion: AiSuggestion): void {
-    this.sendAiMessage(suggestion.prompt);
+    this.aiInputText.set(suggestion.prompt);
+    this.submitAiMessage();
+  }
+
+  public onSendAiMessage(text: string): void {
+    this.aiInputText.set(text);
+    this.submitAiMessage();
   }
 
   public submitAiMessage(): void {
     const text = this.aiInputText().trim();
     if (!text || this.isAiThinking()) return;
-    this.sendAiMessage(text);
-  }
 
-  public onSendAiMessage(text: string): void {
-    this.sendAiMessage(text);
-  }
-
-  private sendAiMessage(promptText: string): void {
     const userMsg: ChatMessage = {
-      id: `usr-${Date.now()}`,
+      id: `msg-${Date.now()}`,
       sender: 'user',
-      text: promptText,
+      text,
       timestamp: new Date(),
     };
 
-    this.chatMessages.update((prev) => [...prev, userMsg]);
+    this.chatMessages.update((msgs) => [...msgs, userMsg]);
     this.aiInputText.set('');
     this.isAiThinking.set(true);
 
     const timer = setTimeout(() => {
-      const replyText = this.generateAiReply(promptText);
-
+      const responseText = this.generateAiResponse(text);
       const aiMsg: ChatMessage = {
-        id: `ai-${Date.now()}`,
+        id: `msg-${Date.now() + 1}`,
         sender: 'ai',
-        text: replyText,
+        text: responseText,
         timestamp: new Date(),
       };
-
-      this.chatMessages.update((prev) => [...prev, aiMsg]);
+      this.chatMessages.update((msgs) => [...msgs, aiMsg]);
       this.isAiThinking.set(false);
     }, 600);
 
     this.timerIds.push(timer);
   }
 
-  private generateAiReply(promptText: string): string {
-    const lower = promptText.toLowerCase();
+  private generateAiResponse(prompt: string): string {
+    const lower = prompt.toLowerCase();
+    const studentsList = this.students();
+    const struggling = studentsList.filter((s) => s.score < 50);
 
-    if (lower.includes('promedio') || lower.includes('grading')) {
-      return this.buildGradeAverageReply();
+    if (lower.includes('atención') || lower.includes('dificultad') || lower.includes('notas')) {
+      if (struggling.length > 0) {
+        const names = struggling.map((s) => `${s.studentName} (${s.score}%)`).join(', ');
+        return `He identificado que ${struggling.length} estudiante(s) requieren atención prioritaria: ${names}. Sugiero reforzar el tema de Mitosis y asignar una lectura guiada.`;
+      }
+      return 'Actualmente ningún estudiante presenta notas críticas (< 50%). ¡La cohorte avanza con buen rendimiento!';
     }
-    if (lower.includes('atención') || lower.includes('struggling') || lower.includes('prioritaria')) {
-      return this.buildStrugglingStudentsReply();
-    }
-    if (lower.includes('foro') || lower.includes('moderation')) {
-      return 'Hay 2 preguntas sin resolver en el foro de Biología relacionadas con "Mitosis y Meiosis" y una consulta sobre "Integrales por partes".';
-    }
-    return 'He analizado los datos actuales del aula y puedo asistirte con las evaluaciones y seguimiento.';
-  }
 
-  private buildGradeAverageReply(): string {
-    const avg = this.kpiMetrics().find((m) => m.id === 'avg-score')?.value ?? '78.5%';
-    return `El promedio general de tu clase es ${avg}. El desempeño general muestra una tendencia positiva (+4.1%).`;
-  }
-
-  private buildStrugglingStudentsReply(): string {
-    const struggling = this.students().filter((s) => s.score < 70);
-    if (struggling.length === 0) {
-      return 'Actualmente todos los estudiantes tienen un rendimiento igual o superior a 70%.';
+    if (lower.includes('calificaciones') || lower.includes('promedio')) {
+      const total = studentsList.reduce((acc, s) => acc + s.score, 0);
+      const avg = studentsList.length ? Math.round(total / studentsList.length) : 0;
+      return `El promedio general de la cohorte es de ${avg}%. Tienes ${this.profesorService.activeStudents()} estudiantes activos actualmente.`;
     }
-    const names = struggling.map((s) => `${s.studentName} (${s.score}%)`).join(', ');
-    return `Los estudiantes que requieren seguimiento prioritario son: ${names}.`;
+
+    return `He procesado tu consulta pedagógica: "${prompt}". Con base en el avance de tus ${studentsList.length} estudiantes, el progreso del grupo se mantiene estable en el módulo de Biología.`;
   }
 
   private showToast(msg: string): void {
     this.actionNotification.set(msg);
-    const toastTimer = setTimeout(() => {
+    const timer = setTimeout(() => {
       this.actionNotification.set(null);
     }, 3200);
-    this.timerIds.push(toastTimer);
+    this.timerIds.push(timer);
   }
 }

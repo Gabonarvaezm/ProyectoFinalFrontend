@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Profesor } from './profesor';
+import { TeacherNotification } from './models/profesor.model';
 
 describe('Profesor Component', () => {
   let component: Profesor;
@@ -142,5 +143,69 @@ describe('Profesor Component', () => {
 
     component.onBookRecommended(mockBook);
     expect(component.actionNotification()).toContain('Biología General');
+  });
+
+  // ── Pruebas del Panel de Notificaciones Académicas ───────────────────────
+
+  it('debe alternar la apertura y cierre del panel de notificaciones', () => {
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+
+    component.onNotificationsClick();
+    expect(component.isNotificationsDrawerOpen()).toBe(true);
+
+    component.closeNotificationsDrawer();
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+  });
+
+  it('debe cerrar el panel de IA al abrir el panel de notificaciones y viceversa', () => {
+    component.openAiDrawer();
+    expect(component.isAiDrawerOpen()).toBe(true);
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+
+    component.openNotificationsDrawer();
+    expect(component.isNotificationsDrawerOpen()).toBe(true);
+    expect(component.isAiDrawerOpen()).toBe(false);
+
+    component.toggleAiDrawer();
+    expect(component.isAiDrawerOpen()).toBe(true);
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+  });
+
+  it('debe marcar todas las notificaciones como leídas y mostrar toast', () => {
+    component.onMarkAllNotificationsAsRead();
+    expect(component.unreadNotificationsCount()).toBe(0);
+    expect(component.actionNotification()).toContain('leídas');
+  });
+
+  it('debe eliminar una notificación y mostrar feedback', () => {
+    const target = component.notifications()[0];
+    const initialCount = component.notifications().length;
+
+    component.onDeleteNotification(target.id);
+    expect(component.notifications().length).toBe(initialCount - 1);
+    expect(component.actionNotification()).toContain('eliminada');
+  });
+
+  it('debe navegar o mostrar toast al seleccionar una notificación', () => {
+    const notifWithRoute: TeacherNotification = {
+      id: 'notif-test-1',
+      type: 'teacher_post',
+      title: 'Nuevo Recurso',
+      message: 'Mensaje de prueba',
+      timeAgo: 'Hace 1 min',
+      timestamp: '2026-11-09T17:00:00.000Z',
+      read: false,
+      authorName: 'Prof. Test',
+      authorRole: 'professor',
+      authorInitials: 'PT',
+      category: 'Ciencias',
+      actionRoute: 'biblioteca',
+    };
+
+    component.openNotificationsDrawer();
+    component.onNotificationSelected(notifWithRoute);
+
+    expect(component.activeNav()).toBe('biblioteca');
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
   });
 });

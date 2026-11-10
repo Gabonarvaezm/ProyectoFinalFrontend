@@ -28,14 +28,16 @@
 
     <button
       type="button"
-      class="icon-button"
+      class="icon-button btn-notifications-toggle"
+      [class.active]="isNotificationsDrawerOpen()"
       (click)="notificationsClicked.emit()"
-      aria-label="Notificaciones"
-      title="Notificaciones"
+      aria-label="Notificaciones académicas"
+      title="Notificaciones académicas"
+      [attr.aria-expanded]="isNotificationsDrawerOpen()"
     >
       <i class="bi bi-bell"></i>
       @if (notificationsCount() > 0) {
-        <span class="notification-indicator"></span>
+        <span class="notification-indicator" aria-hidden="true"></span>
       }
     </button>
 

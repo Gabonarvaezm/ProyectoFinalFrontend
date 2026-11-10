@@ -40,3 +40,20 @@ export interface ActiveCourse {
   progress: number;
 }
 
+export type StudentNotificationFilter = 'all' | 'unread' | 'tasks' | 'forums';
+
+export interface StudentNotification {
+  id: string;
+  type: 'task' | 'forum_reply' | 'teacher_announcement' | 'exam';
+  title: string;
+  message: string;
+  authorName: string;
+  authorRole: 'professor' | 'student' | 'system';
+  authorInitials: string;
+  authorAvatar?: string;
+  timeAgo: string;
+  read: boolean;
+  subject?: string;
+  actionRoute?: string;
+}
+

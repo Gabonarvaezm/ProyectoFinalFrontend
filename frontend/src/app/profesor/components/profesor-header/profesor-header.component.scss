@@ -110,6 +110,15 @@
       }
     }
 
+    &.btn-notifications-toggle {
+      &.active {
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-700);
+        border-color: var(--color-primary-300);
+        box-shadow: 0 0 0 2px var(--color-primary-100);
+      }
+    }
+
     .notification-indicator {
       position: absolute;
       top: 8px;

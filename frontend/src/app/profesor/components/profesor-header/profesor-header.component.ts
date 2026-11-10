@@ -8,10 +8,11 @@ import { ChangeDetectionStrategy, Component, input, model, output } from '@angul
 })
 export class ProfesorHeaderComponent {
   public readonly searchQuery = model<string>('');
-  public readonly notificationsCount = input<number>(1);
+  public readonly notificationsCount = input<number>(0);
   public readonly teacherName = input<string>('Prof. García');
   public readonly teacherInitials = input<string>('PG');
   public readonly isAiDrawerOpen = input<boolean>(false);
+  public readonly isNotificationsDrawerOpen = input<boolean>(false);
 
   public readonly notificationsClicked = output<void>();
   public readonly configClicked = output<void>();
@@ -21,4 +22,3 @@ export class ProfesorHeaderComponent {
     this.searchQuery.set(val);
   }
 }
-

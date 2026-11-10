@@ -3,6 +3,7 @@ export const STORAGE_KEYS = {
   USER_EMAIL: 'disceria_user_email',
   REMEMBERED_EMAIL: 'disceria_remembered_email',
   STUDENTS: 'disceria_profesor_students',
+  NOTIFICATIONS: 'disceria_profesor_notifications',
 } as const;
 
 export interface RegisteredUserData {

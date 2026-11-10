@@ -87,3 +87,17 @@
     color: var(--color-primary-400);
   }
 }
+
+.notifications-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 95;
+  animation: fadeIn var(--duration-fast) var(--ease-out-expo);
+
+  @media (min-width: 1201px) {
+    display: none;
+  }
+}

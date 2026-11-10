@@ -7,9 +7,11 @@ import {
   RecentActivity,
   StudentProgress,
   StudentStatus,
+  TeacherNotification,
 } from '../../profesor/models/profesor.model';
 import {
   INITIAL_ACTIVITIES_SEED,
+  INITIAL_NOTIFICATIONS_SEED,
   INITIAL_STUDENTS_SEED,
 } from '../../profesor/data/profesor.data';
 
@@ -28,6 +30,15 @@ export class ProfesorService {
 
   private readonly _assignmentsCount = signal<number>(4);
   public readonly assignmentsCount = this._assignmentsCount.asReadonly();
+
+  // ── Notificaciones del Profesor (Signals) ────────────────────────────────
+  private readonly _notifications = signal<TeacherNotification[]>([]);
+  public readonly notifications = this._notifications.asReadonly();
+
+  /** Conteo dinámico de notificaciones no leídas */
+  public readonly unreadNotificationsCount = computed(
+    () => this._notifications().filter((n) => !n.read).length
+  );
 
   // ── Métricas Clave Calculadas (Computed Signals) ──────────────────────────
   public readonly totalStudents = computed(() => this._students().length);
@@ -64,7 +75,7 @@ export class ProfesorService {
     this.initializeData();
   }
 
-  // ── Métodos de Negocio ───────────────────────────────────────────────────
+  // ── Métodos de Negocio: Estudiantes ──────────────────────────────────────
 
   /**
    * Registra un nuevo estudiante en el sistema y recalcula métricas
@@ -181,25 +192,84 @@ export class ProfesorService {
     this._recentActivities.update((prev) => [newAct, ...prev.slice(0, 5)]);
   }
 
+  // ── Métodos de Negocio: Notificaciones ───────────────────────────────────
+
+  /**
+   * Marca una notificación específica como leída
+   */
+  public markNotificationAsRead(id: string): void {
+    this._notifications.update((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+    this.persistNotifications();
+  }
+
+  /**
+   * Alterna el estado leído/no leído de una notificación
+   */
+  public toggleNotificationRead(id: string): void {
+    this._notifications.update((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: !n.read } : n))
+    );
+    this.persistNotifications();
+  }
+
+  /**
+   * Marca todas las notificaciones como leídas
+   */
+  public markAllNotificationsAsRead(): void {
+    this._notifications.update((prev) =>
+      prev.map((n) => ({ ...n, read: true }))
+    );
+    this.persistNotifications();
+  }
+
+  /**
+   * Elimina una notificación de la lista
+   */
+  public deleteNotification(id: string): void {
+    this._notifications.update((prev) => prev.filter((n) => n.id !== id));
+    this.persistNotifications();
+  }
+
+  /**
+   * Añade una nueva notificación al inicio de la lista
+   */
+  public addNotification(
+    data: Omit<TeacherNotification, 'id' | 'timestamp'>
+  ): TeacherNotification {
+    const newNotification: TeacherNotification = {
+      ...data,
+      id: `notif-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+    };
+
+    this._notifications.update((prev) => [newNotification, ...prev]);
+    this.persistNotifications();
+    return newNotification;
+  }
+
   // ── Inicialización y Persistencia Segura (SSR Safe) ───────────────────────
 
   private initializeData(): void {
     const initialSeed: StudentProgress[] = [...INITIAL_STUDENTS_SEED];
     const initialActivities: RecentActivity[] = [...INITIAL_ACTIVITIES_SEED];
+    const initialNotifications: TeacherNotification[] = [...INITIAL_NOTIFICATIONS_SEED];
 
     if (!isPlatformBrowser(this.platformId)) {
       this._students.set(initialSeed);
       this._recentActivities.set(initialActivities);
+      this._notifications.set(initialNotifications);
       return;
     }
 
-    // Carga desde localStorage si existe
-    const stored = localStorage.getItem(STORAGE_KEYS.STUDENTS);
+    // Carga de estudiantes desde localStorage si existe
+    const storedStudents = localStorage.getItem(STORAGE_KEYS.STUDENTS);
     let loadedStudents: StudentProgress[] = initialSeed;
 
-    if (stored) {
+    if (storedStudents) {
       try {
-        const parsed = JSON.parse(stored);
+        const parsed = JSON.parse(storedStudents);
         if (Array.isArray(parsed) && parsed.length > 0) {
           loadedStudents = parsed;
         }
@@ -234,8 +304,23 @@ export class ProfesorService {
       }
     }
 
+    // Carga de notificaciones desde localStorage si existe
+    let loadedNotifications: TeacherNotification[] = initialNotifications;
+    const storedNotifications = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    if (storedNotifications) {
+      try {
+        const parsedNotifs = JSON.parse(storedNotifications);
+        if (Array.isArray(parsedNotifs) && parsedNotifs.length > 0) {
+          loadedNotifications = parsedNotifs;
+        }
+      } catch (err) {
+        console.warn('[ProfesorService] Error leyendo notificaciones de storage:', err);
+      }
+    }
+
     this._students.set(loadedStudents);
     this._recentActivities.set(initialActivities);
+    this._notifications.set(loadedNotifications);
   }
 
   private persistStudents(): void {
@@ -244,6 +329,15 @@ export class ProfesorService {
       localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this._students()));
     } catch (e) {
       console.warn('[ProfesorService] No se pudo persistir estudiantes:', e);
+    }
+  }
+
+  private persistNotifications(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    try {
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(this._notifications()));
+    } catch (e) {
+      console.warn('[ProfesorService] No se pudo persistir notificaciones:', e);
     }
   }
 }

@@ -90,9 +90,62 @@ describe('Estudiante', () => {
     expect(component.filteredSubjects().length).toBe(0);
   });
 
-  it('debe permitir continuar el curso activo y emitir toast', () => {
+  it('debe permitir continuar el curso activo, emitir toast y redirigir a /foro', () => {
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
     component.onContinueCourse();
+
     expect(component.toastMessage()).toContain('Biología Celular');
+    expect(component.toastMessage()).toContain('foro');
+    expect(navigateSpy).toHaveBeenCalledWith(['/foro']);
+  });
+
+  it('debe alternar, abrir y cerrar el panel de notificaciones académicas', () => {
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+
+    component.onNotificationsClick();
+    expect(component.isNotificationsDrawerOpen()).toBe(true);
+
+    component.closeNotificationsDrawer();
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+
+    component.openNotificationsDrawer();
+    expect(component.isNotificationsDrawerOpen()).toBe(true);
+  });
+
+  it('debe gestionar las notificaciones: marcar leídas, alternar y eliminar', () => {
+    expect(component.notifications().length).toBe(4);
+    expect(component.unreadNotificationsCount()).toBe(2);
+
+    // Marcar como leída
+    component.onMarkNotificationAsRead('notif-1');
+    expect(component.notifications().find((n) => n.id === 'notif-1')?.read).toBe(true);
+
+    // Alternar lectura
+    component.onToggleNotificationRead('notif-1');
+    expect(component.notifications().find((n) => n.id === 'notif-1')?.read).toBe(false);
+
+    // Marcar todas
+    component.onMarkAllNotificationsAsRead();
+    expect(component.unreadNotificationsCount()).toBe(0);
+
+    // Eliminar
+    component.onDeleteNotification('notif-1');
+    expect(component.notifications().length).toBe(3);
+    expect(component.toastMessage()).toContain('eliminada');
+  });
+
+  it('debe redirigir al foro al seleccionar una notificación con actionRoute', () => {
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    const targetNotif = component.notifications()[0]; // actionRoute: '/foro'
+    component.openNotificationsDrawer();
+    component.onNotificationSelected(targetNotif);
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/foro']);
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
   });
 
   it('debe permitir iniciar el examen de práctica', () => {

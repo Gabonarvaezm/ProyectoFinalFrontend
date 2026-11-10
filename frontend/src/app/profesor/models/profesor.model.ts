@@ -50,3 +50,31 @@ export interface AiSuggestion {
   icon: string;
   prompt: string;
 }
+
+// ── Tipos y Modelos del Sistema de Notificaciones Docente ────────────────────
+
+export type NotificationType =
+  | 'student_reply'      // Estudiante respondió a foros, tareas o dudas
+  | 'teacher_post'       // Docente colega publicó material o recursos
+  | 'academic_alert'     // Alerta de progreso académico o evaluación
+  | 'institutional';     // Comunicados de la institución educativa
+
+export type NotificationRole = 'student' | 'professor' | 'system';
+
+export type NotificationFilter = 'all' | 'unread' | 'students' | 'teachers';
+
+export interface TeacherNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timeAgo: string;
+  timestamp: string;
+  read: boolean;
+  authorName: string;
+  authorRole: NotificationRole;
+  authorInitials: string;
+  category: string;
+  actionLabel?: string;
+  actionRoute?: string;
+}
