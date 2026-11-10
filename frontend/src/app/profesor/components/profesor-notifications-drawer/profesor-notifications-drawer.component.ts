@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,16 +7,14 @@ import {
   output,
   signal,
 } from '@angular/core';
-import {
-  NotificationFilter,
-  TeacherNotification,
-} from '../../models/profesor.model';
+import { NotificationFilter, TeacherNotification } from '../../models/profesor.model';
 
 @Component({
   selector: 'app-profesor-notifications-drawer',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './profesor-notifications-drawer.component.html',
-  styleUrl: './profesor-notifications-drawer.component.scss',
+  styleUrls: ['./profesor-notifications-drawer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfesorNotificationsDrawerComponent {

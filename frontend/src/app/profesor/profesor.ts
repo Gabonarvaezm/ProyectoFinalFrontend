@@ -47,7 +47,7 @@ import {
     ProfesorNotificationsDrawerComponent,
   ],
   selector: 'app-profesor',
-  styleUrl: './profesor.scss',
+  styleUrls: ['./profesor.scss'],
   templateUrl: './profesor.html',
 })
 export class Profesor {
@@ -300,27 +300,29 @@ export class Profesor {
   }
 
   public onRegisterStudentSubmit(dto?: CreateStudentDto): void {
-    let payload: CreateStudentDto;
+    const studentData: CreateStudentDto = dto ?? {
+      studentName: this.studentForm.value.studentName?.trim() || '',
+      email: this.studentForm.value.email?.trim() || '',
+      topic: this.studentForm.value.topic?.trim() || '',
+      score: Number(this.studentForm.value.score) || 0,
+      status: this.studentForm.value.status || 'active',
+    };
 
-    if (dto) {
-      payload = dto;
-    } else {
-      if (this.studentForm.invalid) {
-        this.studentForm.markAllAsTouched();
-        return;
-      }
-      payload = {
-        studentName: this.studentForm.value.studentName.trim(),
-        email: this.studentForm.value.email.trim(),
-        topic: this.studentForm.value.topic.trim(),
-        score: Number(this.studentForm.value.score),
-        status: this.studentForm.value.status as StudentStatus,
-      };
+    if (!dto && this.studentForm.invalid) {
+      this.studentForm.markAllAsTouched();
+      return;
     }
 
-    this.profesorService.registerStudent(payload);
-    this.closeRegisterModal();
-    this.showToast(`Estudiante "${payload.studentName}" registrado con éxito.`);
+    this.isSubmittingStudent.set(true);
+
+    const timer = setTimeout(() => {
+      this.profesorService.registerStudent(studentData);
+      this.isSubmittingStudent.set(false);
+      this.closeRegisterModal();
+      this.showToast(`Estudiante "${studentData.studentName}" registrado con éxito.`);
+    }, 400);
+
+    this.timerIds.push(timer);
   }
 
   public onDeleteStudent(student: StudentProgress, event?: Event): void {

@@ -69,7 +69,7 @@ export type {
     EstudianteNotificationsDrawerComponent,
   ],
   selector: 'app-estudiante',
-  styleUrl: './estudiante.scss',
+  styleUrls: ['./estudiante.scss'],
   templateUrl: './estudiante.html',
 })
 export class Estudiante {

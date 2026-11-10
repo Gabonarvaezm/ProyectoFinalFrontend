@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,16 +7,14 @@ import {
   output,
   signal,
 } from '@angular/core';
-import {
-  StudentNotification,
-  StudentNotificationFilter,
-} from '../../models/estudiante.model';
+import { StudentNotification, StudentNotificationFilter } from '../../models/estudiante.model';
 
 @Component({
   selector: 'app-estudiante-notifications-drawer',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './estudiante-notifications-drawer.component.html',
-  styleUrl: './estudiante-notifications-drawer.component.scss',
+  styleUrls: ['./estudiante-notifications-drawer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EstudianteNotificationsDrawerComponent {
@@ -35,22 +34,13 @@ export class EstudianteNotificationsDrawerComponent {
   public readonly activeFilter = signal<StudentNotificationFilter>('all');
 
   // ── Métricas y Notificaciones Filtradas (Computed Signals) ────────────────
-  public readonly unreadCount = computed(
-    () => this.notifications().filter((n) => !n.read).length
-  );
-
-  public readonly tasksCount = computed(
-    () => this.notifications().filter((n) => n.type === 'task').length
-  );
-
-  public readonly forumsCount = computed(
-    () => this.notifications().filter((n) => n.type === 'forum_reply').length
-  );
+  public readonly unreadCount = computed(() => this.notifications().filter((n) => !n.read).length);
+  public readonly tasksCount = computed(() => this.notifications().filter((n) => n.type === 'task').length);
+  public readonly forumsCount = computed(() => this.notifications().filter((n) => n.type === 'forum_reply').length);
 
   public readonly filteredNotifications = computed<StudentNotification[]>(() => {
     const list = this.notifications();
     const filter = this.activeFilter();
-
     switch (filter) {
       case 'unread':
         return list.filter((n) => !n.read);
@@ -65,7 +55,6 @@ export class EstudianteNotificationsDrawerComponent {
   });
 
   // ── Métodos de Interacción ───────────────────────────────────────────────
-
   public setFilter(filter: StudentNotificationFilter): void {
     this.activeFilter.set(filter);
   }
@@ -96,4 +85,3 @@ export class EstudianteNotificationsDrawerComponent {
     this.notificationSelected.emit(item);
   }
 }
-
