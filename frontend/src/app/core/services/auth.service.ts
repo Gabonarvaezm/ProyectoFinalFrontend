@@ -41,11 +41,16 @@ export class AuthService {
     // Obtener datos del registro previo si existen
     const registeredData = this.getRegisteredUserData(trimmedEmail);
 
+    const resolvedRole =
+      (credentials.role as User['role']) ??
+      (registeredData?.role as User['role']) ??
+      'student';
+
     const user: User = {
       id: `usr-${Date.now()}`,
       email: trimmedEmail,
       fullName: registeredData?.fullName ?? this.extractNameFromEmail(trimmedEmail),
-      role: (registeredData?.role as User['role']) ?? 'student',
+      role: resolvedRole,
       institution: registeredData?.institution ?? 'Universidad Tecnológica',
     };
 

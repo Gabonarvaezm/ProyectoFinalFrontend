@@ -1,0 +1,169 @@
+@if (isOpen()) {
+  <div class="modal-backdrop" (click)="onClose()" aria-hidden="true"></div>
+
+  <div
+    class="modal-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-profesor-title"
+  >
+    <header class="modal-header">
+      <div class="header-icon-wrap">
+        <i class="bi bi-file-earmark-plus" aria-hidden="true"></i>
+      </div>
+      <div>
+        <h2 id="modal-profesor-title" class="modal-title">Asignar Nueva Tarea</h2>
+        <p class="modal-subtitle">
+          Define los parámetros académicos, la materia y el plazo de entrega para la cohorte.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="onClose()"
+        aria-label="Cerrar modal"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
+      <!-- Título de la tarea -->
+      <div class="form-group">
+        <label for="prof-title" class="form-label">
+          Título de la Tarea <span class="required">*</span>
+        </label>
+        <input
+          id="prof-title"
+          type="text"
+          formControlName="title"
+          class="form-control"
+          placeholder="Ej: Reporte de Práctica: Leyes de Mendel"
+        />
+        @if (form.get('title')?.touched && form.get('title')?.errors?.['required']) {
+          <span class="error-msg">El título es obligatorio.</span>
+        }
+        @if (form.get('title')?.touched && form.get('title')?.errors?.['minlength']) {
+          <span class="error-msg">Debe tener al menos 5 caracteres.</span>
+        }
+      </div>
+
+      <!-- Materia y Prioridad -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prof-subject" class="form-label">
+            Materia / Asignatura <span class="required">*</span>
+          </label>
+          <select id="prof-subject" formControlName="subject" class="form-control">
+            @for (sub of subjects(); track sub) {
+              <option [value]="sub">{{ sub }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="prof-priority" class="form-label">
+            Nivel de Prioridad <span class="required">*</span>
+          </label>
+          <select id="prof-priority" formControlName="priority" class="form-control">
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fecha de Entrega y Puntaje Máximo -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prof-dueDate" class="form-label">
+            Fecha Límite de Entrega <span class="required">*</span>
+          </label>
+          <input
+            id="prof-dueDate"
+            type="date"
+            formControlName="dueDate"
+            class="form-control"
+          />
+          @if (form.get('dueDate')?.touched && form.get('dueDate')?.errors?.['required']) {
+            <span class="error-msg">La fecha de entrega es obligatoria.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="prof-maxScore" class="form-label">
+            Puntaje Máximo <span class="required">*</span>
+          </label>
+          <input
+            id="prof-maxScore"
+            type="number"
+            formControlName="maxScore"
+            class="form-control"
+            min="10"
+            max="100"
+          />
+          @if (form.get('maxScore')?.touched && (form.get('maxScore')?.errors?.['min'] || form.get('maxScore')?.errors?.['max'])) {
+            <span class="error-msg">El puntaje debe estar entre 10 y 100.</span>
+          }
+        </div>
+      </div>
+
+      <!-- Descripción y consigna -->
+      <div class="form-group">
+        <label for="prof-description" class="form-label">
+          Consigna e Instrucciones Detalladas <span class="required">*</span>
+        </label>
+        <textarea
+          id="prof-description"
+          formControlName="description"
+          rows="4"
+          class="form-control textarea"
+          placeholder="Describe los objetivos pedagógicos, entregables esperados y criterios de evaluación..."
+        ></textarea>
+        @if (form.get('description')?.touched && form.get('description')?.errors?.['required']) {
+          <span class="error-msg">La consigna es obligatoria.</span>
+        }
+        @if (form.get('description')?.touched && form.get('description')?.errors?.['minlength']) {
+          <span class="error-msg">La descripción debe tener al menos 20 caracteres.</span>
+        }
+      </div>
+
+      <!-- Archivo adjunto / Material complementario -->
+      <div class="form-group">
+        <label for="prof-attachment" class="form-label">
+          Nombre de Documento Guía o Rúbrica (Opcional)
+        </label>
+        <div class="input-with-icon">
+          <i class="bi bi-paperclip input-icon" aria-hidden="true"></i>
+          <input
+            id="prof-attachment"
+            type="text"
+            formControlName="attachmentName"
+            class="form-control input-padded"
+            placeholder="Ej: rubrica_evaluacion_informe.pdf"
+          />
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="onClose()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <span class="spinner-border" aria-hidden="true"></span>
+            <span>Publicando...</span>
+          } @else {
+            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+            <span>Publicar Tarea</span>
+          }
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+

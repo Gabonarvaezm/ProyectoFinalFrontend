@@ -1,15 +1,1 @@
-<div class="login-wrapper">
-  <!-- Componente Hijo Presentacional: Hero Lateral y Branding -->
-  <app-login-hero></app-login-hero>
-
-  <!-- Componente Hijo Auxiliar: Formulario Reactivo y Gestión Local de Campos -->
-  <main class="form-section">
-    <app-login-form
-      [isLoading]="isLoading()"
-      [errorMessage]="errorMessage()"
-      [successMessage]="successMessage()"
-      (loginSubmitted)="handleLogin($event)"
-      (forgotPasswordRequested)="handleForgotPassword($event)"
-    ></app-login-form>
-  </main>
-</div>
+<app-login-page></app-login-page>

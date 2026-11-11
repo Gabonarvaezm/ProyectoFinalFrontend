@@ -1,7 +1,43 @@
 <div class="card-login anim-fade-up anim-stagger-1">
   <div class="form-header">
     <h2 class="form-title">Iniciar Sesión</h2>
-    <p class="form-subtitle">Ingresa tus credenciales institucionales para continuar.</p>
+    <p class="form-subtitle">
+      @if (selectedRole() === 'professor') {
+        Ingresa con tus credenciales docentes para gestionar tus clases y materiales.
+      } @else {
+        Ingresa con tus credenciales estudiantiles para acceder a tus asignaturas y recursos.
+      }
+    </p>
+  </div>
+
+  <!-- Selector de Rol Integrado (Tabs Estudiante / Profesor) -->
+  <div class="role-selector-container" role="tablist" aria-label="Selección de Rol Institucional">
+    <button
+      type="button"
+      role="tab"
+      class="role-tab"
+      id="tab-student"
+      [class.active]="selectedRole() === 'student'"
+      [attr.aria-selected]="selectedRole() === 'student'"
+      aria-controls="panel-login-form"
+      (click)="onSelectRole('student')"
+    >
+      <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+      <span>Estudiante</span>
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="role-tab"
+      id="tab-professor"
+      [class.active]="selectedRole() === 'professor'"
+      [attr.aria-selected]="selectedRole() === 'professor'"
+      aria-controls="panel-login-form"
+      (click)="onSelectRole('professor')"
+    >
+      <i class="bi bi-person-workspace" aria-hidden="true"></i>
+      <span>Profesor</span>
+    </button>
   </div>
 
   <!-- Alertas de estado animadas (locales o emitidas por el padre) -->
@@ -20,10 +56,21 @@
   }
 
   <!-- Formulario Reactivo -->
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
-    <!-- Campo: Correo Electrónico -->
+  <form
+    id="panel-login-form"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+    class="login-form"
+    novalidate
+    role="tabpanel"
+    [attr.aria-labelledby]="selectedRole() === 'professor' ? 'tab-professor' : 'tab-student'"
+  >
+    <!-- Campo: Correo Electrónico Institucional -->
     <div class="form-group">
-      <label for="email" class="form-label">Correo Institucional</label>
+      <label for="email" class="form-label">
+        Correo Institucional
+        <span class="role-badge-indicator">({{ selectedRole() === 'professor' ? 'Docente' : 'Estudiante' }})</span>
+      </label>
       <div class="input-wrapper" [class.has-error]="isFieldInvalid('email')">
         <span class="input-icon" aria-hidden="true">
           <i class="bi bi-envelope"></i>
@@ -34,7 +81,7 @@
           formControlName="email"
           class="form-input"
           [class.is-invalid]="isFieldInvalid('email')"
-          placeholder="estudiante@universidad.edu"
+          [placeholder]="selectedRole() === 'professor' ? 'profesor@universidad.edu' : 'estudiante@universidad.edu'"
           autocomplete="email"
           [attr.aria-invalid]="isFieldInvalid('email')"
           [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
@@ -121,7 +168,7 @@
         <app-lottie name="loading" width="22px" height="22px" ariaLabel="Cargando"></app-lottie>
         <span>Verificando credenciales...</span>
       } @else {
-        <span>Ingresar a la Plataforma</span>
+        <span>Ingresar como {{ selectedRole() === 'professor' ? 'Profesor' : 'Estudiante' }}</span>
         <i class="bi bi-arrow-right" aria-hidden="true"></i>
       }
     </button>
@@ -132,4 +179,3 @@
   <span>¿No tienes una cuenta universitaria? </span>
   <a routerLink="/register" class="request-access-link">Registrarse</a>
 </div>
-

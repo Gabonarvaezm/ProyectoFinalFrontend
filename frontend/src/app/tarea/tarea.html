@@ -1,0 +1,265 @@
+@if (!isEmbedded()) {
+  <div class="tarea-layout">
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- 1. BARRA LATERAL IZQUIERDA (NAVBAR VERTICAL INSTITUCIONAL)              -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <aside class="sidebar" aria-label="Navegación institucional de DiscerIA">
+      <div class="sidebar-top">
+        <a routerLink="/" class="brand-link" aria-label="Ir a inicio de DiscerIA">
+          <div class="brand-icon">
+            <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">DiscerIA</span>
+            <span class="brand-sub">Tareas y Evaluaciones</span>
+          </div>
+        </a>
+
+        <nav class="sidebar-nav" aria-label="Menú de navegación">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a [routerLink]="dashboardRoute()" class="nav-btn">
+                <i class="bi bi-grid-fill nav-icon" aria-hidden="true"></i>
+                <span class="nav-label">Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/biblioteca" class="nav-btn">
+                <i class="bi bi-book nav-icon" aria-hidden="true"></i>
+                <span class="nav-label">Biblioteca</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/tareas" class="nav-btn active" aria-current="page">
+                <i class="bi bi-journal-check nav-icon" aria-hidden="true"></i>
+                <span class="nav-label">Tareas</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/foro" class="nav-btn">
+                <i class="bi bi-chat-square-text-fill nav-icon" aria-hidden="true"></i>
+                <span class="nav-label">Foros</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a [routerLink]="dashboardRoute()" class="nav-btn">
+                <i class="bi bi-bar-chart nav-icon" aria-hidden="true"></i>
+                <span class="nav-label">Progreso</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/configuracion" class="nav-btn">
+                <i class="bi bi-person-circle nav-icon" aria-hidden="true"></i>
+                <span class="nav-label">Perfil</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        @if (isProfessor()) {
+          <button
+            type="button"
+            class="new-task-btn"
+            (click)="openCreateModal()"
+            aria-label="Asignar nueva tarea académica"
+          >
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>Nueva Tarea</span>
+          </button>
+        } @else {
+          <div class="institution-badge" [title]="userInstitution()">
+            <i class="bi bi-building" aria-hidden="true"></i>
+            <span>{{ userInstitution() }}</span>
+          </div>
+        }
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- 2. CONTENIDO PRINCIPAL (HEADER HORIZONTAL + CANVAS DE TAREAS)           -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="main-wrapper">
+      <!-- Navbar Horizontal -->
+      <header class="top-header" role="banner">
+        <div class="header-titles-wrap">
+          <div class="header-badge">
+            <i class="bi bi-journal-text" aria-hidden="true"></i>
+            <span>Portal de Evaluaciones</span>
+          </div>
+          <h1 class="header-main-title">
+            {{ isProfessor() ? 'Gestión y Asignación de Tareas' : 'Mis Tareas Académicas' }}
+          </h1>
+        </div>
+
+        <div class="header-actions">
+          <button
+            type="button"
+            class="icon-btn btn-ai-toggle"
+            (click)="onAiClicked()"
+            title="Asistente de Aprendizaje Context AI"
+            aria-label="Abrir asistente de inteligencia artificial"
+          >
+            <i class="bi bi-robot" aria-hidden="true"></i>
+          </button>
+
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="onNotificationsClicked()"
+            title="Avisos y retroalimentación"
+            aria-label="Ver avisos de tareas"
+          >
+            <i class="bi bi-bell" aria-hidden="true"></i>
+            <span class="notification-indicator" aria-hidden="true"></span>
+          </button>
+
+          <a
+            routerLink="/configuracion"
+            class="icon-btn"
+            aria-label="Configuración"
+            title="Configuración de preferencias"
+          >
+            <i class="bi bi-gear" aria-hidden="true"></i>
+          </a>
+
+          <a
+            routerLink="/configuracion"
+            class="user-profile-badge"
+            [title]="userName() + (isProfessor() ? ' (Docente)' : ' (Estudiante)')"
+            aria-label="Perfil del usuario"
+          >
+            <div class="user-avatar-initials" aria-hidden="true">{{ userInitials() }}</div>
+          </a>
+        </div>
+      </header>
+
+      <!-- Canvas Central de Tareas -->
+      <main class="tarea-canvas">
+        <ng-container *ngTemplateOutlet="tareasContent"></ng-container>
+      </main>
+    </div>
+  </div>
+} @else {
+  <ng-container *ngTemplateOutlet="tareasContent"></ng-container>
+}
+
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<!-- PLANTILLA REUTILIZABLE DEL CATÁLOGO DE TAREAS                            -->
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<ng-template #tareasContent>
+  <div class="tarea-container">
+    <!-- Banner introductorio contextual -->
+    <section class="tarea-intro-banner" aria-label="Información del módulo">
+      <div class="banner-text">
+        <h2 class="banner-heading">
+          {{ isProfessor() ? 'Panel de Asignaciones y Control Docente' : 'Entregas y Trabajos Pendientes' }}
+        </h2>
+        <p class="banner-desc">
+          {{
+            isProfessor()
+              ? 'Publica consignas académicas, revisa los informes de tus estudiantes y asigna calificaciones con retroalimentación personalizada.'
+              : 'Consulta tus tareas asignadas, sube tus desarrollos en los plazos fijados y revisa las notas de tus profesores.'
+          }}
+        </p>
+      </div>
+      @if (isProfessor()) {
+        <button
+          type="button"
+          class="banner-action-btn"
+          (click)="openCreateModal()"
+        >
+          <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+          <span>Asignar Tarea</span>
+        </button>
+      }
+    </section>
+
+    <!-- NODO HIJO 1: Filtros de Estado, Materia y Búsqueda -->
+    <app-tarea-filters
+      [selectedStatus]="selectedStatus()"
+      [selectedSubject]="selectedSubject()"
+      [searchQuery]="searchQuery()"
+      [statuses]="statuses"
+      [subjects]="subjects"
+      [isProfessor]="isProfessor()"
+      [totalCount]="filteredTareas().length"
+      (statusChanged)="onFilterStatus($event)"
+      (subjectChanged)="onFilterSubject($event)"
+      (searchChanged)="onSearch($event)"
+      (createClicked)="openCreateModal()"
+    />
+
+    <!-- Grilla de Nodos Hijos: TareaCardComponent -->
+    @if (filteredTareas().length === 0) {
+      <div class="empty-state-box" role="status">
+        <i class="bi bi-journal-x empty-icon" aria-hidden="true"></i>
+        <h3 class="empty-title">No hay tareas con estos filtros</h3>
+        <p class="empty-desc">
+          Intenta cambiando los criterios de búsqueda o seleccionando otro estado en los filtros superiores.
+        </p>
+        <button
+          type="button"
+          class="btn-reset-filters"
+          (click)="onFilterStatus('todas'); onFilterSubject('Todas las Materias'); onSearch('')"
+        >
+          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+          <span>Restablecer Filtros</span>
+        </button>
+      </div>
+    } @else {
+      <section class="tareas-grid" aria-label="Listado de tareas académicas">
+        @for (tarea of filteredTareas(); track tarea.id) {
+          <app-tarea-card
+            [tarea]="tarea"
+            [isProfessor]="isProfessor()"
+            (cardClicked)="openDetailModal($event)"
+            (actionClicked)="onCardAction($event)"
+            (deleteClicked)="handleDeleteTarea($event)"
+          />
+        }
+      </section>
+    }
+  </div>
+</ng-template>
+
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<!-- NODOS HIJOS: MODALES REACTIVOS                                           -->
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Formulario Docente: Creación de Tarea -->
+<app-tarea-profesor-form
+  [isOpen]="isCreateOpen()"
+  [isSubmitting]="isSubmitting()"
+  [subjects]="subjects.slice(1)"
+  (closeModal)="closeCreateModal()"
+  (tareaCreated)="handleCreateTarea($event)"
+/>
+
+<!-- Formulario Estudiante: Entrega de Tarea -->
+<app-tarea-estudiante-form
+  [isOpen]="isSubmitOpen()"
+  [tarea]="activeTarea()"
+  [isSubmitting]="isSubmitting()"
+  (closeModal)="closeSubmitModal()"
+  (tareaSubmitted)="handleSubmitTarea($event)"
+/>
+
+<!-- Detalle de Tarea & Calificación Docente -->
+<app-tarea-detail-modal
+  [isOpen]="isDetailOpen()"
+  [tarea]="activeTarea()"
+  [isProfessor]="isProfessor()"
+  (closeModal)="closeDetailModal()"
+  (deliverClicked)="closeDetailModal(); openSubmitModal($event)"
+  (gradeSubmitted)="handleGradeTarea($event)"
+/>
+
+<!-- Notificación Toast Flotante -->
+@if (toastMessage()) {
+  <div class="tarea-toast" role="status" aria-live="polite">
+    <i class="bi bi-check-circle-fill toast-icon" aria-hidden="true"></i>
+    <span>{{ toastMessage() }}</span>
+  </div>
+}
