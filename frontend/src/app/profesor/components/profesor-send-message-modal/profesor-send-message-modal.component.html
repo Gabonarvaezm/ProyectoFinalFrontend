@@ -1,0 +1,122 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop"
+    (click)="onClose()"
+    (keydown.escape)="onClose()"
+    role="presentation"
+  >
+    <div
+      class="modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-message-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div class="modal-icon-badge">
+          <i class="bi bi-chat-square-text-fill" aria-hidden="true"></i>
+        </div>
+        <div class="modal-title-wrapper">
+          <h2 id="modal-message-title" class="modal-title">Enviar Mensaje a la Clase</h2>
+          <p class="modal-subtitle">Comunícate de forma directa o difunde un aviso para tu grupo.</p>
+        </div>
+        <button
+          type="button"
+          class="btn-close-modal"
+          (click)="onClose()"
+          aria-label="Cerrar modal"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="messageForm" (ngSubmit)="onSubmit()" class="modal-form" novalidate>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="msgTarget" class="form-label">Destinatarios *</label>
+            <select id="msgTarget" formControlName="targetGroup" class="form-control" required>
+              <option value="all">Toda la Clase (Cohorte Completa)</option>
+              <option value="needs-attention">Estudiantes que Requieren Atención (Score &lt; 50%)</option>
+              <option value="active">Estudiantes Activos</option>
+            </select>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="msgPriority" class="form-label">Prioridad *</label>
+            <select id="msgPriority" formControlName="priority" class="form-control" required>
+              <option value="normal">Normal (Informativo)</option>
+              <option value="urgent">Urgente (Notificación Destacada)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="msgSubject" class="form-label">Asunto del Comunicado *</label>
+          <input
+            type="text"
+            id="msgSubject"
+            formControlName="subject"
+            class="form-control"
+            placeholder="Ej: Instrucciones sobre el taller de Biología Celular"
+            required
+          />
+          @if (messageForm.get('subject')?.touched && messageForm.get('subject')?.errors?.['required']) {
+            <span class="form-error">El asunto es obligatorio.</span>
+          }
+          @if (messageForm.get('subject')?.touched && messageForm.get('subject')?.errors?.['minlength']) {
+            <span class="form-error">Debe tener al menos 3 caracteres.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="msgBody" class="form-label">Mensaje *</label>
+          <textarea
+            id="msgBody"
+            formControlName="message"
+            class="form-control textarea"
+            rows="4"
+            placeholder="Escribe el mensaje o indicaciones para los alumnos..."
+            required
+          ></textarea>
+          @if (messageForm.get('message')?.touched && messageForm.get('message')?.errors?.['required']) {
+            <span class="form-error">El contenido del mensaje es obligatorio.</span>
+          }
+          @if (messageForm.get('message')?.touched && messageForm.get('message')?.errors?.['minlength']) {
+            <span class="form-error">El mensaje debe tener al menos 10 caracteres.</span>
+          }
+        </div>
+
+        <div class="form-check-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="sendToForums" class="form-checkbox" />
+            <span>Publicar también en el Foro General de Discusión</span>
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="onClose()"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="messageForm.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-sm" aria-hidden="true"></span>
+              <span>Enviando...</span>
+            } @else {
+              <i class="bi bi-send-fill" aria-hidden="true"></i>
+              <span>Enviar Comunicado</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

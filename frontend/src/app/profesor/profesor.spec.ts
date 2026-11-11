@@ -214,4 +214,100 @@ describe('Profesor Component', () => {
     expect(component.activeNav()).toBe('biblioteca');
     expect(component.isNotificationsDrawerOpen()).toBe(false);
   });
+
+  // ── Pruebas de las Nuevas Funcionalidades: Examen, Mensaje y Análisis ─────
+
+  it('debe abrir el modal de crear examen mediante acción rápida y registrar la evaluación', () => {
+    vi.useFakeTimers();
+
+    const initialAssignments = component.kpiMetrics().find((k) => k.id === 'assignments')?.value;
+
+    component.triggerQuickAction({
+      id: 'create-exam',
+      label: 'Crear Examen',
+      icon: 'bi bi-file-earmark-plus',
+    });
+
+    expect(component.isCreateExamModalOpen()).toBe(true);
+
+    component.onCreateExamSubmit({
+      title: 'Examen de Mitosis',
+      subject: 'Ciencias',
+      topic: 'División Celular',
+      questionsCount: 10,
+      difficulty: 'Media',
+      durationMinutes: 45,
+    });
+
+    expect(component.isSubmittingExam()).toBe(true);
+    vi.advanceTimersByTime(450);
+
+    expect(component.isSubmittingExam()).toBe(false);
+    expect(component.isCreateExamModalOpen()).toBe(false);
+    expect(component.actionNotification()).toContain('Examen "Examen de Mitosis"');
+
+    const updatedAssignments = component.kpiMetrics().find((k) => k.id === 'assignments')?.value;
+    expect(Number(updatedAssignments)).toBe(Number(initialAssignments) + 1);
+
+    vi.useRealTimers();
+  });
+
+  it('debe abrir el modal de enviar mensaje a la clase y difundir el comunicado', () => {
+    vi.useFakeTimers();
+
+    component.triggerQuickAction({
+      id: 'message-class',
+      label: 'Enviar Mensaje a la Clase',
+      icon: 'bi bi-chat-square-text',
+    });
+
+    expect(component.isSendMessageModalOpen()).toBe(true);
+    expect(component.messageDefaultGroup()).toBe('all');
+
+    component.onSendMessageSubmit({
+      targetGroup: 'all',
+      subject: 'Aviso de Laboratorio',
+      message: 'Traer batas para la práctica de mitosis.',
+      priority: 'urgent',
+      sendToForums: false,
+    });
+
+    expect(component.isSubmittingMessage()).toBe(true);
+    vi.advanceTimersByTime(450);
+
+    expect(component.isSubmittingMessage()).toBe(false);
+    expect(component.isSendMessageModalOpen()).toBe(false);
+    expect(component.actionNotification()).toContain('Aviso de Laboratorio');
+
+    vi.useRealTimers();
+  });
+
+  it('debe abrir el modal de nuevo análisis, diagnosticar la cohorte y permitir profundizar con IA', () => {
+    vi.useFakeTimers();
+
+    component.onNewAnalysis();
+    expect(component.isAnalysisModalOpen()).toBe(true);
+    expect(component.cohortAnalysis()).toBeTruthy();
+    expect(component.cohortAnalysis().totalStudents).toBeGreaterThan(0);
+
+    // Debe permitir profundizar en la consulta con el Asistente IA
+    component.onConsultAiFromAnalysis('Analizar la cohorte actual');
+    expect(component.isAnalysisModalOpen()).toBe(false);
+    expect(component.isAiDrawerOpen()).toBe(true);
+
+    vi.advanceTimersByTime(750);
+    expect(component.chatMessages().length).toBeGreaterThanOrEqual(2);
+
+    vi.useRealTimers();
+  });
+
+  it('debe permitir enviar mensaje a estudiantes en riesgo desde el modal de análisis', () => {
+    component.onNewAnalysis();
+    expect(component.isAnalysisModalOpen()).toBe(true);
+
+    component.onMessageAtRiskFromAnalysis();
+    expect(component.isAnalysisModalOpen()).toBe(false);
+    expect(component.isSendMessageModalOpen()).toBe(true);
+    expect(component.messageDefaultGroup()).toBe('needs-attention');
+  });
 });

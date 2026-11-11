@@ -2,9 +2,12 @@ import { isPlatformBrowser } from '@angular/common';
 import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { STORAGE_KEYS } from '../models/auth.model';
 import {
+  CohortAnalysisSummary,
+  CreateExamDto,
   CreateStudentDto,
   KpiMetric,
   RecentActivity,
+  SendMessageDto,
   StudentProgress,
   StudentStatus,
   TeacherNotification,
@@ -190,6 +193,135 @@ export class ProfesorService {
     };
 
     this._recentActivities.update((prev) => [newAct, ...prev.slice(0, 5)]);
+  }
+
+  // ── Métodos de Negocio: Exámenes y Mensajes a la Clase ───────────────────
+
+  /**
+   * Registra un nuevo examen académico creado por el profesor
+   */
+  public createExam(dto: CreateExamDto): void {
+    this._assignmentsCount.update((count) => count + 1);
+
+    this.addActivity(
+      `Nuevo examen creado: "${dto.title}" (${dto.questionsCount} preguntas - Dif. ${dto.difficulty}).`,
+      'blue',
+      'bi bi-file-earmark-check-fill'
+    );
+
+    this.addNotification({
+      type: 'academic_alert',
+      title: `Examen publicado: ${dto.title}`,
+      message: `La evaluación para "${dto.topic}" (${dto.durationMinutes} min) ha sido programada con éxito para los estudiantes.`,
+      timeAgo: 'Hace un momento',
+      read: false,
+      authorName: 'Sistema de Evaluaciones',
+      authorRole: 'system',
+      authorInitials: 'SE',
+      category: dto.subject,
+    });
+  }
+
+  /**
+   * Envía un mensaje o comunicado oficial a la clase
+   */
+  public sendMessageToClass(dto: SendMessageDto): void {
+    const targetLabel =
+      dto.targetGroup === 'all'
+        ? 'toda la clase'
+        : dto.targetGroup === 'needs-attention'
+        ? 'estudiantes que requieren atención'
+        : 'estudiantes activos';
+
+    this.addActivity(
+      `Mensaje enviado a ${targetLabel}: "${dto.subject}".`,
+      'purple',
+      'bi bi-megaphone-fill'
+    );
+
+    this.addNotification({
+      type: 'teacher_post',
+      title: `Comunicado a la Clase: ${dto.subject}`,
+      message: `${dto.message} (Destinatarios: ${targetLabel})`,
+      timeAgo: 'Hace un momento',
+      read: true,
+      authorName: 'Prof. García',
+      authorRole: 'professor',
+      authorInitials: 'PG',
+      category: dto.priority === 'urgent' ? 'Urgente' : 'General',
+    });
+  }
+
+  /**
+   * Genera un diagnóstico cuantitativo y cualitativo de la cohorte actual
+   */
+  public getCohortAnalysis(): CohortAnalysisSummary {
+    const students = this._students();
+    const total = students.length;
+
+    if (total === 0) {
+      return {
+        totalStudents: 0,
+        averageScore: 0,
+        passingRate: 0,
+        atRiskCount: 0,
+        completedCount: 0,
+        activeCount: 0,
+        topPerformingTopic: 'N/A',
+        challengingTopic: 'N/A',
+        aiPedagogicalAdvice: 'No hay estudiantes registrados para analizar.',
+      };
+    }
+
+    const totalScore = students.reduce((acc, s) => acc + s.score, 0);
+    const averageScore = Math.round(totalScore / total);
+    const passingCount = students.filter((s) => s.score >= 60).length;
+    const passingRate = Math.round((passingCount / total) * 100);
+    const atRiskCount = students.filter((s) => s.status === 'needs-attention' || s.score < 50).length;
+    const completedCount = students.filter((s) => s.status === 'completed' || s.score === 100).length;
+    const activeCount = students.filter((s) => s.status === 'active').length;
+
+    // Calcular tópico con menor puntaje
+    const topicScores: Record<string, { total: number; count: number }> = {};
+    students.forEach((s) => {
+      if (!topicScores[s.topic]) topicScores[s.topic] = { total: 0, count: 0 };
+      topicScores[s.topic].total += s.score;
+      topicScores[s.topic].count += 1;
+    });
+
+    let challengingTopic = 'Biología Celular';
+    let topPerformingTopic = 'Genética Mendeliana';
+    let minAvg = Infinity;
+    let maxAvg = -Infinity;
+
+    Object.entries(topicScores).forEach(([topic, data]) => {
+      const avg = data.total / data.count;
+      if (avg < minAvg) {
+        minAvg = avg;
+        challengingTopic = topic;
+      }
+      if (avg > maxAvg) {
+        maxAvg = avg;
+        topPerformingTopic = topic;
+      }
+    });
+
+    const aiAdvice =
+      atRiskCount > 0
+        ? `Se identificaron ${atRiskCount} estudiante(s) con rendimiento crítico en "${challengingTopic}". Se sugiere programar una sesión de refuerzo conceptual y publicar material complementario en la biblioteca.`
+        : `La cohorte presenta un excelente desempeño con un ${passingRate}% de aprobación. El tópico más consolidado es "${topPerformingTopic}".`;
+
+    return {
+      totalStudents: total,
+      averageScore,
+      passingRate,
+      atRiskCount,
+      completedCount,
+      activeCount,
+      topPerformingTopic,
+      challengingTopic,
+      aiPedagogicalAdvice: aiAdvice,
+    };
   }
 
   // ── Métodos de Negocio: Notificaciones ───────────────────────────────────

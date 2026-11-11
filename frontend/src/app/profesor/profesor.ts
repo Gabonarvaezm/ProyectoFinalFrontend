@@ -10,11 +10,14 @@ import { ProfesorService } from '../core/services/profesor.service';
 import {
   AiSuggestion,
   ChatMessage,
+  CohortAnalysisSummary,
+  CreateExamDto,
   CreateStudentDto,
   KpiMetric,
   NavItem,
   QuickAction,
   RecentActivity,
+  SendMessageDto,
   StudentProgress,
   StudentStatus,
   TeacherNotification,
@@ -25,10 +28,13 @@ import { ConfiguracionComponent } from '../configuracion/configuracion';
 import {
   ProfesorActivityFeedComponent,
   ProfesorAiChatComponent,
+  ProfesorAnalysisModalComponent,
+  ProfesorCreateExamModalComponent,
   ProfesorCreateStudentModalComponent,
   ProfesorHeaderComponent,
   ProfesorKpiCardsComponent,
   ProfesorNotificationsDrawerComponent,
+  ProfesorSendMessageModalComponent,
   ProfesorSidebarComponent,
   ProfesorStudentTableComponent,
 } from './components';
@@ -44,6 +50,9 @@ import {
     ProfesorActivityFeedComponent,
     ProfesorAiChatComponent,
     ProfesorCreateStudentModalComponent,
+    ProfesorCreateExamModalComponent,
+    ProfesorSendMessageModalComponent,
+    ProfesorAnalysisModalComponent,
     ProfesorNotificationsDrawerComponent,
   ],
   selector: 'app-profesor',
@@ -147,6 +156,21 @@ export class Profesor {
   public readonly isRegisterModalOpen = signal<boolean>(false);
   public readonly isSubmittingStudent = signal<boolean>(false);
 
+  // ── Modal de Crear Examen ────────────────────────────────────────────────
+  public readonly isCreateExamModalOpen = signal<boolean>(false);
+  public readonly isSubmittingExam = signal<boolean>(false);
+
+  // ── Modal de Enviar Mensaje a la Clase ───────────────────────────────────
+  public readonly isSendMessageModalOpen = signal<boolean>(false);
+  public readonly isSubmittingMessage = signal<boolean>(false);
+  public readonly messageDefaultGroup = signal<'all' | 'needs-attention' | 'active'>('all');
+
+  // ── Modal de Análisis de Cohorte ─────────────────────────────────────────
+  public readonly isAnalysisModalOpen = signal<boolean>(false);
+  public readonly cohortAnalysis = computed<CohortAnalysisSummary>(() =>
+    this.profesorService.getCohortAnalysis()
+  );
+
   public readonly studentForm: FormGroup = this.fb.group({
     studentName: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
@@ -233,13 +257,82 @@ export class Profesor {
   public triggerQuickAction(action: QuickAction): void {
     if (action.id === 'register-student') {
       this.openRegisterModal();
+    } else if (action.id === 'create-exam') {
+      this.openCreateExamModal();
+    } else if (action.id === 'message-class') {
+      this.openSendMessageModal('all');
     } else {
       this.showToast(`Acción seleccionada: ${action.label}`);
     }
   }
 
+  // ── Gestión del Modal: Nuevo Análisis de Cohorte ─────────────────────────
   public onNewAnalysis(): void {
-    this.showToast('Generando análisis comparativo de la cohorte...');
+    this.isAnalysisModalOpen.set(true);
+    this.showToast('Generando diagnóstico analítico de la cohorte con IA...');
+  }
+
+  public closeAnalysisModal(): void {
+    this.isAnalysisModalOpen.set(false);
+  }
+
+  public onConsultAiFromAnalysis(prompt: string): void {
+    this.closeAnalysisModal();
+    this.openAiDrawer();
+    this.aiInputText.set(prompt);
+    this.submitAiMessage();
+  }
+
+  public onMessageAtRiskFromAnalysis(): void {
+    this.closeAnalysisModal();
+    this.openSendMessageModal('needs-attention');
+  }
+
+  // ── Gestión del Modal: Crear Examen ──────────────────────────────────────
+  public openCreateExamModal(): void {
+    this.isCreateExamModalOpen.set(true);
+  }
+
+  public closeCreateExamModal(): void {
+    this.isCreateExamModalOpen.set(false);
+  }
+
+  public onCreateExamSubmit(dto: CreateExamDto): void {
+    this.isSubmittingExam.set(true);
+    const timer = setTimeout(() => {
+      this.profesorService.createExam(dto);
+      this.isSubmittingExam.set(false);
+      this.closeCreateExamModal();
+      this.showToast(`Examen "${dto.title}" (${dto.subject}) publicado con éxito para la clase.`);
+    }, 400);
+    this.timerIds.push(timer);
+  }
+
+  // ── Gestión del Modal: Enviar Mensaje a la Clase ─────────────────────────
+  public openSendMessageModal(targetGroup: 'all' | 'needs-attention' | 'active' = 'all'): void {
+    this.messageDefaultGroup.set(targetGroup);
+    this.isSendMessageModalOpen.set(true);
+  }
+
+  public closeSendMessageModal(): void {
+    this.isSendMessageModalOpen.set(false);
+  }
+
+  public onSendMessageSubmit(dto: SendMessageDto): void {
+    this.isSubmittingMessage.set(true);
+    const timer = setTimeout(() => {
+      this.profesorService.sendMessageToClass(dto);
+      this.isSubmittingMessage.set(false);
+      this.closeSendMessageModal();
+      const targetText =
+        dto.targetGroup === 'all'
+          ? 'toda la clase'
+          : dto.targetGroup === 'needs-attention'
+          ? 'alumnos con atención prioritaria'
+          : 'alumnos activos';
+      this.showToast(`Comunicado "${dto.subject}" enviado con éxito a ${targetText}.`);
+    }, 400);
+    this.timerIds.push(timer);
   }
 
   // ── Gestión de Recomendaciones de Biblioteca ─────────────────────────────

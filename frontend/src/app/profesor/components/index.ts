@@ -5,4 +5,7 @@ export * from './profesor-student-table/profesor-student-table.component';
 export * from './profesor-activity-feed/profesor-activity-feed.component';
 export * from './profesor-ai-chat/profesor-ai-chat.component';
 export * from './profesor-create-student-modal/profesor-create-student-modal.component';
+export * from './profesor-create-exam-modal/profesor-create-exam-modal.component';
+export * from './profesor-send-message-modal/profesor-send-message-modal.component';
+export * from './profesor-analysis-modal/profesor-analysis-modal.component';
 export * from './profesor-notifications-drawer/profesor-notifications-drawer.component';
