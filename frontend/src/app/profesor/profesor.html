@@ -23,7 +23,11 @@
     <!-- Contenido Scrollable / Dashboard Canvas -->
     <main class="dashboard-canvas">
       @if (activeNav() === 'biblioteca') {
-      <app-biblioteca [userRole]="'professor'" (bookRecommended)="onBookRecommended($event)"></app-biblioteca>
+      <app-biblioteca
+        [userRole]="'professor'"
+        [isEmbedded]="true"
+        (bookRecommended)="onBookRecommended($event)"
+      />
       } @else if (activeNav() === 'configuracion' || activeNav() === 'perfil') {
       <app-configuracion
         [user]="currentUser()"
