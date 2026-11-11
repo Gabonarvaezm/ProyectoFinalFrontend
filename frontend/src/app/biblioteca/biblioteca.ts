@@ -9,6 +9,8 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { CommonModule, NgTemplateOutlet } from '@angular/common';
+import { Router } from '@angular/router';
 import { Book, BookCategory, CategoryFilter, CreateBookDto } from './models/book.model';
 import { CATEGORIES, INITIAL_BOOKS } from './data/books.data';
 import {
@@ -16,16 +18,22 @@ import {
   BibliotecaCategoryNavComponent,
   BibliotecaDetailModalComponent,
   BibliotecaHeaderComponent,
+  BibliotecaSidebarComponent,
+  BibliotecaTopbarComponent,
 } from './components';
 import { LibroComponent } from '../libro/libro.component';
 import { AuthService } from '../core/services/auth.service';
 
 @Component({
   imports: [
+    CommonModule,
+    NgTemplateOutlet,
     BibliotecaHeaderComponent,
     BibliotecaCategoryNavComponent,
     BibliotecaBookCardComponent,
     BibliotecaDetailModalComponent,
+    BibliotecaSidebarComponent,
+    BibliotecaTopbarComponent,
     LibroComponent,
   ],
   selector: 'app-biblioteca',
@@ -36,14 +44,37 @@ import { AuthService } from '../core/services/auth.service';
 export class Biblioteca implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
   // ── Inputs y Outputs Públicos del Módulo ──────────────────────────────────
   public readonly userRole = input<'student' | 'professor' | 'general'>('student');
   public readonly initialCategory = input<string | null>(null);
+  public readonly isEmbedded = input<boolean>(false);
 
   public readonly bookSelected = output<Book>();
   public readonly bookRecommended = output<Book>();
+
+  // ── Usuario y Rutas Institucionales ───────────────────────────────────────
+  public readonly currentUser = this.authService.currentUser;
+
+  public readonly dashboardRoute = computed<string>(() =>
+    this.isProfessor() ? '/profesor' : '/estudiante'
+  );
+
+  public readonly userName = computed<string>(() => {
+    const user = this.currentUser();
+    if (user?.fullName) return user.fullName;
+    return this.isProfessor() ? 'Prof. Carlos Mendoza' : 'Alejandro Silva';
+  });
+
+  public readonly userInitials = computed<string>(() => {
+    const name = this.userName().trim();
+    if (!name) return 'US';
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  });
 
   // ── Estado Reactivo Central ───────────────────────────────────────────────
   public readonly searchQuery = signal<string>('');
@@ -68,7 +99,7 @@ export class Biblioteca implements OnInit {
 
   // ── Computed: Institución del usuario autenticado ─────────────────────────
   public readonly userInstitution = computed(
-    () => this.authService.currentUser()?.institution ?? ''
+    () => this.authService.currentUser()?.institution ?? 'Universidad Tecnológica Pública'
   );
 
   // ── Estado del Modal de Creación (gestionado por el Padre) ───────────────
@@ -127,6 +158,24 @@ export class Biblioteca implements OnInit {
       );
       if (match) this.selectedCategory.set(match.id);
     }
+  }
+
+  // ── Navegación y Acciones del Topbar y Sidebar ─────────────────────────────
+
+  public onTopbarSearch(query: string): void {
+    this.searchQuery.set(query);
+  }
+
+  public onAiClicked(): void {
+    this.router.navigate(['/chatbot']);
+  }
+
+  public onNotificationsClicked(): void {
+    this.showToast('Tienes 2 avisos académicos y recomendaciones nuevas.');
+  }
+
+  public onConfigClicked(): void {
+    this.router.navigate(['/configuracion']);
   }
 
   // ── Gestión del Modal de Creación (delegada al hijo LibroComponent) ───────

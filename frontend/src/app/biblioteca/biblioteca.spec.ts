@@ -1,16 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { Biblioteca } from './biblioteca';
 import { Book, CreateBookDto } from './models/book.model';
 
 describe('Biblioteca Component', () => {
   let component: Biblioteca;
   let fixture: ComponentFixture<Biblioteca>;
+  let router: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Biblioteca],
+      providers: [provideRouter([])],
     }).compileComponents();
 
+    router = TestBed.inject(Router);
     fixture = TestBed.createComponent(Biblioteca);
     component = fixture.componentInstance;
     await fixture.whenStable();
@@ -202,5 +206,44 @@ describe('Biblioteca Component', () => {
     expect(addedBook.pages).toBe(350);
     expect(component.isCreateBookOpen()).toBe(false);
     expect(component.toastFeedback()).toContain('publicado con éxito');
+  });
+
+  // ── Pruebas de UX/UI: Navbar Vertical y Horizontal ───────────────────────
+
+  it('debe renderizar el navbar vertical (sidebar) y horizontal (topbar) en modo standalone (!isEmbedded)', () => {
+    fixture.detectChanges();
+    const sidebar = fixture.nativeElement.querySelector('app-biblioteca-sidebar');
+    const topbar = fixture.nativeElement.querySelector('app-biblioteca-topbar');
+
+    expect(sidebar).toBeTruthy();
+    expect(topbar).toBeTruthy();
+  });
+
+  it('no debe renderizar el navbar vertical u horizontal si isEmbedded es true', () => {
+    const embeddedFixture = TestBed.createComponent(Biblioteca);
+    embeddedFixture.componentRef.setInput('isEmbedded', true);
+    embeddedFixture.detectChanges();
+
+    const sidebar = embeddedFixture.nativeElement.querySelector('app-biblioteca-sidebar');
+    const topbar = embeddedFixture.nativeElement.querySelector('app-biblioteca-topbar');
+
+    expect(sidebar).toBeNull();
+    expect(topbar).toBeNull();
+    expect(embeddedFixture.nativeElement.querySelector('.biblioteca-container')).toBeTruthy();
+  });
+
+  it('debe sincronizar la búsqueda del topbar con searchQuery', () => {
+    component.onTopbarSearch('Álgebra lineal');
+    expect(component.searchQuery()).toBe('Álgebra lineal');
+  });
+
+  it('debe navegar al chatbot y a configuración desde las acciones del topbar', () => {
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    component.onAiClicked();
+    expect(navigateSpy).toHaveBeenCalledWith(['/chatbot']);
+
+    component.onConfigClicked();
+    expect(navigateSpy).toHaveBeenCalledWith(['/configuracion']);
   });
 });

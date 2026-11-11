@@ -1,4 +1,4 @@
-<header class="top-header">
+<header class="top-header" role="banner">
   <div class="header-search-wrap">
     <i class="bi bi-search search-icon" aria-hidden="true"></i>
     <input
@@ -9,9 +9,36 @@
       (input)="onSearchInput($event)"
       aria-label="Buscar en los foros académicos"
     />
+    @if (searchQuery()) {
+      <button
+        type="button"
+        class="btn-clear-search"
+        (click)="clearSearch()"
+        aria-label="Limpiar búsqueda"
+        title="Limpiar búsqueda"
+      >
+        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+      </button>
+    }
   </div>
 
   <div class="header-actions">
+    <!-- Píldora de Selección y Alternancia de Rol (Estudiante <-> Docente) -->
+    <button
+      type="button"
+      class="role-badge-btn"
+      [class.docente]="currentRole() === 'professor'"
+      (click)="onToggleRole()"
+      [title]="'Rol actual: ' + (currentRole() === 'professor' ? 'Docente' : 'Estudiante') + ' • Clic para alternar'"
+      aria-label="Alternar rol académico"
+    >
+      <i
+        [class]="currentRole() === 'professor' ? 'bi bi-mortarboard-fill' : 'bi bi-person-badge-fill'"
+        aria-hidden="true"
+      ></i>
+      <span>{{ currentRole() === 'professor' ? 'Docente' : 'Estudiante' }}</span>
+    </button>
+
     <!-- Botón Topbar Asistente IA (Opción 1: Barra Superior) -->
     <button
       type="button"
@@ -22,45 +49,52 @@
       aria-label="Alternar Asistente de Comunidad"
       [attr.aria-expanded]="isAiPanelOpen()"
     >
-      <i class="bi bi-robot"></i>
+      <i class="bi bi-robot" aria-hidden="true"></i>
     </button>
 
+    <!-- Notificaciones del foro -->
     <button
       type="button"
       class="icon-btn"
+      (click)="notificationsClicked.emit()"
       aria-label="Notificaciones del foro"
       title="Respuestas académicas recientes"
     >
-      <i class="bi bi-bell"></i>
+      <i class="bi bi-bell" aria-hidden="true"></i>
       @if (notificationsCount() > 0) {
-        <span class="notification-indicator"></span>
+        <span class="notification-indicator" aria-hidden="true"></span>
       }
       <span class="visually-hidden">Tienes notificaciones académicas nuevas</span>
     </button>
 
-    <button
-      type="button"
+    <!-- Configuración -->
+    <a
+      routerLink="/configuracion"
       class="icon-btn"
       aria-label="Configuración de preferencias"
       title="Configuración"
     >
-      <i class="bi bi-gear"></i>
-    </button>
+      <i class="bi bi-gear" aria-hidden="true"></i>
+    </a>
 
-    <div
+    <!-- Perfil de usuario con fallback seguro de avatar -->
+    <button
+      type="button"
       class="user-profile-badge"
-      [title]="currentUser().name + ' (' + (currentUser().roleTitle || currentUser().role) + ')'"
+      (click)="onToggleRole()"
+      [title]="currentUser().name + ' (' + (currentUser().roleTitle || currentUser().role) + ') • Clic para alternar rol'"
+      aria-label="Perfil del usuario y alternar rol académico"
     >
-      @if (currentUser().avatar) {
+      @if (currentUser().avatar && !avatarLoadError()) {
         <img
           [src]="currentUser().avatar"
           [alt]="currentUser().name"
           class="user-avatar"
+          (error)="onAvatarError()"
         />
       } @else {
-        <div class="user-avatar-initials">{{ currentUser().initials }}</div>
+        <div class="user-avatar-initials" aria-hidden="true">{{ currentUser().initials }}</div>
       }
-    </div>
+    </button>
   </div>
 </header>
-

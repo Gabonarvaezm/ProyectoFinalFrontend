@@ -73,10 +73,13 @@ describe('Profesor Component', () => {
     });
     expect(component.studentForm.valid).toBe(true);
 
+    vi.useFakeTimers();
     component.onRegisterStudentSubmit();
+    vi.advanceTimersByTime(500);
     expect(component.isRegisterModalOpen()).toBe(false);
     expect(component.students().length).toBe(initialCount + 1);
     expect(component.students()[0].studentName).toBe('Gabriel Narváez');
+    vi.useRealTimers();
   });
 
   it('debe filtrar los estudiantes reactivamente al buscar', () => {

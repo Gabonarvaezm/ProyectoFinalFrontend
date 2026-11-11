@@ -1,3 +1,12 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Foro Header Component Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+:host {
+  display: block;
+  width: 100%;
+}
+
 .top-header {
   height: var(--header-height, 70px);
   background-color: var(--color-bg-surface);
@@ -12,7 +21,7 @@
   z-index: 20;
 
   @media (max-width: 768px) {
-    padding: 0 var(--space-4);
+    padding: var(--space-3) var(--space-4);
     height: auto;
     min-height: 60px;
     flex-wrap: wrap;
@@ -38,7 +47,7 @@
 
 .header-search-input {
   width: 100%;
-  padding: 0.625rem 1rem 0.625rem 2.6rem;
+  padding: 0.625rem 2.5rem 0.625rem 2.6rem;
   background-color: var(--color-slate-50);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -58,10 +67,86 @@
   }
 }
 
+.btn-clear-search {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--color-slate-400);
+  cursor: pointer;
+  padding: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: color var(--duration-fast) var(--ease-out-expo);
+
+  &:hover {
+    color: var(--color-slate-700);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-full);
+  }
+}
+
 .header-actions {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
+}
+
+.role-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-slate-100);
+  color: var(--color-slate-700);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  i {
+    font-size: 0.9rem;
+    color: var(--color-primary-600);
+  }
+
+  &:hover {
+    background-color: var(--color-slate-200);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-xs);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  &.docente {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #b45309;
+
+    i {
+      color: #b45309;
+    }
+
+    &:hover {
+      background: rgba(245, 158, 11, 0.22);
+    }
+  }
 }
 
 .icon-btn {
@@ -77,6 +162,7 @@
   font-size: 1.15rem;
   cursor: pointer;
   position: relative;
+  text-decoration: none;
   transition: var(--transition-fast);
 
   &:hover {
@@ -122,7 +208,21 @@
 .user-profile-badge {
   display: flex;
   align-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
   cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
 }
 
 .user-avatar {
@@ -159,4 +259,3 @@
   white-space: nowrap;
   border: 0;
 }
-

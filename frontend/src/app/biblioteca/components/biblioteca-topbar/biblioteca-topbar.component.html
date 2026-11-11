@@ -1,0 +1,62 @@
+<header class="top-header" role="banner">
+  <div class="header-search-wrap">
+    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+    <input
+      type="search"
+      class="header-search-input"
+      placeholder="Buscar libros, autores, conceptos o disciplinas..."
+      [value]="searchQuery()"
+      (input)="onSearchInput($event)"
+      aria-label="Buscar recursos en el repositorio digital"
+    />
+  </div>
+
+  <div class="header-actions">
+    <!-- Asistente de IA -->
+    <button
+      type="button"
+      class="icon-btn btn-ai-toggle"
+      (click)="aiClicked.emit()"
+      title="Asistente de Aprendizaje Context AI"
+      aria-label="Abrir Asistente de Inteligencia Artificial"
+    >
+      <i class="bi bi-robot" aria-hidden="true"></i>
+    </button>
+
+    <!-- Notificaciones -->
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="notificationsClicked.emit()"
+      title="Notificaciones y Avisos"
+      aria-label="Ver notificaciones académicas"
+    >
+      <i class="bi bi-bell" aria-hidden="true"></i>
+      @if (notificationsCount() > 0) {
+        <span class="notification-indicator" aria-hidden="true"></span>
+      }
+    </button>
+
+    <!-- Configuración -->
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="configClicked.emit()"
+      title="Configuración de preferencias"
+      aria-label="Ir a Configuración"
+    >
+      <i class="bi bi-gear" aria-hidden="true"></i>
+    </button>
+
+    <!-- Perfil de usuario -->
+    <a
+      routerLink="/configuracion"
+      class="user-profile-badge"
+      [title]="userName() + (isProfessor() ? ' (Docente)' : ' (Estudiante)')"
+      aria-label="Perfil del usuario"
+    >
+      <div class="user-avatar-initials" aria-hidden="true">{{ userInitials() }}</div>
+    </a>
+  </div>
+</header>
+

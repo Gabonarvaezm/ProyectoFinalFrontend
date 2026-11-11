@@ -26,7 +26,11 @@
     />
 
     @if (activeNav() === 'biblioteca') {
-      <app-biblioteca [userRole]="'student'" [initialCategory]="selectedSubjectCategory()" />
+      <app-biblioteca
+        [userRole]="'student'"
+        [initialCategory]="selectedSubjectCategory()"
+        [isEmbedded]="true"
+      />
     } @else if (activeNav() === 'configuracion' || activeNav() === 'perfil') {
       <app-configuracion
         [user]="currentUser()"
