@@ -29,8 +29,6 @@ export class BibliotecaSidebarComponent {
     { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-grid-fill', route: this.dashboardRoute() },
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book-half', route: '/biblioteca' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text-fill', route: '/foro' },
-    { id: 'progreso', label: 'Progreso', icon: 'bi bi-bar-chart', route: this.dashboardRoute() },
-    { id: 'perfil', label: 'Perfil', icon: 'bi bi-person-circle', route: '/configuracion' },
   ]);
 }
 
