@@ -560,3 +560,91 @@
     margin: 0;
   }
 }
+
+// ── Refuerzos de Legibilidad y Contraste para Modo Oscuro ─────────────────────
+
+[data-theme='dark'],
+.dark-theme {
+  color-scheme: dark;
+
+  // Banner de bienvenida con degradado oscuro suave
+  .welcome-banner {
+    background: linear-gradient(135deg, var(--color-bg-surface-elevated) 0%, var(--color-bg-surface) 100%);
+    border-color: var(--color-border);
+  }
+
+  // Inputs, selects y textareas
+  .form-input,
+  .form-select,
+  .form-textarea {
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-main);
+    border-color: var(--color-border);
+
+    &::placeholder {
+      color: var(--color-slate-400);
+    }
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-slate-400);
+    }
+
+    &:focus {
+      border-color: var(--color-primary-400);
+      background-color: var(--color-bg-surface-elevated);
+    }
+
+    &:disabled {
+      background-color: var(--color-bg-muted);
+      color: var(--color-slate-500);
+    }
+  }
+
+  // Badges
+  .badge-primary {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-400);
+    border-color: var(--color-primary-200);
+  }
+
+  .badge-success {
+    background-color: var(--color-success-bg);
+    color: #6ee7b7;
+    border-color: var(--color-success-border);
+  }
+
+  .badge-danger {
+    background-color: var(--color-danger-bg);
+    color: #fca5a5;
+    border-color: var(--color-danger-border);
+  }
+
+  // Alertas
+  .alert-box {
+    &.alert-danger {
+      color: #fca5a5;
+    }
+    &.alert-success {
+      color: #6ee7b7;
+    }
+    &.alert-info {
+      color: #7dd3fc;
+    }
+  }
+
+  // Tablas
+  table, .progress-table {
+    th {
+      color: var(--color-slate-500);
+    }
+
+    td {
+      color: var(--color-text-secondary);
+    }
+
+    tbody tr:hover {
+      background-color: var(--color-slate-50);
+    }
+  }
+}
+

@@ -1,0 +1,28 @@
+@if (isOpen()) {
+  <div class="modal-backdrop" (click)="onCancel()" aria-hidden="true"></div>
+  <div
+    class="modal-dialog-card"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="logout-dialog-title"
+    aria-describedby="logout-dialog-desc"
+  >
+    <div class="modal-icon-danger">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <h3 id="logout-dialog-title" class="modal-title">¿Cerrar sesión en DiscerIA?</h3>
+    <p id="logout-dialog-desc" class="modal-desc">
+      Estás a punto de cerrar tu sesión actual. Tendrás que volver a ingresar con tus credenciales institucionales.
+    </p>
+    <div class="modal-actions-row">
+      <button type="button" class="btn btn-outline" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-danger-solid" (click)="onConfirm()">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Sí, Cerrar Sesión</span>
+      </button>
+    </div>
+  </div>
+}
+

@@ -1,0 +1,15 @@
+<nav class="config-nav-tabs" aria-label="Secciones de configuración">
+  @for (sec of sections(); track sec.id) {
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeSection() === sec.id"
+      (click)="onSelectSection(sec.id)"
+      [attr.aria-selected]="activeSection() === sec.id"
+    >
+      <i [class]="sec.icon + ' tab-icon'" aria-hidden="true"></i>
+      <span class="tab-label">{{ sec.label }}</span>
+    </button>
+  }
+</nav>
+

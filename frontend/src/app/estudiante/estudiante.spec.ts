@@ -27,7 +27,9 @@ describe('Estudiante', () => {
   it('debe inicializarse con el dashboard activo y el nombre del estudiante', () => {
     expect(component.activeNav()).toBe('dashboard');
     expect(component.studentName()).toBe('Alejandro');
-    expect(component.navItems().length).toBe(5);
+    expect(component.navItems().length).toBe(3);
+    expect(component.navItems().some((item) => item.id === 'configuracion')).toBe(false);
+    expect(component.navItems().some((item) => item.id === 'progreso')).toBe(false);
     expect(component.navItems().some((item) => item.id === 'asistente-ia')).toBe(false);
   });
 
@@ -190,12 +192,11 @@ describe('Estudiante', () => {
     expect(component.isAvatarBroken('q1')).toBe(true);
   });
 
-  it('debe navegar al catálogo de biblioteca y pasar la categoría al seleccionar una materia', () => {
+  it('debe actualizar el progreso semanal y resaltar la materia al seleccionarla', () => {
     const matSubject = component.subjects()[0]; // id: 'mat', name: 'Matemáticas'
     component.onSelectSubject(matSubject);
 
-    expect(component.activeNav()).toBe('biblioteca');
-    expect(component.selectedSubjectCategory()).toBe('matematicas');
+    expect(component.highlightedSubjectId()).toBe('mat');
     expect(component.toastMessage()).toContain('Matemáticas');
   });
 

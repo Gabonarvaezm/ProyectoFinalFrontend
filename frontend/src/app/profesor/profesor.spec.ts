@@ -24,7 +24,9 @@ describe('Profesor Component', () => {
 
   it('debe inicializar las métricas y la navegación por defecto', () => {
     expect(component.activeNav()).toBe('dashboard');
-    expect(component.navItems().length).toBeGreaterThan(0);
+    expect(component.navItems().length).toBe(3);
+    expect(component.navItems().some((item) => item.id === 'configuracion')).toBe(false);
+    expect(component.navItems().some((item) => item.id === 'progreso')).toBe(false);
     expect(component.kpiMetrics().length).toBe(3);
     expect(component.students().length).toBeGreaterThanOrEqual(3);
   });
@@ -72,10 +74,14 @@ describe('Profesor Component', () => {
     });
     expect(component.studentForm.valid).toBe(true);
 
+    vi.useFakeTimers();
     component.onRegisterStudentSubmit();
+    vi.advanceTimersByTime(450);
+
     expect(component.isRegisterModalOpen()).toBe(false);
     expect(component.students().length).toBe(initialCount + 1);
     expect(component.students()[0].studentName).toBe('Gabriel Narváez');
+    vi.useRealTimers();
   });
 
   it('debe filtrar los estudiantes reactivamente al buscar', () => {
