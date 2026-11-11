@@ -10,7 +10,9 @@ import { LibrarySubject } from '../../models/estudiante.model';
 })
 export class EstudianteSubjectsGridComponent {
   public readonly subjects = input.required<readonly LibrarySubject[]>();
+  /** Emite la materia presionada para actualizar el gráfico en el padre */
   public readonly subjectSelected = output<LibrarySubject>();
+  /** Emite cuando el usuario quiere ver toda la biblioteca */
   public readonly viewAllRequested = output<void>();
 }
 

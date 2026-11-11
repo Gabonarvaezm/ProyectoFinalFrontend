@@ -1,0 +1,100 @@
+<!-- ──────────────────────────────────────────────────────────────────────── -->
+<!-- EstudianteWeeklyProgressComponent — Gráfico de Progreso Semanal         -->
+<!-- ──────────────────────────────────────────────────────────────────────── -->
+<section class="weekly-progress" aria-label="Gráfico de progreso semanal por materia">
+
+  <!-- Cabecera con título y botón de restablecer -->
+  <div class="progress-header">
+    <div class="header-left">
+      <h3 class="progress-title">Progreso Semanal</h3>
+      <p class="progress-subtitle">Presiona una materia para ver su detalle</p>
+    </div>
+
+    @if (highlightedId() !== null) {
+      <button
+        type="button"
+        class="btn-reset"
+        (click)="clearClicked.emit()"
+        aria-label="Ver todas las materias"
+      >
+        <i class="bi bi-arrow-counterclockwise"></i>
+        Ver todas
+      </button>
+    }
+  </div>
+
+  <!-- Área del gráfico -->
+  <div class="chart-area">
+    <!-- Eje Y -->
+    <div class="y-axis" aria-hidden="true">
+      <span>100%</span>
+      <span>75%</span>
+      <span>50%</span>
+      <span>25%</span>
+      <span>0%</span>
+    </div>
+
+    <!-- Líneas guía horizontales + barras -->
+    <div class="chart-body">
+      <!-- Líneas de cuadrícula -->
+      <div class="grid-lines" aria-hidden="true">
+        <span class="grid-line"></span>
+        <span class="grid-line"></span>
+        <span class="grid-line"></span>
+        <span class="grid-line"></span>
+        <span class="grid-line"></span>
+      </div>
+
+      <!-- Columnas de barras -->
+      <div class="bars-row">
+        @for (item of items(); track item.subjectId) {
+          <button
+            type="button"
+            class="bar-col"
+            [class.is-highlighted]="item.highlighted"
+            [class.is-dimmed]="!item.highlighted"
+            [attr.aria-label]="item.fullName + ': ' + item.percentage + '% de progreso esta semana'"
+            [attr.aria-pressed]="highlightedId() === item.subjectId"
+            (click)="onBarClick(item)"
+          >
+            <!-- Valor sobre la barra -->
+            <span class="bar-value" [class.visible]="item.highlighted">
+              {{ item.percentage }}%
+            </span>
+
+            <!-- Track + fill de la barra -->
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                [style.height.%]="item.percentage"
+                [style.background-color]="item.iconColor"
+              ></div>
+            </div>
+
+            <!-- Etiqueta de la materia -->
+            <span class="bar-label">{{ item.subject }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Leyenda -->
+  <ul class="legend" aria-label="Leyenda de materias">
+    @for (item of items(); track item.subjectId) {
+      <li
+        class="legend-item"
+        [class.is-highlighted]="item.highlighted"
+      >
+        <span
+          class="legend-dot"
+          [style.background-color]="item.iconColor"
+          aria-hidden="true"
+        ></span>
+        <span class="legend-label">{{ item.fullName }}</span>
+        <span class="legend-pct">{{ item.percentage }}%</span>
+      </li>
+    }
+  </ul>
+
+</section>

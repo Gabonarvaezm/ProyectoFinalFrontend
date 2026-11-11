@@ -5,6 +5,7 @@ export interface LibrarySubject {
   icon: string;
   badgeBg: string;
   iconColor: string;
+  weeklyProgress: number; // 0–100 — progreso semanal de cada materia
 }
 
 export interface ForumQuestion {
@@ -30,8 +31,12 @@ export interface PracticeExam {
 }
 
 export interface WeeklyProgressItem {
-  subject: string;
-  percentage: number;
+  subject: string;      // Etiqueta corta (3 letras)
+  subjectId: string;    // ID para vincular con LibrarySubject
+  fullName: string;     // Nombre completo de la materia
+  percentage: number;   // 0–100
+  iconColor: string;    // Color del ícono de la materia
+  highlighted: boolean; // true si está seleccionada o no hay selección activa
 }
 
 export interface ActiveCourse {

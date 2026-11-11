@@ -19,27 +19,5 @@
       Iniciar Examen
     </button>
   </div>
-
-  <!-- Tarjeta: Progreso Semanal -->
-  <div class="weekly-progress-card">
-    <h3 class="progress-card-title">Progreso Semanal</h3>
-    <div class="chart-mockup">
-      <div class="chart-y-axis">
-        <span>100%</span>
-        <span>50%</span>
-        <span>0%</span>
-      </div>
-      <div class="chart-bars-wrap">
-        @for (item of weeklyProgress(); track item.subject) {
-          <div class="bar-col">
-            <div class="bar-track">
-              <div class="bar-fill" [style.height.%]="item.percentage"></div>
-            </div>
-            <span class="bar-label">{{ item.subject }}</span>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
 </div>
 
