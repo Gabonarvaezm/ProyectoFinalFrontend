@@ -57,8 +57,6 @@ export class Foro {
     { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-grid-fill', route: '/estudiante' },
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book', route: '/biblioteca' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text-fill', route: '/foro' },
-    { id: 'progreso', label: 'Progreso', icon: 'bi bi-bar-chart', route: '/estudiante' },
-    { id: 'perfil', label: 'Perfil', icon: 'bi bi-person-circle', route: '/estudiante' },
   ];
 
   // ── Panel Desplegable (Drawer) Asistente Context AI ───────────────────────

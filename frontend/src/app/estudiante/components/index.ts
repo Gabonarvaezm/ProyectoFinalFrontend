@@ -3,6 +3,7 @@ export * from './estudiante-header/estudiante-header.component';
 export * from './estudiante-continue-course/estudiante-continue-course.component';
 export * from './estudiante-subjects-grid/estudiante-subjects-grid.component';
 export * from './estudiante-exam-card/estudiante-exam-card.component';
+export * from './estudiante-weekly-progress/estudiante-weekly-progress.component';
 export * from './estudiante-forum-preview/estudiante-forum-preview.component';
 export * from './estudiante-ai-drawer/estudiante-ai-drawer.component';
 export * from './estudiante-notifications-drawer/estudiante-notifications-drawer.component';
