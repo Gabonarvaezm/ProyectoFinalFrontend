@@ -1,6 +1,8 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ChatbotService } from '../core/services/chatbot.service';
 import {
   ChatSession,
   ChatbotAcademicMode,
@@ -28,6 +30,7 @@ import {
 })
 export class Chatbot {
   private readonly fb = inject(FormBuilder);
+  private readonly chatbotService = inject(ChatbotService);
   private readonly destroyRef = inject(DestroyRef);
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
@@ -91,30 +94,8 @@ export class Chatbot {
     },
   ]);
 
-  // ── Sesiones Archivadas de Consulta ──────────────────────────────────────
-  public readonly sessions = signal<ChatSession[]>([
-    {
-      id: 'session-1',
-      title: 'Dudas de Cálculo Integral',
-      lastMessage: 'Excelente, ahora entiendo la sustitución trigonométrica.',
-      updatedAt: new Date(Date.now() - 3600000),
-      messageCount: 4,
-    },
-    {
-      id: 'session-2',
-      title: 'Biología Celular y Mitosis',
-      lastMessage: 'Resumen de metafase y anafase completado.',
-      updatedAt: new Date(Date.now() - 86400000),
-      messageCount: 6,
-    },
-    {
-      id: 'session-3',
-      title: 'Historia del Arte Barroco',
-      lastMessage: 'Referencias de Gombrich consultadas.',
-      updatedAt: new Date(Date.now() - 172800000),
-      messageCount: 3,
-    },
-  ]);
+  // ── Sesiones Archivadas de Consulta (Persistente con ChatbotService) ─────
+  public readonly sessions = this.chatbotService.sessions;
 
   // ── Estado Central Gestionado por el Componente Padre (Signals) ──────────
   public readonly activeSessionId = signal<string>('session-1');
@@ -204,18 +185,24 @@ export class Chatbot {
     // 2. Activar estado de procesamiento / redacción de la IA
     this.isThinking.set(true);
 
-    // 3. Simulación de respuesta inteligente contextual según el modo
+    // 3. Envío al servicio de IA (HTTP API con fallback local mock)
     const currentMode = this.activeMode();
-    const timer = setTimeout(() => {
-      const aiResponse = this.generateAiAcademicResponse(text, currentMode);
-      this.messages.update((prev) => [...prev, aiResponse]);
-      this.isThinking.set(false);
-
-      // Actualizar metadatos de la sesión activa
-      this.updateActiveSessionMetadata(text);
-    }, 750);
-
-    this.timerIds.push(timer);
+    this.chatbotService
+      .sendMessage(text, currentMode, this.messages())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (aiResponse) => {
+          this.messages.update((prev) => [...prev, aiResponse]);
+          this.isThinking.set(false);
+          this.updateActiveSessionMetadata(text);
+        },
+        error: () => {
+          const fallback = this.chatbotService.generateLocalAcademicFallback(text, currentMode);
+          this.messages.update((prev) => [...prev, fallback]);
+          this.isThinking.set(false);
+          this.updateActiveSessionMetadata(text);
+        },
+      });
   }
 
   public handlePromptSelected(prompt: QuickPrompt): void {
@@ -248,6 +235,7 @@ export class Chatbot {
     };
 
     this.sessions.update((prev) => [newSession, ...prev]);
+    this.chatbotService.persistSessions(this.sessions());
     this.activeSessionId.set(newSessionId);
     this.messages.set([
       {
@@ -376,6 +364,7 @@ function verifyDerivative(x: number): number {
         return sess;
       })
     );
+    this.chatbotService.persistSessions(this.sessions());
   }
 
   private showToast(msg: string): void {

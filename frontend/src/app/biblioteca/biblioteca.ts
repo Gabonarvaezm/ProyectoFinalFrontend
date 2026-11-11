@@ -23,6 +23,7 @@ import {
 } from './components';
 import { LibroComponent } from '../libro/libro.component';
 import { AuthService } from '../core/services/auth.service';
+import { BookService } from '../core/services/book.service';
 
 @Component({
   imports: [
@@ -44,6 +45,7 @@ import { AuthService } from '../core/services/auth.service';
 export class Biblioteca implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly authService = inject(AuthService);
+  private readonly bookService = inject(BookService);
   private readonly router = inject(Router);
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
@@ -80,7 +82,7 @@ export class Biblioteca implements OnInit {
   public readonly searchQuery = signal<string>('');
   public readonly selectedCategory = signal<BookCategory>('all');
   public readonly selectedFormat = signal<string>('all');
-  public readonly books = signal<Book[]>(INITIAL_BOOKS);
+  public readonly books = this.bookService.books;
 
   public readonly categories = computed<CategoryFilter[]>(() => {
     const all = this.books();
@@ -110,7 +112,7 @@ export class Biblioteca implements OnInit {
   public readonly selectedBook = signal<Book | null>(null);
 
   /** IDs de libros en marcadores del usuario */
-  public readonly bookmarkedIds = signal<Set<string>>(new Set(['bk-1', 'bk-3']));
+  public readonly bookmarkedIds = this.bookService.bookmarkedIds;
 
   /** Toast de feedback flotante */
   public readonly toastFeedback = signal<string | null>(null);
@@ -198,31 +200,7 @@ export class Biblioteca implements OnInit {
    */
   public handleBookCreated(dto: CreateBookDto): void {
     this.isSavingBook.set(true);
-
-    // Construcción del libro completo (el padre determina id, rating, etc.)
-    const categoryData = this.categories().find((c) => c.id === dto.category);
-    const newBook: Book = {
-      id: `bk-${Date.now()}`,
-      title: dto.title,
-      author: dto.author,
-      category: dto.category,
-      categoryLabel: categoryData?.label ?? 'Recurso Académico',
-      description: dto.description,
-      coverImage:
-        dto.coverImage?.trim() ||
-        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=400&q=80',
-      pages: dto.pages,
-      year: dto.year,
-      format: dto.format,
-      rating: 5.0,
-      reviewsCount: 0,
-      readsCount: 0,
-      institution: dto.institution ?? 'Comunidad Docente DiscerIA',
-      tags: dto.tags,
-      featured: false,
-    };
-
-    this.books.update((current) => [newBook, ...current]);
+    const newBook = this.bookService.createBook(dto, this.userName());
     this.isCreateBookOpen.set(false);
     this.isSavingBook.set(false);
     this.showToast(`"${newBook.title}" publicado con éxito en el repositorio.`);
@@ -263,15 +241,12 @@ export class Biblioteca implements OnInit {
 
   public toggleBookmark(book: Book, event?: Event): void {
     event?.stopPropagation();
-    const current = new Set(this.bookmarkedIds());
-    if (current.has(book.id)) {
-      current.delete(book.id);
-      this.showToast(`"${book.title}" eliminado de tus marcadores.`);
-    } else {
-      current.add(book.id);
+    const isNowBookmarked = this.bookService.toggleBookmark(book.id);
+    if (isNowBookmarked) {
       this.showToast(`"${book.title}" guardado en tus marcadores de estudio.`);
+    } else {
+      this.showToast(`"${book.title}" eliminado de tus marcadores.`);
     }
-    this.bookmarkedIds.set(current);
   }
 
   public onRecommend(book: Book, event?: Event): void {

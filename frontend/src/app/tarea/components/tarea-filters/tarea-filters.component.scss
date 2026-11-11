@@ -1,0 +1,153 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Tarea Filters Component Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.search-and-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1 1 320px;
+  position: relative;
+  min-width: 260px;
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-slate-400);
+    pointer-events: none;
+    font-size: 0.95rem;
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-main);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: var(--transition-fast);
+
+  &:focus {
+    border-color: var(--color-primary-600);
+    box-shadow: var(--focus-ring);
+  }
+
+  &::placeholder {
+    color: var(--color-slate-400);
+  }
+}
+
+.select-subject-wrap {
+  position: relative;
+  min-width: 200px;
+
+  .select-icon {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-slate-400);
+    pointer-events: none;
+    font-size: 0.9rem;
+  }
+}
+
+.subject-select {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.3rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-main);
+  font-size: var(--font-size-sm);
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:focus {
+    border-color: var(--color-primary-600);
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.btn-create-tarea {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-700);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+  white-space: nowrap;
+
+  &:hover {
+    background-color: var(--color-primary-800);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.status-pills-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  color: var(--color-slate-600);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover {
+    background-color: var(--color-slate-100);
+    color: var(--color-primary-700);
+  }
+
+  &.active {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+    border-color: var(--color-primary-300);
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.count-tag {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-left: auto;
+}
+

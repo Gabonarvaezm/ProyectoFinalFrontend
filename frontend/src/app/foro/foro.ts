@@ -1,6 +1,7 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { ForumService } from '../core/services/forum.service';
 import {
   ForoAiWidgetComponent,
   ForoCreateModalComponent,
@@ -41,6 +42,7 @@ import {
 })
 export class Foro {
   private readonly authService = inject(AuthService);
+  private readonly forumService = inject(ForumService);
   private readonly destroyRef = inject(DestroyRef);
   private timerIds: ReturnType<typeof setTimeout>[] = [];
 
@@ -117,8 +119,8 @@ export class Foro {
 
   public readonly forumEtiquette = FORUM_ETIQUETTE_RULES;
 
-  // ── Almacén Reactivo de Publicaciones ────────────────────────────────────
-  public readonly posts = signal<ForumPost[]>([...INITIAL_FORUM_POSTS]);
+  // ── Almacén Reactivo de Publicaciones (Persistente con ForumService) ───────
+  public readonly posts = this.forumService.posts;
 
   // ── Cálculo Derivado de Publicaciones Filtradas ─────────────────────────
   public readonly filteredPosts = computed<ForumPost[]>(() => {
@@ -169,78 +171,18 @@ export class Foro {
 
   /** Comunicación desde ForoPostCardComponent: Voto Helpful */
   public handleHelpfulVote(post: ForumPost): void {
-    this.posts.update((currentPosts) =>
-      currentPosts.map((p) => {
-        if (p.id === post.id) {
-          const wasVoted = !!p.userHasVotedHelpful;
-          return {
-            ...p,
-            userHasVotedHelpful: !wasVoted,
-            helpfulCount: wasVoted ? Math.max(0, p.helpfulCount - 1) : p.helpfulCount + 1,
-          };
-        }
-        return p;
-      })
-    );
+    this.forumService.toggleHelpfulPost(post.id);
   }
 
   /** Comunicación desde ForoPostCardComponent: Voto Helpful en Respuesta */
   public handleReplyHelpfulVote(reply: ForumReply): void {
-    this.posts.update((currentPosts) =>
-      currentPosts.map((post) => {
-        const updatedReplies = post.replies.map((r) => {
-          if (r.id === reply.id) {
-            const wasVoted = !!r.userHasVotedHelpful;
-            return {
-              ...r,
-              userHasVotedHelpful: !wasVoted,
-              helpfulCount: wasVoted ? Math.max(0, r.helpfulCount - 1) : r.helpfulCount + 1,
-            };
-          }
-          return r;
-        });
-        return { ...post, replies: updatedReplies };
-      })
-    );
+    this.forumService.toggleHelpfulReply(reply.postId, reply.id);
   }
 
   /** Comunicación desde ForoPostCardComponent: Nueva Respuesta */
   public handleReplySubmit(payload: CreateReplyPayload): void {
     const author = this.currentUser();
-    const newReply: ForumReply = {
-      id: `reply-${Date.now()}`,
-      postId: payload.postId,
-      author: {
-        id: author.id,
-        name: author.name,
-        role: author.role,
-        roleTitle: author.roleTitle,
-        institution: author.institution,
-        avatar: author.avatar,
-        initials: author.initials,
-      },
-      content: payload.content,
-      createdAt: 'Hace un momento',
-      helpfulCount: 0,
-      userHasVotedHelpful: false,
-      isTeacherVerified: payload.isTeacherVerified,
-      academicReference: payload.academicReference,
-    };
-
-    this.posts.update((list) =>
-      list.map((post) => {
-        if (post.id === payload.postId) {
-          return {
-            ...post,
-            repliesCount: post.repliesCount + 1,
-            isUnanswered: false,
-            isTeacherVerified: post.isTeacherVerified || !!payload.isTeacherVerified,
-            replies: [...post.replies, newReply],
-          };
-        }
-        return post;
-      })
-    );
+    this.forumService.addReply(payload, author);
 
     this.showToast(
       payload.isTeacherVerified
@@ -280,32 +222,7 @@ export class Foro {
     const author = this.currentUser();
 
     const postTimer = setTimeout(() => {
-      const newPost: ForumPost = {
-        id: `post-${Date.now()}`,
-        title: payload.title,
-        content: payload.content,
-        subject: payload.subject,
-        author: {
-          id: author.id,
-          name: author.name,
-          role: author.role,
-          roleTitle: author.roleTitle,
-          institution: author.institution,
-          avatar: author.avatar,
-          initials: author.initials,
-        },
-        createdAt: 'Hace un momento',
-        isTeacherVerified: author.role === 'professor',
-        isUnanswered: true,
-        helpfulCount: 0,
-        userHasVotedHelpful: false,
-        viewsCount: 1,
-        repliesCount: 0,
-        academicReference: payload.academicReference,
-        replies: [],
-      };
-
-      this.posts.update((list) => [newPost, ...list]);
+      const newPost = this.forumService.createPost(payload, author);
       this.isSubmittingPost.set(false);
       this.closeCreateModal();
       this.activeExpandedPostId.set(newPost.id);

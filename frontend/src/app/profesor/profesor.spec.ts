@@ -26,7 +26,7 @@ describe('Profesor Component', () => {
     expect(component.activeNav()).toBe('dashboard');
     expect(component.navItems().length).toBe(3);
     expect(component.navItems().some((item) => item.id === 'configuracion')).toBe(false);
-    expect(component.navItems().some((item) => item.id === 'progreso')).toBe(false);
+    expect(component.navItems().some((item) => item.id === 'foros')).toBe(true);
     expect(component.kpiMetrics().length).toBe(3);
     expect(component.students().length).toBeGreaterThanOrEqual(3);
   });

@@ -1,9 +1,15 @@
 export const STORAGE_KEYS = {
+  ACTIVE_SESSION: 'disceria_active_session',
   REGISTERED_USER: 'disceria_registered_user',
   USER_EMAIL: 'disceria_user_email',
   REMEMBERED_EMAIL: 'disceria_remembered_email',
   STUDENTS: 'disceria_profesor_students',
   NOTIFICATIONS: 'disceria_profesor_notifications',
+  BOOKS: 'disceria_academic_books',
+  BOOKMARKS: 'disceria_academic_bookmarks',
+  TAREAS: 'disceria_academic_tareas',
+  FORUM_POSTS: 'disceria_academic_forum_posts',
+  CHAT_SESSIONS: 'disceria_academic_chat_sessions',
 } as const;
 
 export interface RegisteredUserData {
@@ -26,6 +32,7 @@ export interface LoginCredentials {
   email: string;
   password: string;
   rememberMe?: boolean;
+  role?: 'student' | 'professor' | 'admin';
 }
 
 export interface AuthResponse {

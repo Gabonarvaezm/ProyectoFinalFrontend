@@ -1,0 +1,193 @@
+@if (isOpen() && tarea()) {
+  <div class="modal-backdrop" (click)="onClose()" aria-hidden="true"></div>
+
+  <div
+    class="modal-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-detail-title"
+  >
+    <header class="modal-header">
+      <div class="header-badge-row">
+        <span class="subject-tag">{{ tarea()!.subject }}</span>
+        <span class="status-pill" [class]="'status-' + tarea()!.status">
+          {{ tarea()!.status | uppercase }}
+        </span>
+      </div>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="onClose()"
+        aria-label="Cerrar detalle"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+      <h2 id="modal-detail-title" class="modal-title">{{ tarea()!.title }}</h2>
+    </header>
+
+    <div class="modal-body">
+      <!-- Metadatos de la tarea -->
+      <div class="meta-grid">
+        <div class="meta-card">
+          <i class="bi bi-person-circle" aria-hidden="true"></i>
+          <div>
+            <span class="meta-label">Asignado por</span>
+            <span class="meta-value">{{ tarea()!.assignedBy }}</span>
+          </div>
+        </div>
+
+        <div class="meta-card">
+          <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+          <div>
+            <span class="meta-label">Fecha Límite</span>
+            <span class="meta-value">{{ tarea()!.dueDate }}</span>
+          </div>
+        </div>
+
+        <div class="meta-card">
+          <i class="bi bi-award-fill" aria-hidden="true"></i>
+          <div>
+            <span class="meta-label">Puntaje Máximo</span>
+            <span class="meta-value">{{ tarea()!.maxScore }} pts</span>
+          </div>
+        </div>
+
+        <div class="meta-card">
+          <i class="bi bi-people-fill" aria-hidden="true"></i>
+          <div>
+            <span class="meta-label">Entregas de cohorte</span>
+            <span class="meta-value">{{ tarea()!.submissionsCount }} alumnos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consigna completa -->
+      <section class="section-box">
+        <h4 class="section-title">
+          <i class="bi bi-card-text" aria-hidden="true"></i>
+          <span>Consigna y Objetivos Académicos</span>
+        </h4>
+        <p class="consigna-text">{{ tarea()!.description }}</p>
+
+        @if (tarea()!.attachmentName) {
+          <div class="guide-attachment-box">
+            <i class="bi bi-file-earmark-pdf-fill" aria-hidden="true"></i>
+            <div>
+              <span class="file-name">{{ tarea()!.attachmentName }}</span>
+              <span class="file-desc">Guía metodológica y rúbrica oficial</span>
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- Sección de Entrega / Calificación según rol -->
+      @if (tarea()!.mySubmission) {
+        <section class="section-box submission-box">
+          <h4 class="section-title">
+            <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
+            <span>Entrega Registrada • {{ tarea()!.mySubmission!.studentName }}</span>
+          </h4>
+
+          <div class="submission-content">
+            <p>{{ tarea()!.mySubmission!.content }}</p>
+
+            @if (tarea()!.mySubmission!.attachmentUrl) {
+              <div class="attachment-link-row">
+                <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                <a
+                  [href]="tarea()!.mySubmission!.attachmentUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="link-doc"
+                >
+                  Ver Documento Adjunto de la Entrega
+                </a>
+              </div>
+            }
+
+            @if (tarea()!.mySubmission!.comments) {
+              <p class="submission-comments">
+                <strong>Nota del estudiante:</strong> {{ tarea()!.mySubmission!.comments }}
+              </p>
+            }
+          </div>
+
+          <!-- Si ya está calificada -->
+          @if (tarea()!.mySubmission!.grade !== undefined) {
+            <div class="grade-feedback-card">
+              <div class="grade-score">
+                <span class="score-number">{{ tarea()!.mySubmission!.grade }}</span>
+                <span class="score-max">/ {{ tarea()!.maxScore }} pts</span>
+              </div>
+              <div class="feedback-text-wrap">
+                <span class="feedback-title">Retroalimentación del Docente</span>
+                <p class="feedback-body">{{ tarea()!.mySubmission!.feedback }}</p>
+              </div>
+            </div>
+          }
+
+          <!-- Si el profesor desea calificar o actualizar nota -->
+          @if (isProfessor()) {
+            <form [formGroup]="gradeForm" (ngSubmit)="onSubmitGrade()" class="grade-form">
+              <h5 class="form-subheading">
+                <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                <span>Calificar Entrega</span>
+              </h5>
+
+              <div class="form-row-grade">
+                <div class="form-group-score">
+                  <label for="grade-input" class="form-label">Calificación (0 - {{ tarea()!.maxScore }})</label>
+                  <input
+                    id="grade-input"
+                    type="number"
+                    formControlName="grade"
+                    class="form-control"
+                    min="0"
+                    [max]="tarea()!.maxScore"
+                  />
+                </div>
+
+                <div class="form-group-feedback">
+                  <label for="feedback-input" class="form-label">Comentarios Pedagógicos</label>
+                  <input
+                    id="feedback-input"
+                    type="text"
+                    formControlName="feedback"
+                    class="form-control"
+                    placeholder="Excelente trabajo analítico..."
+                  />
+                </div>
+
+                <button type="submit" class="btn-save-grade">
+                  <i class="bi bi-check-lg" aria-hidden="true"></i>
+                  <span>Guardar Nota</span>
+                </button>
+              </div>
+            </form>
+          }
+        </section>
+      } @else if (!isProfessor() && tarea()!.status === 'pendiente') {
+        <div class="pending-prompt-box">
+          <div class="prompt-text">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <div>
+              <strong>Esta tarea aún no ha sido entregada.</strong>
+              <span>Plazo vence el {{ tarea()!.dueDate }}. Asegúrate de responder con tiempo.</span>
+            </div>
+          </div>
+          <button type="button" class="btn-deliver-now" (click)="onDeliver()">
+            <i class="bi bi-send-fill" aria-hidden="true"></i>
+            <span>Realizar Entrega Ahora</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="onClose()">
+        Cerrar
+      </button>
+    </footer>
+  </div>
+}
+

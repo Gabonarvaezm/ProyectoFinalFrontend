@@ -5,7 +5,9 @@
 
 export const AUTH_ROUTES = {
   PROFESSOR: '/profesor',
+  PROFESSOR_DASHBOARD: '/profesor/dashboard',
   STUDENT: '/estudiante',
+  STUDENT_DASHBOARD: '/estudiante/dashboard',
   HOME: '/',
   LOGIN: '/login',
   FORO: '/foro',

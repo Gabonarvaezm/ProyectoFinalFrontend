@@ -36,12 +36,15 @@ export class LoginFormComponent {
   private readonly fb = inject(FormBuilder);
 
   // Inputs desde el componente padre
+  public readonly selectedRole = input<'student' | 'professor'>('student');
   public readonly isLoading = input<boolean>(false);
   public readonly errorMessage = input<string | null>(null);
   public readonly successMessage = input<string | null>(null);
 
   // Outputs hacia el componente padre
-  public readonly loginSubmitted = output<LoginCredentials>();
+  public readonly roleChange = output<'student' | 'professor'>();
+  public readonly submitLogin = output<LoginCredentials>();
+  public readonly loginSubmitted = output<LoginCredentials>(); // Compatibilidad retroactiva
   public readonly forgotPasswordRequested = output<string>();
 
   // Estado reactivo local
@@ -105,6 +108,12 @@ export class LoginFormComponent {
     return 'Dato inválido';
   }
 
+  public onSelectRole(role: 'student' | 'professor'): void {
+    if (this.selectedRole() !== role) {
+      this.roleChange.emit(role);
+    }
+  }
+
   public togglePasswordVisibility(): void {
     this.showPassword.update((visible) => !visible);
   }
@@ -119,11 +128,15 @@ export class LoginFormComponent {
     }
 
     const { email, password, rememberMe } = this.loginForm.value;
-    this.loginSubmitted.emit({
+    const credentials: LoginCredentials = {
       email: (email || '').trim(),
       password: password || '',
       rememberMe: !!rememberMe,
-    });
+      role: this.selectedRole(),
+    };
+
+    this.submitLogin.emit(credentials);
+    this.loginSubmitted.emit(credentials);
   }
 
   public onForgotPassword(event: Event): void {
@@ -137,4 +150,3 @@ export class LoginFormComponent {
     }
   }
 }
-

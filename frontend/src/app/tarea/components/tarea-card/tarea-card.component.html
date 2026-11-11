@@ -1,0 +1,117 @@
+<article
+  class="tarea-card"
+  [class.status-vencida]="tarea().status === 'vencida'"
+  (click)="cardClicked.emit(tarea())"
+  tabindex="0"
+  role="button"
+  [attr.aria-label]="'Tarea: ' + tarea().title"
+>
+  <header class="card-header">
+    <div class="subject-and-priority">
+      <span class="subject-tag">{{ tarea().subject }}</span>
+      <span class="priority-tag" [class]="'priority-' + tarea().priority">
+        Prioridad {{ tarea().priority | titlecase }}
+      </span>
+    </div>
+
+    <span class="status-badge" [class]="statusBadgeClass()">
+      {{ statusLabel() }}
+    </span>
+  </header>
+
+  <h3 class="tarea-title">{{ tarea().title }}</h3>
+  <p class="tarea-description">{{ tarea().description }}</p>
+
+  <div class="meta-row">
+    <div class="meta-item">
+      <i class="bi bi-calendar-event" aria-hidden="true"></i>
+      <span>Entrega: <strong>{{ tarea().dueDate }}</strong></span>
+    </div>
+
+    <div class="meta-item">
+      <i class="bi bi-award" aria-hidden="true"></i>
+      <span>Puntaje Máx: <strong>{{ tarea().maxScore }} pts</strong></span>
+    </div>
+
+    @if (tarea().attachmentName) {
+      <div class="meta-item attachment-badge" [title]="tarea().attachmentName">
+        <i class="bi bi-paperclip" aria-hidden="true"></i>
+        <span>{{ tarea().attachmentName }}</span>
+      </div>
+    }
+  </div>
+
+  <footer class="card-footer">
+    <div class="assigned-by">
+      <i class="bi bi-person-circle" aria-hidden="true"></i>
+      <span>{{ tarea().assignedBy }}</span>
+    </div>
+
+    <div class="card-actions">
+      @if (isProfessor()) {
+        <button
+          type="button"
+          class="btn-card-action"
+          (click)="onAction($event)"
+          title="Ver detalles y entregas"
+        >
+          <i class="bi bi-people" aria-hidden="true"></i>
+          <span>Entregas ({{ tarea().submissionsCount }})</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn-icon-delete"
+          (click)="onDelete($event)"
+          title="Eliminar tarea asignada"
+          aria-label="Eliminar tarea"
+        >
+          <i class="bi bi-trash" aria-hidden="true"></i>
+        </button>
+      } @else {
+        @if (tarea().status === 'pendiente') {
+          <button
+            type="button"
+            class="btn-card-submit"
+            (click)="onAction($event)"
+            title="Realizar entrega de la tarea"
+          >
+            <i class="bi bi-send-fill" aria-hidden="true"></i>
+            <span>Entregar Tarea</span>
+          </button>
+        } @else if (tarea().status === 'entregada') {
+          <button
+            type="button"
+            class="btn-card-view"
+            (click)="onAction($event)"
+            title="Ver entrega realizada"
+          >
+            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+            <span>Ver Mi Entrega</span>
+          </button>
+        } @else if (tarea().status === 'calificada') {
+          <button
+            type="button"
+            class="btn-card-grade"
+            (click)="onAction($event)"
+            title="Ver nota y retroalimentación"
+          >
+            <i class="bi bi-trophy-fill" aria-hidden="true"></i>
+            <span>Nota: {{ tarea().mySubmission?.grade ?? 100 }}/{{ tarea().maxScore }}</span>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn-card-view"
+            (click)="onAction($event)"
+            title="Ver información de la tarea"
+          >
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <span>Detalles</span>
+          </button>
+        }
+      }
+    </div>
+  </footer>
+</article>
+

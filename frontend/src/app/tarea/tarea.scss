@@ -1,0 +1,512 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Tarea Parent Component Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+:host {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+  font-family: var(--font-family-base);
+  background-color: var(--color-bg-app);
+  color: var(--color-text-main);
+}
+
+.tarea-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-bg-app);
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+}
+
+// ── Sidebar de Navegación ───────────────────────────────────────────────────
+.sidebar {
+  width: var(--sidebar-width, 256px);
+  min-width: var(--sidebar-width, 256px);
+  background-color: var(--color-bg-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 30;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: inherit;
+  transition: opacity var(--duration-fast) var(--ease-out-expo);
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.28);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-slate-900);
+  letter-spacing: -0.02em;
+}
+
+.brand-sub {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.sidebar-nav {
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+
+    @media (max-width: 1024px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0.65rem 0.875rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-slate-600);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    transition: var(--transition-fast);
+    border: 1px solid transparent;
+
+    .nav-icon {
+      font-size: 1.125rem;
+      color: var(--color-slate-500);
+      transition: color var(--duration-fast) var(--ease-out-expo);
+    }
+
+    &:hover {
+      background-color: var(--color-slate-100);
+      color: var(--color-primary-700);
+
+      .nav-icon {
+        color: var(--color-primary-700);
+      }
+    }
+
+    &.active {
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-700);
+      font-weight: var(--font-weight-semibold);
+      border-color: var(--color-primary-200);
+
+      .nav-icon {
+        color: var(--color-primary-700);
+      }
+    }
+  }
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.new-task-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-700);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+
+  &:hover {
+    background-color: var(--color-primary-800);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.institution-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-600);
+  padding: 0.55rem 0.75rem;
+  background-color: var(--color-slate-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Wrapper Principal y Topbar ──────────────────────────────────────────────
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.top-header {
+  height: var(--header-height, 70px);
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  gap: var(--space-6);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  @media (max-width: 768px) {
+    padding: var(--space-3) var(--space-4);
+    height: auto;
+    min-height: 60px;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+}
+
+.header-titles-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary-700);
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+
+  .header-main-title {
+    margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-slate-900);
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background-color: transparent;
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-slate-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  position: relative;
+  text-decoration: none;
+  transition: var(--transition-fast);
+
+  &:hover {
+    background-color: var(--color-slate-100);
+    color: var(--color-slate-900);
+  }
+
+  &.btn-ai-toggle {
+    background: var(--color-slate-100);
+    color: var(--color-primary-700);
+
+    &:hover {
+      background: var(--color-primary-50);
+      color: var(--color-primary-800);
+      transform: translateY(-1px);
+    }
+  }
+
+  .notification-indicator {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-danger);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-white);
+  }
+}
+
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.user-avatar-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-ai-gradient);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// ── Canvas de Tareas ────────────────────────────────────────────────────────
+.tarea-canvas {
+  flex: 1;
+  padding: var(--space-6) var(--space-8);
+  max-width: var(--max-content-width, 1400px);
+  width: 100%;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: var(--space-4);
+  }
+}
+
+.tarea-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-bottom: var(--space-10);
+}
+
+// ── Banner Introductorio ───────────────────────────────────────────────────
+.tarea-intro-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.banner-heading {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-slate-900);
+}
+
+.banner-desc {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-width: 750px;
+}
+
+.banner-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-700);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+
+  &:hover {
+    background: var(--color-primary-800);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+// ── Grilla de Tareas ────────────────────────────────────────────────────────
+.tareas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-5);
+  width: 100%;
+}
+
+// ── Estado Vacío (Empty State) ──────────────────────────────────────────────
+.empty-state-box {
+  background-color: var(--color-bg-surface);
+  border: 2px dashed var(--color-slate-200);
+  border-radius: var(--radius-xl);
+  padding: var(--space-16) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-3);
+
+  .empty-icon {
+    font-size: 3.5rem;
+    color: var(--color-slate-300);
+    margin-bottom: var(--space-2);
+  }
+
+  .empty-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-900);
+    margin: 0;
+  }
+
+  .empty-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    max-width: 440px;
+    margin: 0;
+    line-height: var(--line-height-base);
+  }
+
+  .btn-reset-filters {
+    margin-top: var(--space-3);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary-700);
+    color: var(--color-white);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-primary-800);
+    }
+  }
+}
+
+// ── Toast de Feedback ───────────────────────────────────────────────────────
+.tarea-toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  background-color: var(--color-slate-900);
+  color: var(--color-white);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  z-index: 1200;
+  animation: slideUp var(--duration-fast) var(--ease-out-expo);
+
+  .toast-icon {
+    color: var(--color-success);
+    font-size: 1.15rem;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

@@ -1,0 +1,117 @@
+@if (isOpen() && tarea()) {
+  <div class="modal-backdrop" (click)="onClose()" aria-hidden="true"></div>
+
+  <div
+    class="modal-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-entrega-title"
+  >
+    <header class="modal-header">
+      <div class="header-icon-wrap">
+        <i class="bi bi-upload" aria-hidden="true"></i>
+      </div>
+      <div>
+        <h2 id="modal-entrega-title" class="modal-title">Entregar Tarea Académica</h2>
+        <p class="modal-subtitle">
+          {{ tarea()!.title }} • <strong>{{ tarea()!.subject }}</strong>
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="onClose()"
+        aria-label="Cerrar modal"
+      >
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="tarea-reminder-box">
+      <div class="reminder-item">
+        <i class="bi bi-calendar-event" aria-hidden="true"></i>
+        <span>Fecha Límite: <strong>{{ tarea()!.dueDate }}</strong></span>
+      </div>
+      <div class="reminder-item">
+        <i class="bi bi-award" aria-hidden="true"></i>
+        <span>Puntaje Máximo: <strong>{{ tarea()!.maxScore }} pts</strong></span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
+      <!-- Desarrollo de la respuesta -->
+      <div class="form-group">
+        <label for="est-content" class="form-label">
+          Desarrollo / Respuesta de la Tarea <span class="required">*</span>
+        </label>
+        <textarea
+          id="est-content"
+          formControlName="content"
+          rows="6"
+          class="form-control textarea"
+          placeholder="Redacta tu solución académica, resumen, código o argumentos solicitados por el docente..."
+        ></textarea>
+        @if (form.get('content')?.touched && form.get('content')?.errors?.['required']) {
+          <span class="error-msg">El contenido de la entrega es obligatorio.</span>
+        }
+        @if (form.get('content')?.touched && form.get('content')?.errors?.['minlength']) {
+          <span class="error-msg">Debe contener al menos 20 caracteres con tu desarrollo.</span>
+        }
+      </div>
+
+      <!-- Enlace o URL de archivo de entrega -->
+      <div class="form-group">
+        <label for="est-attachment" class="form-label">
+          Enlace al Documento o Archivo Adjunto (Google Drive, GitHub, PDF)
+        </label>
+        <div class="input-with-icon">
+          <i class="bi bi-link-45deg input-icon" aria-hidden="true"></i>
+          <input
+            id="est-attachment"
+            type="url"
+            formControlName="attachmentUrl"
+            class="form-control input-padded"
+            placeholder="https://drive.google.com/... o https://github.com/..."
+          />
+        </div>
+      </div>
+
+      <!-- Comentarios adicionales para el profesor -->
+      <div class="form-group">
+        <label for="est-comments" class="form-label">
+          Comentarios o Notas para el Docente (Opcional)
+        </label>
+        <input
+          id="est-comments"
+          type="text"
+          formControlName="comments"
+          class="form-control"
+          placeholder="Ej: Se incluyen comprobaciones adicionales en la página 3."
+        />
+        @if (form.get('comments')?.touched && form.get('comments')?.errors?.['maxlength']) {
+          <span class="error-msg">Máximo 500 caracteres.</span>
+        }
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="onClose()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <span class="spinner-border" aria-hidden="true"></span>
+            <span>Enviando Entrega...</span>
+          } @else {
+            <i class="bi bi-send-check" aria-hidden="true"></i>
+            <span>Confirmar y Entregar</span>
+          }
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+

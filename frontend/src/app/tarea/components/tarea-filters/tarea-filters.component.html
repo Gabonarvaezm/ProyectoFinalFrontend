@@ -1,0 +1,56 @@
+<div class="filters-container">
+  <div class="search-and-actions">
+    <div class="search-box">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input
+        type="search"
+        class="search-input"
+        placeholder="Buscar tareas por título, contenido o materia..."
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+        aria-label="Buscar tareas"
+      />
+    </div>
+
+    <div class="select-subject-wrap">
+      <i class="bi bi-bookmarks select-icon" aria-hidden="true"></i>
+      <select
+        class="subject-select"
+        [value]="selectedSubject()"
+        (change)="onSubjectSelect($event)"
+        aria-label="Filtrar por materia"
+      >
+        @for (sub of subjects(); track sub) {
+          <option [value]="sub">{{ sub }}</option>
+        }
+      </select>
+    </div>
+
+    @if (isProfessor()) {
+      <button
+        type="button"
+        class="btn-create-tarea"
+        (click)="createClicked.emit()"
+        aria-label="Asignar nueva tarea"
+      >
+        <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+        <span>Nueva Tarea</span>
+      </button>
+    }
+  </div>
+
+  <div class="status-pills-row" role="group" aria-label="Filtrar por estado">
+    @for (status of statuses(); track status.id) {
+      <button
+        type="button"
+        class="status-pill"
+        [class.active]="selectedStatus() === status.id"
+        (click)="onStatusSelect(status.id)"
+      >
+        {{ status.label }}
+      </button>
+    }
+    <span class="count-tag">{{ totalCount() }} resultado(s)</span>
+  </div>
+</div>
+

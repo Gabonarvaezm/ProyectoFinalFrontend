@@ -8,15 +8,26 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./login/login').then((m) => m.Login),
+    loadComponent: () =>
+      import('./login/login-page.component').then((m) => m.LoginPageComponent),
   },
   {
     path: 'register',
     loadComponent: () => import('./register/register').then((m) => m.Register),
   },
   {
+    path: 'profesor/dashboard',
+    redirectTo: 'profesor',
+    pathMatch: 'full',
+  },
+  {
     path: 'profesor',
     loadComponent: () => import('./profesor/profesor').then((m) => m.Profesor),
+  },
+  {
+    path: 'estudiante/dashboard',
+    redirectTo: 'estudiante',
+    pathMatch: 'full',
   },
   {
     path: 'estudiante',
@@ -25,6 +36,10 @@ export const routes: Routes = [
   {
     path: 'biblioteca',
     loadComponent: () => import('./biblioteca/biblioteca').then((m) => m.Biblioteca),
+  },
+  {
+    path: 'tareas',
+    loadComponent: () => import('./tarea/tarea').then((m) => m.Tarea),
   },
   {
     path: 'foro',
