@@ -48,19 +48,31 @@
         (continueClicked)="onContinueCourse()"
       />
 
-      <!-- Sección Intermedia: Biblioteca Digital + Examen y Progreso Semanal (NODOS HIJOS) -->
+      <!-- Sección Intermedia: Layout Biblioteca + Progreso | Examen -->
       <div class="middle-grid">
-        <!-- Columna Izquierda: Cuadrícula de Biblioteca Digital -->
-        <app-estudiante-subjects-grid
-          [subjects]="filteredSubjects()"
-          (subjectSelected)="onSelectSubject($event)"
-          (viewAllRequested)="onViewAllLibrary()"
-        />
 
-        <!-- Columna Derecha: Examen de Práctica + Progreso Semanal -->
+        <!-- Columna Izquierda: Biblioteca + Gráfico de Progreso Semanal -->
+        <div class="left-col">
+          <!-- NODO HIJO: Cuadrícula de Biblioteca Digital -->
+          <app-estudiante-subjects-grid
+            [subjects]="filteredSubjects()"
+            (subjectSelected)="onSelectSubject($event)"
+            (viewAllRequested)="onViewAllLibrary()"
+          />
+
+          <!-- NODO HIJO: Gráfico de Progreso Semanal (interactivo) -->
+          <app-estudiante-weekly-progress
+            [items]="weeklyProgress()"
+            [highlightedId]="highlightedSubjectId()"
+            (barClicked)="onProgressBarSelected($event)"
+            (clearClicked)="onClearSubjectHighlight()"
+          />
+        </div>
+
+        <!-- Columna Derecha: Examen de Práctica -->
         <app-estudiante-exam-card
           [practiceExam]="practiceExam()"
-          [weeklyProgress]="weeklyProgress()"
+          [weeklyProgress]="[]"
           (startExamClicked)="onStartExam()"
         />
       </div>

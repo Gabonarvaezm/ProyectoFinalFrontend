@@ -27,6 +27,7 @@ import {
   EstudianteNotificationsDrawerComponent,
   EstudianteSidebarComponent,
   EstudianteSubjectsGridComponent,
+  EstudianteWeeklyProgressComponent,
 } from './components';
 import {
   AI_DEFAULT_FALLBACK_REPLY,
@@ -64,6 +65,7 @@ export type {
     EstudianteContinueCourseComponent,
     EstudianteSubjectsGridComponent,
     EstudianteExamCardComponent,
+    EstudianteWeeklyProgressComponent,
     EstudianteForumPreviewComponent,
     EstudianteAiDrawerComponent,
     EstudianteNotificationsDrawerComponent,
@@ -90,7 +92,6 @@ export class Estudiante {
     { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-grid-fill' },
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text' },
-    { id: 'progreso', label: 'Progreso', icon: 'bi bi-bar-chart' },
   ]);
 
   // ── Panel Desplegable (Drawer) Asistente IA ─────────────────────────────
@@ -217,6 +218,7 @@ export class Estudiante {
       icon: 'bi bi-calculator-fill',
       badgeBg: '#e6f4ea',
       iconColor: '#137333',
+      weeklyProgress: 90,
     },
     {
       id: 'cie',
@@ -225,6 +227,7 @@ export class Estudiante {
       icon: 'bi bi-eyedropper',
       badgeBg: '#fef7e0',
       iconColor: '#b06000',
+      weeklyProgress: 75,
     },
     {
       id: 'his',
@@ -233,6 +236,7 @@ export class Estudiante {
       icon: 'bi bi-hourglass-split',
       badgeBg: '#fce8e6',
       iconColor: '#c5221f',
+      weeklyProgress: 60,
     },
     {
       id: 'len',
@@ -241,6 +245,7 @@ export class Estudiante {
       icon: 'bi bi-book-half',
       badgeBg: '#e8f0fe',
       iconColor: '#1a73e8',
+      weeklyProgress: 45,
     },
   ]);
 
@@ -260,12 +265,22 @@ export class Estudiante {
     difficulty: 'Media',
   });
 
-  // ── Progreso Semanal ─────────────────────────────────────────────────────
-  public readonly weeklyProgress = signal([
-    { subject: 'Mat', percentage: 90 },
-    { subject: 'Cie', percentage: 75 },
-    { subject: 'His', percentage: 60 },
-  ]);
+  // ── Progreso Semanal: derivado de las materias, actualizable por selección ──
+  /** ID de la materia actualmente resaltada en el gráfico (null = mostrar todas) */
+  public readonly highlightedSubjectId = signal<string | null>(null);
+
+  /** Convierte las materias en items para el gráfico de progreso */
+  public readonly weeklyProgress = computed<WeeklyProgressItem[]>(() =>
+    this.subjects().map((s) => ({
+      subject: s.name.slice(0, 3),    // 3 letras para la etiqueta del eje
+      subjectId: s.id,
+      fullName: s.name,
+      percentage: s.weeklyProgress,
+      iconColor: s.iconColor,
+      highlighted: this.highlightedSubjectId() === null
+        || this.highlightedSubjectId() === s.id,
+    }))
+  );
 
   // ── Preguntas Recientes en Foros ─────────────────────────────────────────
   public readonly forumQuestions = signal<ForumQuestion[]>([
@@ -466,10 +481,20 @@ export class Estudiante {
   }
 
   public onSelectSubject(subject: LibrarySubject): void {
-    const category = SUBJECT_CATEGORY_MAP[subject.id] || subject.name;
-    this.selectedSubjectCategory.set(category);
-    this.activeNav.set('biblioteca');
-    this.showToast(`Abriendo biblioteca: ${subject.name} - ${subject.topic}`);
+    // Resalta la materia en el gráfico de progreso
+    this.highlightedSubjectId.set(subject.id);
+    this.showToast(`${subject.name}: ${subject.weeklyProgress}% de progreso esta semana`);
+  }
+
+  /** Recibe la barra del gráfico presionada y resalta la materia correspondiente */
+  public onProgressBarSelected(item: WeeklyProgressItem): void {
+    this.highlightedSubjectId.set(item.subjectId);
+    this.showToast(`${item.fullName}: ${item.percentage}% de progreso esta semana`);
+  }
+
+  /** Restablece el gráfico mostrando todas las materias */
+  public onClearSubjectHighlight(): void {
+    this.highlightedSubjectId.set(null);
   }
 
   public onViewAllLibrary(): void {

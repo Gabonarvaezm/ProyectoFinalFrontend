@@ -58,12 +58,20 @@
 
 .middle-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 320px;
   gap: var(--space-6);
+  align-items: start;
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
+}
+
+// Columna izquierda: Biblioteca + Gráfico en stack vertical
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
 .student-toast {
