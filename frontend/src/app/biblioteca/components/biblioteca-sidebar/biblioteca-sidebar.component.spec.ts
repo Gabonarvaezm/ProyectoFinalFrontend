@@ -21,12 +21,14 @@ describe('BibliotecaSidebarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debe contener los 5 items de navegación institucional con biblioteca activa por defecto', () => {
+  it('debe contener los 3 items de navegación institucional con biblioteca activa por defecto', () => {
     const items = component.navItems();
-    expect(items.length).toBe(5);
+    expect(items.length).toBe(3);
     expect(items.some((i) => i.id === 'biblioteca')).toBe(true);
     expect(items.some((i) => i.id === 'dashboard')).toBe(true);
     expect(items.some((i) => i.id === 'foros')).toBe(true);
+    expect(items.some((i) => i.id === 'progreso')).toBe(false);
+    expect(items.some((i) => i.id === 'perfil')).toBe(false);
     expect(component.activeNav()).toBe('biblioteca');
   });
 

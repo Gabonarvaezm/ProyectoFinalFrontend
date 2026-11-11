@@ -10,6 +10,7 @@
 .student-dashboard-layout {
   display: flex;
   min-height: 100vh;
+  align-items: stretch;
   background-color: var(--color-bg-app);
   position: relative;
   overflow-x: hidden;
