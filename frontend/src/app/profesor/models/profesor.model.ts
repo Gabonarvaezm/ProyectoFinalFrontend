@@ -51,6 +51,38 @@ export interface AiSuggestion {
   prompt: string;
 }
 
+// ── Modelos de Acciones del Profesor (Exámenes, Mensajes y Análisis) ─────────
+
+export interface CreateExamDto {
+  title: string;
+  subject: string;
+  topic: string;
+  questionsCount: number;
+  difficulty: 'Baja' | 'Media' | 'Alta';
+  durationMinutes: number;
+  instructions?: string;
+}
+
+export interface SendMessageDto {
+  targetGroup: 'all' | 'needs-attention' | 'active';
+  subject: string;
+  message: string;
+  priority: 'normal' | 'urgent';
+  sendToForums: boolean;
+}
+
+export interface CohortAnalysisSummary {
+  totalStudents: number;
+  averageScore: number;
+  passingRate: number;
+  atRiskCount: number;
+  completedCount: number;
+  activeCount: number;
+  topPerformingTopic: string;
+  challengingTopic: string;
+  aiPedagogicalAdvice: string;
+}
+
 // ── Tipos y Modelos del Sistema de Notificaciones Docente ────────────────────
 
 export type NotificationType =

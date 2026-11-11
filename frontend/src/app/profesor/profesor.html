@@ -97,10 +97,43 @@
   />
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- 5. MODAL DE REGISTRO DE ESTUDIANTE (NODO HIJO PRESENTACIONAL)          -->
+  <!-- 5. MODALES INTERACTIVOS (NODOS HIJOS PRESENTACIONALES)                 -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <app-profesor-create-student-modal [isOpen]="isRegisterModalOpen()" [isSubmitting]="isSubmittingStudent()"
-    (closeModal)="closeRegisterModal()" (studentSubmitted)="onRegisterStudentSubmit($event)" />
+
+  <!-- Modal 5.1: Registro de Estudiante -->
+  <app-profesor-create-student-modal
+    [isOpen]="isRegisterModalOpen()"
+    [isSubmitting]="isSubmittingStudent()"
+    (closeModal)="closeRegisterModal()"
+    (studentSubmitted)="onRegisterStudentSubmit($event)"
+  />
+
+  <!-- Modal 5.2: Crear Examen / Evaluación -->
+  <app-profesor-create-exam-modal
+    [isOpen]="isCreateExamModalOpen()"
+    [isSubmitting]="isSubmittingExam()"
+    (closeModal)="closeCreateExamModal()"
+    (examSubmitted)="onCreateExamSubmit($event)"
+  />
+
+  <!-- Modal 5.3: Enviar Mensaje a la Clase -->
+  <app-profesor-send-message-modal
+    [isOpen]="isSendMessageModalOpen()"
+    [isSubmitting]="isSubmittingMessage()"
+    [defaultTargetGroup]="messageDefaultGroup()"
+    (closeModal)="closeSendMessageModal()"
+    (messageSubmitted)="onSendMessageSubmit($event)"
+  />
+
+  <!-- Modal 5.4: Diagnóstico y Análisis de Cohorte -->
+  <app-profesor-analysis-modal
+    [isOpen]="isAnalysisModalOpen()"
+    [summary]="cohortAnalysis()"
+    [students]="students()"
+    (closeModal)="closeAnalysisModal()"
+    (consultAi)="onConsultAiFromAnalysis($event)"
+    (messageAtRisk)="onMessageAtRiskFromAnalysis()"
+  />
 
   <!-- Toast Notification para Interacciones Rápidas -->
   @if (actionNotification()) {
