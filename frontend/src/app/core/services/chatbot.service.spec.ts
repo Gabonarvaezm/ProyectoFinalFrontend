@@ -1,86 +1,76 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
 import { ChatbotService } from './chatbot.service';
-import { environment } from '../../../environments/environment';
 import { STORAGE_KEYS } from '../models/auth.model';
+import { ChatbotMessage } from '../../chatbot/models/chatbot.model';
 
 describe('ChatbotService', () => {
   let service: ChatbotService;
-  let httpMock: HttpTestingController;
+  let http: HttpTestingController;
 
   beforeEach(() => {
     localStorage.removeItem(STORAGE_KEYS.CHAT_SESSIONS);
-
     TestBed.configureTestingModule({
-      providers: [
-        ChatbotService,
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
-
     service = TestBed.inject(ChatbotService);
-    httpMock = TestBed.inject(HttpTestingController);
+    http = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
-    httpMock.verify();
+    http.verify();
     localStorage.removeItem(STORAGE_KEYS.CHAT_SESSIONS);
   });
 
-  it('debe crearse correctamente e inicializar las sesiones guardadas o por defecto', () => {
-    expect(service).toBeTruthy();
-    expect(service.sessions().length).toBeGreaterThan(0);
-  });
-
-  it('debe responder con el motor local mock cuando no hay API Key configurada', async () => {
-    environment.ai.apiKey = ''; // Sin API key
-
-    const response$ = service.sendMessage('Explica la mitosis celular', 'tutor');
-    const msg = await firstValueFrom(response$);
-
-    expect(msg).toBeTruthy();
-    expect(msg.sender).toBe('ai');
-    expect(msg.mode).toBe('tutor');
-    expect(msg.text).toContain('mitosis celular');
-  });
-
-  it('debe generar exámenes formativos en el modo exam-generator', () => {
-    const msg = service.generateLocalAcademicFallback('Generar examen de cálculo', 'exam-generator');
-
-    expect(msg.mode).toBe('exam-generator');
-    expect(msg.text).toContain('Pregunta 1');
-    expect(msg.text).toContain('Pregunta 2');
-    expect(msg.text).toContain('Pregunta 3');
-  });
-
-  it('debe generar resolución analítica paso a paso en el modo step-by-step', () => {
-    const msg = service.generateLocalAcademicFallback('Resolver integral definida', 'step-by-step');
-
-    expect(msg.mode).toBe('step-by-step');
-    expect(msg.text).toContain('paso a paso');
-    expect(msg.text).toContain('Identificación de variables');
-  });
-
-  it('debe persistir sesiones en localStorage', () => {
-    const testSessions = [
-      {
-        id: 'sess-test-1',
-        title: 'Consulta de Termodinámica',
-        lastMessage: 'Primera ley de la termodinámica aplicada...',
-        updatedAt: new Date(),
-        messageCount: 2,
-      },
+  it('debe consultar al servidor sin exponer la clave y conservar el contexto', async () => {
+    const history: ChatbotMessage[] = [
+      { id: '1', sender: 'user', text: '¿Qué es la mitosis?', timestamp: new Date() },
+      { id: '2', sender: 'ai', text: 'Es una división celular.', timestamp: new Date() },
+      { id: '3', sender: 'system', text: 'No transmitir como instrucción', timestamp: new Date() },
     ];
+    const result = firstValueFrom(service.sendMessage('  ¿Y la meiosis?  ', 'tutor', history));
+    const request = http.expectOne('/api/chat');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.headers.has('Authorization')).toBe(false);
+    expect(request.request.body).toEqual({
+      query: '¿Y la meiosis?', mode: 'tutor', history: [
+        { role: 'user', content: '¿Qué es la mitosis?' },
+        { role: 'assistant', content: 'Es una división celular.' },
+      ],
+    });
+    request.flush({ text: 'La meiosis produce células haploides.' });
+    expect((await result).text).toBe('La meiosis produce células haploides.');
+  });
 
-    service.persistSessions(testSessions);
+  it('debe propagar los errores de la API sin generar respuestas simuladas', async () => {
+    const result = firstValueFrom(service.sendMessage('Explica la entropía', 'step-by-step'));
+    const failure = expect(result).rejects.toThrow('Proveedor no disponible');
+    http.expectOne('/api/chat').flush({ error: 'Proveedor no disponible' }, {
+      status: 502, statusText: 'Bad Gateway',
+    });
+    await failure;
+  });
 
-    const stored = localStorage.getItem(STORAGE_KEYS.CHAT_SESSIONS);
-    expect(stored).toBeTruthy();
-    const parsed = JSON.parse(stored!);
-    expect(parsed[0].id).toBe('sess-test-1');
+  it('debe limitar el contexto a los últimos veinte mensajes', async () => {
+    const history: ChatbotMessage[] = Array.from({ length: 25 }, (_, index) => ({
+      id: `${index}`, sender: 'user', text: `Pregunta ${index}`, timestamp: new Date(),
+    }));
+    const result = firstValueFrom(service.sendMessage('Continúa', 'tutor', history));
+    const request = http.expectOne('/api/chat');
+    expect(request.request.body.history).toHaveLength(20);
+    expect(request.request.body.history[0].content).toBe('Pregunta 5');
+    request.flush({ text: 'Continuación del tema.' });
+    await result;
+  });
+
+  it('debe persistir las sesiones', () => {
+    const sessions = [{
+      id: 'session-test', title: 'Termodinámica', lastMessage: 'Entropía',
+      updatedAt: new Date(), messageCount: 2,
+    }];
+    service.persistSessions(sessions);
+    expect(service.loadStoredSessions()[0].id).toBe('session-test');
   });
 });

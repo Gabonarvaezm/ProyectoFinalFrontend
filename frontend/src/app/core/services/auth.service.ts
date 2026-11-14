@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, computed, inject, PLATFORM_ID, signal } from '@angular/core';
 import { Observable, delay, of, throwError, tap } from 'rxjs';
+import { AUTH_ROUTES } from '../constants/auth.constants';
 import {
   AuthResponse,
   LoginCredentials,
@@ -54,6 +55,9 @@ export class AuthService {
   public readonly isAuthenticated = computed(() => this._currentUser() !== null);
   public readonly isProfessor = computed(() => this._currentUser()?.role === 'professor');
   public readonly isStudent = computed(() => this._currentUser()?.role === 'student');
+  public readonly dashboardRoute = computed(() =>
+    this.isProfessor() ? AUTH_ROUTES.PROFESSOR : AUTH_ROUTES.STUDENT
+  );
 
   /**
    * Carga la sesión activa almacenada previamente en localStorage

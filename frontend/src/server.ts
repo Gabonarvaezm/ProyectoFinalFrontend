@@ -6,11 +6,14 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { createChatbotRouter } from './server/chatbot-api';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+app.use('/api/chat', createChatbotRouter());
 
 /**
  * Example Express Rest API endpoints can be defined here.

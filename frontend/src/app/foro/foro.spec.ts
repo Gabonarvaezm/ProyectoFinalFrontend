@@ -84,10 +84,9 @@ describe('Foro Component (Parent Orchestrator & Child Nodes)', () => {
     expect(component.posts()[0].title).toBe('Nueva Consulta sobre Álgebra Lineal');
   });
 
-  it('should toggle user roles when header emits roleToggled', () => {
+  it('should use the student perspective by default without a role switch', () => {
     expect(component.currentRole()).toBe('student');
-    component.toggleRole();
-    expect(component.currentRole()).toBe('professor');
-    expect(component.currentUser().role).toBe('professor');
+    expect(component.currentUser().role).toBe('student');
+    expect(fixture.nativeElement.querySelector('.role-badge-btn')).toBeNull();
   });
 });

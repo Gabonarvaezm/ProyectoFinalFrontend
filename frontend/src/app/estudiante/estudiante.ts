@@ -1,3 +1,5 @@
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChatbotService } from '../core/services/chatbot.service';
 import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
@@ -30,8 +32,7 @@ import {
   EstudianteWeeklyProgressComponent,
 } from './components';
 import {
-  AI_DEFAULT_FALLBACK_REPLY,
-  AI_KNOWLEDGE_BASE,
+  AI_QUICK_ACTION_PROMPTS,
   SUBJECT_CATEGORY_MAP,
 } from './constants/estudiante.constants';
 import {
@@ -76,6 +77,7 @@ export type {
 })
 export class Estudiante {
   private readonly authService = inject(AuthService);
+  private readonly chatbotService = inject(ChatbotService);
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly destroyRef = inject(DestroyRef);
@@ -317,20 +319,15 @@ export class Estudiante {
   // ── Panel Lateral Derecho: Asistente de Aprendizaje IA ────────────────────
   public readonly chatMessages = signal<ChatMessage[]>([
     {
-      id: 'm1',
-      sender: 'user',
-      text: '¿Qué es la Mitosis?',
-      timestamp: new Date(),
-    },
-    {
-      id: 'm2',
+      id: 'welcome',
       sender: 'ai',
-      text: 'La mitosis es el proceso de división celular mediante el cual una célula madre se divide para producir dos células hijas genéticamente idénticas. Es fundamental para el crecimiento y la reparación de tejidos.',
+      text: '¡Hola! Soy DiscerIA. ¿En qué tema académico puedo ayudarte?',
       timestamp: new Date(),
     },
   ]);
 
   public readonly isAiThinking = signal<boolean>(false);
+  public readonly aiErrorMessage = signal<string | null>(null);
   public readonly aiInputText = signal<string>('');
 
   public readonly quickActions = signal<QuickAction[]>([
@@ -513,15 +510,14 @@ export class Estudiante {
   }
 
   public onQuickAction(action: QuickAction): void {
-    if (action.id === 'summary') {
-      this.sendAiMessage('Por favor genera un resumen clave del tema Biología Celular: Mitosis y Meiosis.');
-    } else if (action.id === 'exam') {
-      this.sendAiMessage('Crea un breve examen de práctica de 3 preguntas sobre Mitosis.');
-    } else if (action.id === 'explain') {
-      this.sendAiMessage('Explica de manera sencilla la diferencia entre Profase y Metafase.');
-    } else {
-      this.sendAiMessage(`Ayuda con: ${action.label}`);
+    if (this.isAiThinking()) return;
+    const prompt = AI_QUICK_ACTION_PROMPTS[action.id] ?? 'Ayúdame con ';
+    const topic = this.aiInputText().trim();
+    if (!topic) {
+      this.aiInputText.set(prompt);
+      return;
     }
+    this.sendAiMessage(`${prompt}${topic}`);
   }
 
   public onSendAiMessage(text: string): void {
@@ -535,36 +531,32 @@ export class Estudiante {
   }
 
   public sendAiMessage(promptText: string): void {
-    const userMsg: ChatMessage = {
-      id: `usr-${Date.now()}`,
-      sender: 'user',
-      text: promptText,
-      timestamp: new Date(),
-    };
-
-    this.chatMessages.update((prev) => [...prev, userMsg]);
+    const text = promptText.trim();
+    if (!text || text.length > 2000 || this.isAiThinking()) return;
+    const history = this.chatMessages();
+    this.aiErrorMessage.set(null);
+    const userMessageId = `user-${Date.now()}`;
+    this.chatMessages.update((messages) => [...messages, {
+      id: userMessageId, sender: 'user', text, timestamp: new Date(),
+    }]);
     this.aiInputText.set('');
     this.isAiThinking.set(true);
-
-    const timer = setTimeout(() => {
-      const lower = promptText.toLowerCase();
-      const matched = AI_KNOWLEDGE_BASE.find((rule) =>
-        rule.keywords.some((kw) => lower.includes(kw))
-      );
-      const reply = matched?.response ?? AI_DEFAULT_FALLBACK_REPLY;
-
-      const aiMsg: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        sender: 'ai',
-        text: reply,
-        timestamp: new Date(),
-      };
-
-      this.chatMessages.update((prev) => [...prev, aiMsg]);
-      this.isAiThinking.set(false);
-    }, 600);
-
-    this.timerIds.push(timer);
+    this.chatbotService.sendMessage(text, 'tutor', history)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (message) => {
+          this.chatMessages.update((messages) => [...messages, {
+            id: message.id, sender: 'ai', text: message.text, timestamp: message.timestamp,
+          }]);
+          this.isAiThinking.set(false);
+        },
+        error: (error: unknown) => {
+          this.chatMessages.update((messages) => messages.filter((message) => message.id !== userMessageId));
+          this.aiErrorMessage.set(error instanceof Error ? error.message : 'No se pudo consultar la IA. Intenta de nuevo.');
+          this.aiInputText.set(text);
+          this.isAiThinking.set(false);
+        },
+      });
   }
 
   public isAvatarBroken(id: string): boolean {

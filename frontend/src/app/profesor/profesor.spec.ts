@@ -1,20 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Profesor } from './profesor';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TeacherNotification } from './models/profesor.model';
 
 describe('Profesor Component', () => {
   let component: Profesor;
   let fixture: ComponentFixture<Profesor>;
+  let http: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Profesor],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Profesor);
     component = fixture.componentInstance;
+    http = TestBed.inject(HttpTestingController);
     await fixture.whenStable();
   });
 
@@ -96,7 +100,7 @@ describe('Profesor Component', () => {
     expect(component.filteredStudents().length).toBeGreaterThanOrEqual(3);
   });
 
-  it('debe enviar mensajes al Asistente de IA y recibir respuesta dinámica basada en los alumnos', () => {
+  it('debe enviar consultas al Asistente de IA y mostrar la respuesta de la API', () => {
     vi.useFakeTimers();
 
     component.aiInputText.set('¿Cuáles estudiantes necesitan atención prioritaria?');
@@ -105,7 +109,7 @@ describe('Profesor Component', () => {
     expect(component.chatMessages().length).toBe(1);
     expect(component.isAiThinking()).toBe(true);
 
-    vi.advanceTimersByTime(700);
+    http.expectOne('/api/chat').flush({ text: 'Revisa el progreso de Carlos Pérez con una actividad de refuerzo.' });
 
     expect(component.isAiThinking()).toBe(false);
     expect(component.chatMessages().length).toBe(2);
@@ -295,7 +299,7 @@ describe('Profesor Component', () => {
     expect(component.isAnalysisModalOpen()).toBe(false);
     expect(component.isAiDrawerOpen()).toBe(true);
 
-    vi.advanceTimersByTime(750);
+    http.expectOne('/api/chat').flush({ text: 'Diagnóstico pedagógico recibido de la API.' });
     expect(component.chatMessages().length).toBeGreaterThanOrEqual(2);
 
     vi.useRealTimers();

@@ -13,6 +13,7 @@ export class ProfesorAiChatComponent {
   public readonly isOpen = input<boolean>(false);
   public readonly chatMessages = input.required<readonly ChatMessage[]>();
   public readonly aiSuggestions = input.required<readonly AiSuggestion[]>();
+  public readonly errorMessage = input<string | null>(null);
   public readonly isAiThinking = input.required<boolean>();
 
   public readonly inputText = model<string>('');

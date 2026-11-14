@@ -68,6 +68,9 @@
 
   <!-- Barra de Entrada del Chat con IA -->
   <div class="ai-footer">
+    @if (errorMessage()) {
+      <p role="alert">{{ errorMessage() }}</p>
+    }
     <form class="ai-input-form" (ngSubmit)="onSubmit()">
       <input
         #chatInput
@@ -76,7 +79,7 @@
         placeholder="Pregunta a la IA sobre tus alumnos..."
         [value]="inputText()"
         (input)="inputText.set(chatInput.value)"
-        name="chatText"
+        name="chatText" maxlength="2000"
         [disabled]="isAiThinking()"
         aria-label="Pregunta al Asistente del Profesor"
         autocomplete="off"

@@ -14,6 +14,7 @@ export class EstudianteAiDrawerComponent {
   public readonly isOpen = input<boolean>(false);
   public readonly chatMessages = input.required<readonly ChatMessage[]>();
   public readonly quickActions = input.required<readonly QuickAction[]>();
+  public readonly errorMessage = input<string | null>(null);
   public readonly isAiThinking = input<boolean>(false);
   public readonly inputText = model<string>('');
 

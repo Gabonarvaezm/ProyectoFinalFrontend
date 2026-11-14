@@ -36,3 +36,9 @@ export const AI_KNOWLEDGE_BASE: readonly AiKnowledgeRule[] = [
 export const AI_DEFAULT_FALLBACK_REPLY =
   'He analizado tu consulta con base en la biblioteca académica de DiscerIA.';
 
+export const AI_QUICK_ACTION_PROMPTS: Readonly<Record<string, string>> = {
+  summary: 'Genera un resumen sobre ',
+  exam: 'Crea un examen de práctica de 3 preguntas sobre ',
+  explain: 'Explica con ejemplos sencillos ',
+};
+

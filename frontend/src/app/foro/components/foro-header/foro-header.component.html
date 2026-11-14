@@ -23,23 +23,6 @@
   </div>
 
   <div class="header-actions">
-    <!-- Píldora de Selección y Alternancia de Rol (Estudiante <-> Docente) -->
-    <button
-      type="button"
-      class="role-badge-btn"
-      [class.docente]="currentRole() === 'professor'"
-      (click)="onToggleRole()"
-      [title]="'Rol actual: ' + (currentRole() === 'professor' ? 'Docente' : 'Estudiante') + ' • Clic para alternar'"
-      aria-label="Alternar rol académico"
-    >
-      <i
-        [class]="currentRole() === 'professor' ? 'bi bi-mortarboard-fill' : 'bi bi-person-badge-fill'"
-        aria-hidden="true"
-      ></i>
-      <span>{{ currentRole() === 'professor' ? 'Docente' : 'Estudiante' }}</span>
-    </button>
-
-    <!-- Botón Topbar Asistente IA (Opción 1: Barra Superior) -->
     <button
       type="button"
       class="icon-btn btn-ai-toggle"
@@ -78,12 +61,9 @@
     </a>
 
     <!-- Perfil de usuario con fallback seguro de avatar -->
-    <button
-      type="button"
+    <div
       class="user-profile-badge"
-      (click)="onToggleRole()"
-      [title]="currentUser().name + ' (' + (currentUser().roleTitle || currentUser().role) + ') • Clic para alternar rol'"
-      aria-label="Perfil del usuario y alternar rol académico"
+      [title]="currentUser().name + ' (' + (currentUser().roleTitle || currentUser().role) + ')'"
     >
       @if (currentUser().avatar && !avatarLoadError()) {
         <img
@@ -95,6 +75,6 @@
       } @else {
         <div class="user-avatar-initials" aria-hidden="true">{{ currentUser().initials }}</div>
       }
-    </button>
+    </div>
   </div>
 </header>

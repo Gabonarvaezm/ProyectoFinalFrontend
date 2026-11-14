@@ -1,3 +1,5 @@
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChatbotService } from '../core/services/chatbot.service';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import {
   FormBuilder,
@@ -62,6 +64,7 @@ import {
 export class Profesor {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly chatbotService = inject(ChatbotService);
   private readonly profesorService = inject(ProfesorService);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
@@ -203,6 +206,7 @@ export class Profesor {
 
   public readonly chatMessages = signal<ChatMessage[]>([]);
   public readonly isAiThinking = signal<boolean>(false);
+  public readonly aiErrorMessage = signal<string | null>(null);
   public readonly aiInputText = signal<string>('');
 
   // Notificación tipo toast para feedback
@@ -436,54 +440,29 @@ export class Profesor {
 
   public submitAiMessage(): void {
     const text = this.aiInputText().trim();
-    if (!text || this.isAiThinking()) return;
-
-    const userMsg: ChatMessage = {
-      id: `msg-${Date.now()}`,
-      sender: 'user',
-      text,
-      timestamp: new Date(),
-    };
-
-    this.chatMessages.update((msgs) => [...msgs, userMsg]);
+    if (!text || text.length > 2000 || this.isAiThinking()) return;
+    const history = this.chatMessages();
+    this.aiErrorMessage.set(null);
+    this.chatMessages.update((messages) => [...messages, {
+      id: `user-${Date.now()}`, sender: 'user', text, timestamp: new Date(),
+    }]);
     this.aiInputText.set('');
     this.isAiThinking.set(true);
-
-    const timer = setTimeout(() => {
-      const responseText = this.generateAiResponse(text);
-      const aiMsg: ChatMessage = {
-        id: `msg-${Date.now() + 1}`,
-        sender: 'ai',
-        text: responseText,
-        timestamp: new Date(),
-      };
-      this.chatMessages.update((msgs) => [...msgs, aiMsg]);
-      this.isAiThinking.set(false);
-    }, 600);
-
-    this.timerIds.push(timer);
-  }
-
-  private generateAiResponse(prompt: string): string {
-    const lower = prompt.toLowerCase();
-    const studentsList = this.students();
-    const struggling = studentsList.filter((s) => s.score < 50);
-
-    if (lower.includes('atención') || lower.includes('dificultad') || lower.includes('notas')) {
-      if (struggling.length > 0) {
-        const names = struggling.map((s) => `${s.studentName} (${s.score}%)`).join(', ');
-        return `He identificado que ${struggling.length} estudiante(s) requieren atención prioritaria: ${names}. Sugiero reforzar el tema de Mitosis y asignar una lectura guiada.`;
-      }
-      return 'Actualmente ningún estudiante presenta notas críticas (< 50%). ¡La cohorte avanza con buen rendimiento!';
-    }
-
-    if (lower.includes('calificaciones') || lower.includes('promedio')) {
-      const total = studentsList.reduce((acc, s) => acc + s.score, 0);
-      const avg = studentsList.length ? Math.round(total / studentsList.length) : 0;
-      return `El promedio general de la cohorte es de ${avg}%. Tienes ${this.profesorService.activeStudents()} estudiantes activos actualmente.`;
-    }
-
-    return `He procesado tu consulta pedagógica: "${prompt}". Con base en el avance de tus ${studentsList.length} estudiantes, el progreso del grupo se mantiene estable en el módulo de Biología.`;
+    this.chatbotService.sendMessage(text, 'tutor', history)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (message) => {
+          this.chatMessages.update((messages) => [...messages, {
+            id: message.id, sender: 'ai', text: message.text, timestamp: message.timestamp,
+          }]);
+          this.isAiThinking.set(false);
+        },
+        error: (error: unknown) => {
+          this.aiErrorMessage.set(error instanceof Error ? error.message : 'No se pudo consultar la IA. Intenta de nuevo.');
+          this.aiInputText.set(text);
+          this.isAiThinking.set(false);
+        },
+      });
   }
 
   private showToast(msg: string): void {
