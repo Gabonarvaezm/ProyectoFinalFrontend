@@ -9,3 +9,4 @@ export interface ChatbotConfiguration {
 }
 
 export function loadChatbotConfiguration(options?: ChatbotConfigurationOptions): ChatbotConfiguration;
+export function findProjectDirectory(startDirectory: string): string;

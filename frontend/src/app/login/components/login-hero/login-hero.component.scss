@@ -11,12 +11,7 @@
 .hero-section {
   height: 100%;
   min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    var(--color-slate-900) 0%,
-    var(--color-slate-800) 60%,
-    var(--color-primary-800) 140%
-  );
+  background: var(--color-auth-hero-bg);
   color: var(--color-white);
   display: flex;
   flex-direction: column;
@@ -90,14 +85,14 @@
     font-weight: var(--font-weight-extrabold);
     line-height: var(--line-height-tight);
     margin-bottom: var(--space-4);
-    color: var(--color-slate-50);
+    color: var(--color-auth-hero-text);
     letter-spacing: -0.025em;
   }
 
   .hero-description {
     font-size: var(--font-size-base);
     line-height: var(--line-height-relaxed);
-    color: var(--color-slate-300);
+    color: var(--color-auth-hero-secondary);
     margin-bottom: var(--space-8);
   }
 
@@ -111,7 +106,7 @@
       align-items: center;
       gap: var(--space-3);
       font-size: var(--font-size-sm);
-      color: var(--color-slate-200);
+      color: var(--color-auth-hero-secondary);
 
       i {
         color: var(--color-info);

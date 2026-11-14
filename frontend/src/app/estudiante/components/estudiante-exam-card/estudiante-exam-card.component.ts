@@ -9,6 +9,7 @@ import { PracticeExam, WeeklyProgressItem } from '../../models/estudiante.model'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EstudianteExamCardComponent {
+  readonly isPublished = input(false);
   public readonly practiceExam = input.required<PracticeExam>();
   public readonly weeklyProgress = input.required<readonly WeeklyProgressItem[]>();
 

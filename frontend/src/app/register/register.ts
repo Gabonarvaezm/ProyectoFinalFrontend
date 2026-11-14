@@ -1,13 +1,12 @@
-import { isPlatformBrowser } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../core/services/auth.service';
 import {
   Component,
   DestroyRef,
   inject,
-  PLATFORM_ID,
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { STORAGE_KEYS } from '../core/models/auth.model';
 import {
   AUTH_ROUTES,
   AUTH_TIMERS,
@@ -27,7 +26,7 @@ import {
 })
 export class Register {
   private readonly router = inject(Router);
-  private readonly platformId = inject(PLATFORM_ID);
+  private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
   private timerIds: ReturnType<typeof setTimeout>[] = [];
@@ -52,31 +51,17 @@ export class Register {
     this.successMessage.set(null);
     this.isLoading.set(true);
 
-    const submitTimer = setTimeout(() => {
-      this.isLoading.set(false);
-      this.successMessage.set(
-        `¡Cuenta creada exitosamente para ${payload.fullName}! Redirigiendo al inicio de sesión...`
-      );
-
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem(
-          STORAGE_KEYS.REGISTERED_USER,
-          JSON.stringify({
-            fullName: payload.fullName,
-            email: payload.email.toLowerCase(),
-            institution: payload.institution,
-            role: payload.role,
-          })
-        );
-      }
-
-      const navTimer = setTimeout(
-        () => this.router.navigate([AUTH_ROUTES.LOGIN]),
-        AUTH_TIMERS.REGISTER_REDIRECT_DELAY_MS
-      );
-      this.timerIds.push(navTimer);
-    }, AUTH_TIMERS.REGISTER_SIMULATION_MS);
-
-    this.timerIds.push(submitTimer);
+    this.authService.register(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.successMessage.set(`¡Cuenta creada exitosamente para ${payload.fullName}! Redirigiendo al inicio de sesión...`);
+        const timer = setTimeout(() => this.router.navigate([AUTH_ROUTES.LOGIN]), AUTH_TIMERS.REGISTER_REDIRECT_DELAY_MS);
+        this.timerIds.push(timer);
+      },
+      error: (error: Error) => {
+        this.isLoading.set(false);
+        this.errorMessage.set(error.message);
+      },
+    });
   }
 }

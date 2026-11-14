@@ -61,10 +61,10 @@
         background-color: var(--color-primary-50);
       }
       &.quadrant-2 {
-        background-color: #f0fdf4;
+        background-color: var(--color-landing-soft-green);
       }
       &.quadrant-3 {
-        background-color: #f0f9ff;
+        background-color: var(--color-landing-soft-cyan);
       }
       &.quadrant-4 {
         background-color: var(--color-slate-50);
@@ -122,7 +122,7 @@
 
       &.cyan-soft,
       &.pink-soft {
-        background: #f0f9ff;
+        background: var(--color-landing-soft-cyan);
         color: var(--color-info);
       }
     }

@@ -1,3 +1,5 @@
+import { effect } from '@angular/core';
+import { AcademicSyncService } from './academic-sync.service';
 import { isPlatformBrowser } from '@angular/common';
 import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { STORAGE_KEYS } from '../models/auth.model';
@@ -23,6 +25,7 @@ import {
 })
 export class ProfesorService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly sync = inject(AcademicSyncService);
 
   // ── Estado Reactivo Principal con Signals ─────────────────────────────────
   private readonly _students = signal<StudentProgress[]>([]);
@@ -76,6 +79,15 @@ export class ProfesorService {
 
   constructor() {
     this.initializeData();
+    effect(() => {
+      const state = this.sync.snapshot();
+      if (!state) {
+        if (this.sync.enabled()) { this._students.set([]); this._assignmentsCount.set(0); }
+        return;
+      }
+      this._students.set(state.students);
+      this._assignmentsCount.set(state.exams.length);
+    });
   }
 
   // ── Métodos de Negocio: Estudiantes ──────────────────────────────────────
@@ -111,6 +123,7 @@ export class ProfesorService {
     );
 
     this.persistStudents();
+    this.sync.publish('student.upsert', newStudent);
     return newStudent;
   }
 
@@ -156,6 +169,8 @@ export class ProfesorService {
         'bi bi-graph-up'
       );
       this.persistStudents();
+      const updated = this._students().find((student) => student.id === id);
+      if (updated) this.sync.publish('student.upsert', updated);
     }
   }
 
@@ -167,6 +182,7 @@ export class ProfesorService {
     this._students.update((prev) => prev.filter((s) => s.id !== id));
 
     if (target) {
+      if (target.email) this.sync.publish('student.remove', { email: target.email });
       this.addActivity(
         `Se retiró el registro de ${target.studentName}.`,
         'purple',
@@ -201,6 +217,7 @@ export class ProfesorService {
    * Registra un nuevo examen académico creado por el profesor
    */
   public createExam(dto: CreateExamDto): void {
+    this.sync.publish('exam.publish', { ...dto, id: crypto.randomUUID() });
     this._assignmentsCount.update((count) => count + 1);
 
     this.addActivity(
@@ -226,6 +243,7 @@ export class ProfesorService {
    * Envía un mensaje o comunicado oficial a la clase
    */
   public sendMessageToClass(dto: SendMessageDto): void {
+    this.sync.publish('message.publish', { ...dto, id: crypto.randomUUID() });
     const targetLabel =
       dto.targetGroup === 'all'
         ? 'toda la clase'

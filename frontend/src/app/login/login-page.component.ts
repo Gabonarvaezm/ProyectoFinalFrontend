@@ -66,7 +66,7 @@ export class LoginPageComponent {
       role: roleToUse,
     };
 
-    const registeredRole = this.authService.getRegisteredUserRole(credentials.email);
+
 
     this.authService
       .login(payload)
@@ -74,7 +74,7 @@ export class LoginPageComponent {
       .subscribe({
         next: (response) => {
           this.isLoading.set(false);
-          const effectiveRole = registeredRole ?? response.user.role ?? roleToUse;
+          const effectiveRole = response.user.role;
           const targetRoute = this.resolveTargetRoute(effectiveRole);
           const successText = this.resolveSuccessMessage(effectiveRole);
 

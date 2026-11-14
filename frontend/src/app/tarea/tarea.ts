@@ -1,3 +1,4 @@
+import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -30,6 +31,7 @@ import {
   selector: 'app-tarea',
   standalone: true,
   imports: [
+    ActionToastComponent,
     CommonModule,
     RouterLink,
     NgTemplateOutlet,

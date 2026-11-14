@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseEnv } from 'node:util';
 
-function findProjectDirectory(startDirectory) {
+export function findProjectDirectory(startDirectory) {
   let directory = startDirectory;
   while (true) {
     const packagePath = join(directory, 'package.json');
