@@ -1,3 +1,4 @@
+import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChatbotService } from '../core/services/chatbot.service';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
@@ -43,6 +44,7 @@ import {
 
 @Component({
   imports: [
+    ActionToastComponent,
     Biblioteca,
     ConfiguracionComponent,
     ProfesorSidebarComponent,

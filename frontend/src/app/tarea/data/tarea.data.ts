@@ -1,4 +1,4 @@
-import { Tarea } from '../models/tarea.model';
+import type { Tarea } from '../models/tarea.model';
 
 export const INITIAL_TAREAS: Tarea[] = [
   {

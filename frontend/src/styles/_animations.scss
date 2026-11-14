@@ -92,23 +92,23 @@
 // ── Clases Utilitarias para la Interfaz ───────────────────────────────────────
 
 .anim-fade-in {
-  animation: fadeIn var(--duration-normal) var(--ease-out-expo) forwards;
+  animation: fadeIn var(--duration-normal) var(--ease-out-expo) both;
 }
 
 .anim-fade-up {
-  animation: fadeInUp var(--duration-slow) var(--ease-out-expo) forwards;
+  animation: fadeInUp var(--duration-slow) var(--ease-out-expo) both;
 }
 
 .anim-fade-down {
-  animation: fadeInDown var(--duration-slow) var(--ease-out-expo) forwards;
+  animation: fadeInDown var(--duration-slow) var(--ease-out-expo) both;
 }
 
 .anim-scale-in {
-  animation: scaleInSubtle var(--duration-normal) var(--ease-out-expo) forwards;
+  animation: scaleInSubtle var(--duration-normal) var(--ease-out-expo) both;
 }
 
 .anim-slide-right {
-  animation: slideInRight var(--duration-slow) var(--ease-out-expo) forwards;
+  animation: slideInRight var(--duration-slow) var(--ease-out-expo) both;
 }
 
 .anim-pulse-ai {
@@ -179,6 +179,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

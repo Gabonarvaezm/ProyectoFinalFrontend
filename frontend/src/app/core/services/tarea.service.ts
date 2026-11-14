@@ -1,3 +1,5 @@
+import { effect } from '@angular/core';
+import { AcademicSyncService } from './academic-sync.service';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CreateTareaDto, GradeTareaDto, SubmitTareaDto, Tarea, TareaSubmission } from '../../tarea/models/tarea.model';
@@ -11,8 +13,20 @@ const STORAGE_KEY_TAREAS = 'disceria_academic_tareas';
 })
 export class TareaService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly sync = inject(AcademicSyncService);
 
   public readonly tareas = signal<Tarea[]>(this.loadInitialTareas());
+
+  constructor() {
+    effect(() => {
+      const state = this.sync.snapshot();
+      if (!state) {
+        if (this.sync.enabled()) this.tareas.set([...INITIAL_TAREAS]);
+        return;
+      }
+      this.tareas.set(state.tareas);
+    });
+  }
 
   private loadInitialTareas(): Tarea[] {
     if (isPlatformBrowser(this.platformId)) {
@@ -43,7 +57,7 @@ export class TareaService {
 
   public createTarea(dto: CreateTareaDto, professorName: string): Tarea {
     const newTarea: Tarea = {
-      id: `tar-${Date.now()}`,
+      id: `tar-${crypto.randomUUID()}`,
       title: dto.title.trim(),
       description: dto.description.trim(),
       subject: dto.subject,
@@ -59,12 +73,13 @@ export class TareaService {
 
     this.tareas.update((list) => [newTarea, ...list]);
     this.persist();
+    this.sync.publish('tarea.publish', newTarea);
     return newTarea;
   }
 
   public submitTarea(dto: SubmitTareaDto, student?: User | null): TareaSubmission {
     const submission: TareaSubmission = {
-      id: `sub-${Date.now()}`,
+      id: `sub-${crypto.randomUUID()}`,
       tareaId: dto.tareaId,
       studentId: student?.id || 'student-local',
       studentName: student?.fullName || 'Alejandro Silva',
@@ -88,10 +103,12 @@ export class TareaService {
       })
     );
     this.persist();
+    this.sync.publish('tarea.submit', submission);
     return submission;
   }
 
   public gradeTarea(dto: GradeTareaDto): void {
+    this.sync.publish('tarea.grade', dto);
     this.tareas.update((list) =>
       list.map((t) => {
         if (t.id === dto.tareaId && t.mySubmission) {
@@ -113,6 +130,7 @@ export class TareaService {
   }
 
   public deleteTarea(tareaId: string): void {
+    this.sync.publish('tarea.delete', { id: tareaId });
     this.tareas.update((list) => list.filter((t) => t.id !== tareaId));
     this.persist();
   }

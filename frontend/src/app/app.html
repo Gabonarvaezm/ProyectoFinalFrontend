@@ -1,1 +1,2 @@
 <router-outlet></router-outlet>
+<app-academic-sync-status [error]="academicSync.error()" [saving]="academicSync.saving()" (retry)="academicSync.retry()" (discard)="academicSync.discardFailed()" />

@@ -1,4 +1,4 @@
-<header class="navbar">
+<header class="navbar" (keydown.escape)="closeMobileMenu.emit()">
   <div class="nav-container">
     <!-- Logo de Marca con Icono Robot DiscerIA -->
     <a routerLink="/" class="brand-logo" aria-label="DiscerIA - Biblioteca Virtual para Instituciones Públicas">
@@ -40,6 +40,7 @@
       <button
         type="button"
         class="mobile-menu-toggle"
+        aria-controls="landing-mobile-navigation"
         (click)="toggleMobileMenu.emit()"
         [attr.aria-expanded]="mobileMenuOpen()"
         [attr.aria-label]="mobileMenuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'"
@@ -51,7 +52,7 @@
 
   <!-- Menú Desplegable Móvil -->
   @if (mobileMenuOpen()) {
-    <nav class="mobile-dropdown anim-fade-down" aria-label="Menú móvil">
+    <nav id="landing-mobile-navigation" class="mobile-dropdown anim-fade-down" aria-label="Menú móvil">
       <a href="#biblioteca" class="mobile-link" (click)="closeMobileMenu.emit()">Biblioteca</a>
       <a href="#docentes" class="mobile-link" (click)="closeMobileMenu.emit()">Docentes</a>
       <a href="#beneficios" class="mobile-link" (click)="closeMobileMenu.emit()">Beneficios</a>

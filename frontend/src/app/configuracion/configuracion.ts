@@ -1,3 +1,4 @@
+import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -40,6 +41,7 @@ import {
   selector: 'app-configuracion',
   standalone: true,
   imports: [
+    ActionToastComponent,
     CommonModule,
     ReactiveFormsModule,
     ConfiguracionHeaderComponent,

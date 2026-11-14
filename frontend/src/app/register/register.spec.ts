@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
@@ -13,7 +15,7 @@ describe('Register Component (Smart Parent & Presentational Child Nodes)', () =>
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Register, RegisterHeroComponent, RegisterFormComponent],
-      providers: [provideRouter([]), provideNoopAnimations()],
+      providers: [provideRouter([]), provideNoopAnimations(), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     parentFixture = TestBed.createComponent(Register);
@@ -55,6 +57,8 @@ describe('Register Component (Smart Parent & Presentational Child Nodes)', () =>
       });
 
       expect(parentComponent.isLoading()).toBe(true);
+
+      TestBed.inject(HttpTestingController).expectOne('/api/academic/register').flush({ user: { id: 'registered-user', fullName: 'Carlos Docente', email: 'carlos@universidad.edu', institution: 'Universidad Nacional', role: 'professor' } });
 
       // Simulación de registro (1200ms)
       await vi.advanceTimersByTimeAsync(1250);

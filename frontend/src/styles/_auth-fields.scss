@@ -1,0 +1,23 @@
+// Keep native autofill and the caret aligned with the active form theme.
+@mixin autofill {
+  caret-color: var(--color-text-main);
+
+  &:autofill,
+  &:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-text-main);
+    box-shadow: inset 0 0 0 1000px var(--color-bg-surface);
+
+    &:focus {
+      box-shadow: inset 0 0 0 1000px var(--color-bg-surface), var(--focus-ring);
+    }
+
+    &.is-invalid {
+      box-shadow: inset 0 0 0 1000px var(--color-auth-invalid-bg);
+
+      &:focus {
+        box-shadow: inset 0 0 0 1000px var(--color-auth-invalid-bg),
+          0 0 0 3px var(--color-danger-border);
+      }
+    }
+  }
+}

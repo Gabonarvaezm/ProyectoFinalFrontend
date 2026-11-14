@@ -23,6 +23,20 @@ describe('Foro Component (Parent Orchestrator & Child Nodes)', () => {
     expect(component.selectedSubject()).toBe('Todas las Materias');
   });
 
+  it('debe mostrar una alerta al pulsar la campana del foro en modo oscuro', () => {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    try {
+      fixture.nativeElement.querySelector('[aria-label="Notificaciones del foro"]').click();
+      fixture.detectChanges();
+      const toast = fixture.nativeElement.querySelector('app-action-toast[role="status"]');
+      expect(toast).toBeTruthy();
+      expect(toast.textContent).toContain('consultas');
+      expect(toast.getAttribute('aria-live')).toBe('polite');
+    } finally {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  });
+
   it('should update filteredPosts when filters node modifies subject or search query', () => {
     component.onFilterChanged({ subject: 'Matemáticas', query: 'integrales' });
     const filtered = component.filteredPosts();

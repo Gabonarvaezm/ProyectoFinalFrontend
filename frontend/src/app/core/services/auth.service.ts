@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, computed, inject, PLATFORM_ID, signal } from '@angular/core';
-import { Observable, delay, of, throwError, tap } from 'rxjs';
+import { Observable, throwError, tap, catchError, switchMap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { AUTH_ROUTES } from '../constants/auth.constants';
 import {
   AuthResponse,
@@ -17,7 +18,7 @@ export interface MockAccount {
 
 /**
  * Catálogo central de usuarios mock predefinidos para la plataforma DiscerIA.
- * 100% autónomo y persistente en frontend sin dependencias backend.
+ * Conserva las cuentas de demostración utilizadas por la interfaz y sus pruebas.
  */
 export const MOCK_USERS: MockAccount[] = [
   {
@@ -49,6 +50,9 @@ export const MOCK_USERS: MockAccount[] = [
 })
 export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly http = inject(HttpClient);
+  private readonly _sessionToken = signal<string | null>(this.loadToken());
+  public readonly sessionToken = this._sessionToken.asReadonly();
   private readonly _currentUser = signal<User | null>(this.loadActiveSession());
 
   public readonly currentUser = this._currentUser.asReadonly();
@@ -78,7 +82,7 @@ export class AuthService {
 
   /**
    * Autenticación con credenciales institucionales.
-   * Valida integridad contra cuentas mock y usuarios registrados dinámicamente en LocalStorage.
+   * El servidor valida la contraseña y determina el rol de la cuenta registrada.
    */
   public login(credentials: LoginCredentials): Observable<AuthResponse> {
     const { email, password } = credentials;
@@ -94,42 +98,20 @@ export class AuthService {
       );
     }
 
-    // 1. Buscar en cuentas Mock predefinidas
-    const mockMatch = MOCK_USERS.find(
-      (acc) => acc.user.email.toLowerCase() === trimmedEmail
-    );
-
-    // 2. Buscar en registro dinámico previo de LocalStorage
     const registeredData = this.getRegisteredUserData(trimmedEmail);
-
-    let resolvedRole: User['role'] =
-      (credentials.role as User['role']) ??
-      mockMatch?.user.role ??
-      (registeredData?.role as User['role']) ??
-      'student';
-
-    const user: User = {
-      id: mockMatch?.user.id ?? `usr-${Date.now()}`,
-      email: trimmedEmail,
-      fullName:
-        registeredData?.fullName ??
-        mockMatch?.user.fullName ??
-        this.extractNameFromEmail(trimmedEmail),
-      avatarUrl: mockMatch?.user.avatarUrl,
-      role: resolvedRole,
-      institution:
-        registeredData?.institution ??
-        mockMatch?.user.institution ??
-        'Universidad Tecnológica',
-    };
-
-    const response: AuthResponse = {
-      user,
-      token: `jwt-simulated-token-${Date.now()}`,
-    };
-
-    return of(response).pipe(
-      delay(800),
+    const request = () => this.http.post<AuthResponse>('/api/academic/login', { email: trimmedEmail, password });
+    return request().pipe(
+      catchError((error: unknown) => {
+        if (!(error instanceof HttpErrorResponse) || error.status !== 401 || !registeredData) return throwError(() => this.toError(error));
+        return this.http.post('/api/academic/register', { ...registeredData, password }).pipe(
+          catchError(() => throwError(() => this.toError(error))),
+          switchMap(() => request())
+        );
+      }),
+      tap((res) => {
+        this._sessionToken.set(res.token);
+        if (isPlatformBrowser(this.platformId)) localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, res.token);
+      }),
       tap((res) => {
         this._currentUser.set(res.user);
         if (isPlatformBrowser(this.platformId)) {
@@ -152,9 +134,11 @@ export class AuthService {
    */
   public logout(): void {
     this._currentUser.set(null);
+    this._sessionToken.set(null);
     if (isPlatformBrowser(this.platformId)) {
       try {
         localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
       } catch (e) {
         console.warn('[AuthService] Error al limpiar storage en logout:', e);
@@ -209,11 +193,24 @@ export class AuthService {
     return mock?.user.role ?? null;
   }
 
-  private extractNameFromEmail(email: string): string {
-    const namePart = email.split('@')[0] || 'Estudiante';
-    return namePart
-      .split('.')
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(' ');
+  public register(data: RegisteredUserData & { password: string }): Observable<{ user: User }> {
+    return this.http.post<{ user: User }>('/api/academic/register', data).pipe(
+      tap(({ user }) => {
+        if (isPlatformBrowser(this.platformId)) localStorage.setItem(STORAGE_KEYS.REGISTERED_USER, JSON.stringify(user));
+      }),
+      catchError((error: unknown) => throwError(() => this.toError(error)))
+    );
+  }
+
+  private loadToken(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    try { return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN); } catch { return null; }
+  }
+
+  private toError(error: unknown): Error {
+    if (error instanceof Error && !(error instanceof HttpErrorResponse)) return error;
+    const detail: unknown = error instanceof HttpErrorResponse ? error.error : null;
+    return new Error(typeof detail === 'object' && detail !== null && 'error' in detail && typeof detail.error === 'string'
+      ? detail.error : 'No se pudo conectar con el servidor. Intenta de nuevo.');
   }
 }

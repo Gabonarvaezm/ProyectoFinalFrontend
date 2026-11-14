@@ -1,4 +1,4 @@
-import { Book, CategoryFilter } from '../models/book.model';
+import type { Book, CategoryFilter } from '../models/book.model';
 
 export const CATEGORIES: CategoryFilter[] = [
   { id: 'all', label: 'Todos los Recursos', icon: 'bi bi-grid' },

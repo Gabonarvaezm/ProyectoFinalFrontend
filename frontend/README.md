@@ -1,5 +1,21 @@
 # DiscerIA
 
+## Contenidos compartidos entre docentes y estudiantes
+
+El registro, el inicio de sesión, la biblioteca, el foro, las tareas, los exámenes publicados y los comunicados utilizan `/api/academic`. El servidor conserva las cuentas y los contenidos en `frontend/data/academic.sqlite`, con SQLite incluido en Node.js 24. La carpeta de datos está excluida de Git y debe conservarse al reiniciar o actualizar el servidor.
+
+Ejecuta `npm start` desde `frontend` para iniciar Angular y la API. Todos los usuarios deben acceder a la misma aplicación y al mismo servidor; cada navegador puede tener su propia sesión. Los paneles consultan novedades cada cuatro segundos, sin recargar la página. No hace falta contratar otro servicio para las pruebas locales.
+
+Al actualizar desde la versión anterior, vuelve a iniciar sesión. Las cuentas de demostración siguen siendo `profesor@universidad.edu` y `estudiante@universidad.edu`, ambas con contraseña `password123`. Las cuentas nuevas se registran en el servidor. Un perfil de registro antiguo que aún exista en el navegador puede migrarse al primer inicio de sesión.
+
+Las publicaciones antiguas de biblioteca, foro y tareas que aún estén guardadas en el navegador del profesor se importan una vez al iniciar sesión. Los exámenes antiguos que solo incrementaban un contador y los mensajes que nunca se conservaron como contenido no pueden reconstruirse: deben volver a publicarse.
+
+Los exámenes muestran los datos que recoge el formulario docente: tema, cantidad de preguntas, dificultad, duración e instrucciones. El formulario actual no incorpora un editor de preguntas ni de respuestas; publicar un examen no genera automáticamente ese contenido.
+
+Los comunicados respetan el grupo seleccionado, incluso al compartirlos en el foro. Cada alumno conserva su propio estado de lectura y eliminación de avisos. Los envíos pendientes se conservan por cuenta y se reintentan al recuperar la conexión. La API comprueba el rol del usuario y no permite que un estudiante publique recursos exclusivos del docente.
+
+Para desplegar la web, el alojamiento debe ejecutar el servidor Node de producción y conservar la base de datos. Subir solamente los archivos estáticos de Angular no habilita la comunicación entre usuarios.
+
 ## Asistente académico con OpenRouter
 
 El navegador envía las consultas a `/api/chat`. El servidor Express consulta OpenRouter y mantiene la clave fuera del código público. La página del chatbot y los asistentes laterales de estudiante y profesor utilizan el mismo servicio.

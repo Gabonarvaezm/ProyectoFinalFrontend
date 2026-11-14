@@ -57,6 +57,7 @@
       [currentUser]="currentUser()"
       [isAiPanelOpen]="isAiPanelOpen()"
       (aiToggleClicked)="toggleAiPanel()"
+      (notificationsClicked)="onNotificationsClicked()"
     />
 
     <!-- Contenedor con Feed Central y Panel Lateral Derecho de Asistente -->
@@ -134,10 +135,7 @@
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   <!-- 4. MENSAJE TOAST FLOTANTE DE RETROALIMENTACIÓN                         -->
   <!-- ══════════════════════════════════════════════════════════════════════ -->
-  @if (toastMessage()) {
-    <div class="toast-notification" role="status" aria-live="polite">
-      <i class="bi bi-info-circle-fill toast-icon"></i>
-      <span>{{ toastMessage() }}</span>
-    </div>
+  @if (toastMessage(); as message) {
+    <app-action-toast [message]="message" tone="info" />
   }
 </div>

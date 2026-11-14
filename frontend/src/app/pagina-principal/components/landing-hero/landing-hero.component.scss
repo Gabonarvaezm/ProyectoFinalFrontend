@@ -15,10 +15,10 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
     padding: 0 1.5rem;
     display: grid;
     grid-template-columns: 1.15fr 0.85fr;
-    gap: 4rem;
+    gap: clamp(2rem, 4vw, 4rem);
     align-items: center;
 
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       grid-template-columns: 1fr;
       text-align: center;
       gap: 3.5rem;
@@ -28,7 +28,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
   .hero-text-col {
     max-width: 580px;
 
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       margin: 0 auto;
     }
   }
@@ -42,7 +42,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
     margin-bottom: 1.5rem;
 
     @media (max-width: 640px) {
-      font-size: 2.35rem;
+      font-size: clamp(1.8rem, 6vw, 2.35rem);
     }
   }
 
@@ -53,7 +53,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
     margin-bottom: 2.25rem;
     max-width: 520px;
 
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       margin-left: auto;
       margin-right: auto;
     }
@@ -64,7 +64,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
     align-items: center;
     gap: 1.5rem;
 
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       justify-content: center;
     }
 
@@ -74,7 +74,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
     }
 
     .btn-enroll {
-      background: var(--color-primary-700);
+      background: var(--color-landing-action-bg);
       color: var(--color-white);
       font-size: 1rem;
       font-weight: var(--font-weight-semibold);
@@ -85,7 +85,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
       transition: all var(--duration-fast) ease;
 
       &:hover {
-        background: var(--color-primary-800);
+        background: var(--color-landing-action-hover);
         box-shadow: 0 12px 26px rgba(29, 78, 216, 0.42);
         transform: translateY(-2px);
       }
@@ -118,7 +118,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
       &:hover {
         color: var(--color-primary-700);
         .play-icon-wrap {
-          background: var(--color-primary-700);
+          background: var(--color-landing-action-bg);
           color: var(--color-white);
           transform: scale(1.08);
           box-shadow: 0 4px 14px rgba(29, 78, 216, 0.35);
@@ -136,7 +136,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
 
   .hero-arch-card {
     position: relative;
-    width: 380px;
+    width: min(380px, 100%);
     height: 490px;
     display: flex;
     align-items: flex-end;
@@ -168,10 +168,10 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
     .floating-badge {
       position: absolute;
       z-index: 3;
-      background: rgba(255, 255, 255, 0.94);
+      background: var(--color-landing-card-bg);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--color-landing-card-border);
       border-radius: 18px;
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
       display: flex;
@@ -292,6 +292,13 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
       }
 
       .class-avatar {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border-radius: 50%;
+        background: var(--color-primary-50);
+        color: var(--color-primary-700);
+        font-size: 1.2rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -318,7 +325,7 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
       }
 
       .btn-join-now {
-        background: var(--color-primary-700);
+        background: var(--color-landing-action-bg);
         color: var(--color-white);
         text-align: center;
         font-size: var(--font-size-xs);
@@ -329,10 +336,38 @@ $gradient-hero-arch: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 10
         transition: background var(--duration-fast) ease;
 
         &:hover {
-          background: var(--color-primary-800);
+          background: var(--color-landing-action-hover);
         }
       }
     }
   }
 }
 
+
+// Keep the portrait clear and every card inside the viewport on small screens.
+@media (max-width: 640px) {
+  .hero-section {
+    padding-top: 2.5rem;
+    .hero-arch-card {
+      --portrait-height: clamp(320px, 90vw, 410px);
+      display: grid;
+      justify-items: center;
+      gap: 0.75rem;
+      width: min(380px, 100%);
+      height: auto;
+      .arch-bg { height: var(--portrait-height); }
+      .student-photo { height: calc(var(--portrait-height) - 14px); margin-top: 14px; }
+      .floating-badge {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        text-align: left;
+        animation: none;
+      }
+      .badge-students { justify-content: space-between; }
+      .btn-join-now { min-height: 44px; display: grid; place-items: center; }
+    }
+  }
+}

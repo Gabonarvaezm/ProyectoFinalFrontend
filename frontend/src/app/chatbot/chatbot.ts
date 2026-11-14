@@ -1,3 +1,4 @@
+import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -19,6 +20,7 @@ import {
 
 @Component({
   imports: [
+    ActionToastComponent,
     ReactiveFormsModule,
     RouterLink,
     ChatbotSidebarComponent,
