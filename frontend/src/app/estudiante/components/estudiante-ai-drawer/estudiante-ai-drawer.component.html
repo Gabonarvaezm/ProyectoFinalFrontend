@@ -62,7 +62,7 @@
     <h3 class="quick-actions-heading">Acciones Rápidas</h3>
     <div class="quick-buttons-list">
       @for (action of quickActions(); track action.id) {
-      <button type="button" class="btn-ai-action" (click)="onActionClick(action)">
+      <button type="button" class="btn-ai-action" [disabled]="isAiThinking()" (click)="onActionClick(action)">
         <i [class]="action.icon"></i>
         <span>{{ action.label }}</span>
       </button>
@@ -72,9 +72,12 @@
 
   <!-- Barra Inferior de Entrada de Pregunta -->
   <div class="ai-input-container">
+    @if (errorMessage()) {
+      <p class="ai-error-message" role="alert">{{ errorMessage() }}</p>
+    }
     <form class="ai-input-form" (submit)="onSubmit(); $event.preventDefault()">
-      <input type="text" class="ai-input-field" placeholder="Escribe tu pregunta..." [ngModel]="inputText()"
-        (ngModelChange)="inputText.set($event)" name="aiInputText" aria-label="Pregunta al tutor de IA" />
+      <input type="text" class="ai-input-field" placeholder="Pregunta sobre cualquier materia..." [ngModel]="inputText()"
+        (ngModelChange)="inputText.set($event)" name="aiInputText" maxlength="2000" [disabled]="isAiThinking()" aria-label="Pregunta al tutor de IA" />
       <button type="submit" class="btn-send-ai" [disabled]="!inputText() || isAiThinking()"
         aria-label="Enviar mensaje a la IA">
         <i class="bi bi-send-fill"></i>

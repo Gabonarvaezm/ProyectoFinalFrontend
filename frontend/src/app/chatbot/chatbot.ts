@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ChatbotService } from '../core/services/chatbot.service';
+import { AuthService } from '../core/services/auth.service';
 import {
   ChatSession,
   ChatbotAcademicMode,
@@ -31,8 +32,14 @@ import {
 export class Chatbot {
   private readonly fb = inject(FormBuilder);
   private readonly chatbotService = inject(ChatbotService);
+  private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private timerIds: ReturnType<typeof setTimeout>[] = [];
+
+  public readonly dashboardRoute = this.authService.dashboardRoute;
+  public readonly dashboardLabel = computed(() =>
+    this.authService.isProfessor() ? 'Portal Profesor' : 'Portal Estudiante'
+  );
 
   // ── Modos Académicos Disponibles ─────────────────────────────────────────
   public readonly modes = signal<ModeOption[]>([
@@ -101,41 +108,20 @@ export class Chatbot {
   public readonly activeSessionId = signal<string>('session-1');
   public readonly activeMode = signal<ChatbotAcademicMode>('tutor');
   public readonly isThinking = signal<boolean>(false);
+  public readonly errorMessage = signal<string | null>(null);
   public readonly toastMessage = signal<string | null>(null);
 
   /** Mensajes del Hilo Activo */
   public readonly messages = signal<ChatbotMessage[]>([
     {
-      id: 'msg-init-1',
+      id: 'msg-welcome',
       sender: 'ai',
-      text: '¡Hola! Soy DiscerIA Context AI, tu asistente pedagógico inteligente. ¿En qué tema o ejercicio académico puedo colaborar hoy?',
-      timestamp: new Date(Date.now() - 600000),
+      text: '¡Hola! Soy DiscerIA. ¿Qué pregunta académica quieres explorar hoy?',
+      timestamp: new Date(),
       mode: 'tutor',
-      academicSources: [
-        'DiscerIA Corpus Pedagógico Universitario (2026)',
-        'Repositorio Digital Abierto de Educación Superior',
-      ],
-    },
-    {
-      id: 'msg-init-2',
-      sender: 'user',
-      text: '¿Podrías explicarme brevemente la diferencia fundamental entre mitosis y meiosis?',
-      timestamp: new Date(Date.now() - 500000),
-    },
-    {
-      id: 'msg-init-3',
-      sender: 'ai',
-      text: 'Con gusto. La diferencia medular radica en el objetivo biológico y el número de células resultantes:\n\n1. **Mitosis**: Ocurre en células somáticas. Una célula madre diploide (2n) genera **dos células hijas genéticamente idénticas (2n)**. Su propósito es el crecimiento, reparación y regeneración tisular.\n\n2. **Meiosis**: Proceso exclusivo de células germinales para la gametogénesis. Una célula diploide (2n) atraviesa dos divisiones consecutivas dando origen a **cuatro células haploides (n)**, con recombinación genética (crossing-over), garantizando la diversidad biológica.',
-      timestamp: new Date(Date.now() - 400000),
-      mode: 'tutor',
-      academicSources: [
-        'Alberts, B., et al. (2015). Molecular Biology of the Cell (6ta ed.). Garland Science.',
-        'Campbell, N. A., & Reece, J. B. (2018). Biología General.',
-      ],
     },
   ]);
 
-  // ── Señal Computada para la etiqueta del modo activo ─────────────────────
   public readonly activeModeLabel = computed(() => {
     const current = this.modes().find((m) => m.id === this.activeMode());
     return current ? current.label : 'Tutor Académico';
@@ -172,6 +158,8 @@ export class Chatbot {
     if (!text) return;
 
     // 1. Agregar mensaje del usuario inmutablemente
+    const history = this.messages();
+    this.errorMessage.set(null);
     const userMessage: ChatbotMessage = {
       id: `user-${Date.now()}`,
       sender: 'user',
@@ -185,10 +173,10 @@ export class Chatbot {
     // 2. Activar estado de procesamiento / redacción de la IA
     this.isThinking.set(true);
 
-    // 3. Envío al servicio de IA (HTTP API con fallback local mock)
+    // 3. Envío al servicio de IA (API del servidor)
     const currentMode = this.activeMode();
     this.chatbotService
-      .sendMessage(text, currentMode, this.messages())
+      .sendMessage(text, currentMode, history)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (aiResponse) => {
@@ -196,11 +184,11 @@ export class Chatbot {
           this.isThinking.set(false);
           this.updateActiveSessionMetadata(text);
         },
-        error: () => {
-          const fallback = this.chatbotService.generateLocalAcademicFallback(text, currentMode);
-          this.messages.update((prev) => [...prev, fallback]);
+        error: (error: unknown) => {
+          const message = error instanceof Error ? error.message : 'No se pudo consultar la IA. Intenta de nuevo.';
+          this.errorMessage.set(message);
           this.isThinking.set(false);
-          this.updateActiveSessionMetadata(text);
+          this.chatForm.patchValue({ message: text });
         },
       });
   }
@@ -217,6 +205,7 @@ export class Chatbot {
   }
 
   public handleSessionSelected(sessionId: string): void {
+    if (this.isThinking()) return;
     this.activeSessionId.set(sessionId);
     const session = this.sessions().find((s) => s.id === sessionId);
     if (session) {
@@ -225,6 +214,8 @@ export class Chatbot {
   }
 
   public handleNewChat(): void {
+    if (this.isThinking()) return;
+    this.errorMessage.set(null);
     const newSessionId = `session-${Date.now()}`;
     const newSession: ChatSession = {
       id: newSessionId,
@@ -252,6 +243,8 @@ export class Chatbot {
   }
 
   public handleClearHistory(): void {
+    if (this.isThinking()) return;
+    this.errorMessage.set(null);
     this.messages.set([
       {
         id: `msg-${Date.now()}`,
@@ -282,72 +275,6 @@ export class Chatbot {
   }
 
   // ── Motor Pedagógico Contextual de Respuestas ────────────────────────────
-
-  private generateAiAcademicResponse(
-    query: string,
-    mode: ChatbotAcademicMode
-  ): ChatbotMessage {
-    const lower = query.toLowerCase();
-
-    if (mode === 'exam-generator' || lower.includes('examen') || lower.includes('preguntas')) {
-      return {
-        id: `ai-${Date.now()}`,
-        sender: 'ai',
-        text: `Aquí tienes una evaluación formativa de 3 preguntas basada en tu solicitud:\n\n**Pregunta 1:** ¿Cuál es la principal característica de una función continua en un intervalo cerrado [a, b]?\na) Posee asíntotas verticales.\nb) Alcanza un valor máximo y mínimo absoluto (Teorema de Weierstrass).\nc) Su derivada siempre existe en todos los puntos.\n*Respuesta correcta: b*\n\n**Pregunta 2:** En el cálculo de integrales por partes, la fórmula fundamental se deriva de:\na) La regla de la cadena.\nb) La regla del producto para derivadas.\nc) El teorema de Taylor.\n*Respuesta correcta: b*\n\n**Pregunta 3:** ¿Qué ocurre durante la profase mitótica?\na) Los cromosomas se alinean en el ecuador.\nb) La cromatina se condensa y desaparece la envoltura nuclear.\nc) Se divide el citoplasma.\n*Respuesta correcta: b*`,
-        timestamp: new Date(),
-        mode: 'exam-generator',
-        academicSources: [
-          'Stewart, J. (2016). Cálculo Trascendentes Tempranas (8va ed.).',
-          'Karp, G. (2014). Biología Celular y Molecular (7ma ed.).',
-        ],
-      };
-    }
-
-    if (mode === 'step-by-step' || lower.includes('paso a paso') || lower.includes('ejercicio') || lower.includes('integral')) {
-      return {
-        id: `ai-${Date.now()}`,
-        sender: 'ai',
-        text: `Demostración y resolución analítica paso a paso:\n\n**Paso 1: Identificación y Regla LIATE**\nDefinimos los componentes para aplicar ∫ u dv = u·v - ∫ v du.\n• u = x  ==>  du = dx\n• dv = e^(2x) dx  ==>  v = (1/2) e^(2x)\n\n**Paso 2: Aplicación de la fórmula**\n∫ x e^(2x) dx = (1/2) x e^(2x) - ∫ (1/2) e^(2x) dx\n\n**Paso 3: Integración del término remanente**\n= (1/2) x e^(2x) - (1/4) e^(2x) + C\n\n**Resultado factorizado:**\n= (1/2) e^(2x) [ x - 1/2 ] + C`,
-        timestamp: new Date(),
-        mode: 'step-by-step',
-        codeSnippet: `// Comprobación simbólica en TypeScript / JavaScript:
-function verifyDerivative(x: number): number {
-  // Derivada de F(x) = (1/2)*x*e^(2x) - (1/4)*e^(2x)
-  // F'(x) = (1/2)*e^(2x) + x*e^(2x) - (1/2)*e^(2x) = x*e^(2x)
-  return x * Math.exp(2 * x);
-}`,
-        academicSources: [
-          'Larson, R., & Edwards, B. (2018). Cálculo tomo I. McGraw-Hill.',
-        ],
-      };
-    }
-
-    if (mode === 'bibliography' || lower.includes('libro') || lower.includes('fuente') || lower.includes('bibliografia')) {
-      return {
-        id: `ai-${Date.now()}`,
-        sender: 'ai',
-        text: `Referencias bibliográficas recomendadas en el repositorio institucional de DiscerIA:\n\n1. **Cálculo de una Variable: Trascendentes Tempranas**\n   • Autor: James Stewart (8va edición)\n   • Editorial: Cengage Learning\n   • Enlace: Disponible en /biblioteca (Materia: Matemáticas)\n\n2. **Molecular Biology of the Cell**\n   • Autores: Bruce Alberts et al. (6ta edición)\n   • Editorial: Garland Science\n   • Enlace: Disponible en /biblioteca (Materia: Ciencias)`,
-        timestamp: new Date(),
-        mode: 'bibliography',
-        academicSources: [
-          'Catálogo General Biblioteca Digital Universitaria DiscerIA (2026)',
-        ],
-      };
-    }
-
-    // Modo Tutor Académico General
-    return {
-      id: `ai-${Date.now()}`,
-      sender: 'ai',
-      text: `Excelente planteamiento. Respecto a tu duda:\n\nPara abordar este problema con solidez, es fundamental distinguir las premisas teóricas del marco aplicativo. Al analizar los datos bajo una perspectiva sistemática, logramos simplificar variables complejas y validar los axiomas de partida.\n\n¿Deseas que resolvamos un ejemplo aplicado, generemos preguntas de autoevaluación o verifiquemos las fuentes bibliográficas correspondientes?`,
-      timestamp: new Date(),
-      mode: 'tutor',
-      academicSources: [
-        'DiscerIA Research Framework (2026)',
-        'Guía Docente de Aprendizaje Guiado',
-      ],
-    };
-  }
 
   private updateActiveSessionMetadata(lastUserText: string): void {
     const currentId = this.activeSessionId();

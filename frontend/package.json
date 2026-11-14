@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node scripts/start.mjs",
+    "start:api": "node --watch scripts/serve-api.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:api": "node --test scripts/chatbot-api.test.mjs scripts/server-environment.test.mjs",
     "serve:ssr:DiscerIA": "node dist/DiscerIA/server/server.mjs"
   },
   "private": true,

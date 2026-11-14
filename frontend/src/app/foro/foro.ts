@@ -55,11 +55,11 @@ export class Foro {
 
   // ── Navegación Lateral (Menú de la Aplicación) ───────────────────────────
   public readonly activeNav = signal<string>('foros');
-  public readonly navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-grid-fill', route: '/estudiante' },
+  public readonly navItems = computed(() => [
+    { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-grid-fill', route: this.authService.dashboardRoute() },
     { id: 'biblioteca', label: 'Biblioteca', icon: 'bi bi-book', route: '/biblioteca' },
     { id: 'foros', label: 'Foros', icon: 'bi bi-chat-square-text-fill', route: '/foro' },
-  ];
+  ]);
 
   // ── Panel Desplegable (Drawer) Asistente Context AI ───────────────────────
   public readonly isAiPanelOpen = signal<boolean>(true);
@@ -69,7 +69,9 @@ export class Foro {
   }
 
   // ── Estado Global del Foro (Gestión Central del Componente Padre) ───────
-  public readonly currentRole = signal<UserRole>('student');
+  public readonly currentRole = computed<UserRole>(
+    () => this.authService.currentUser()?.role ?? 'student'
+  );
   public readonly searchQuery = signal<string>('');
   public readonly selectedSubject = signal<string>('Todas las Materias');
   public readonly subjects = signal<string[]>([
@@ -144,17 +146,6 @@ export class Foro {
   });
 
   // ── Orquestación de Modificaciones y Comunicación entre Nodos ───────────
-
-  /** Comunicación desde ForoHeaderComponent */
-  public toggleRole(): void {
-    const nextRole: UserRole = this.currentRole() === 'student' ? 'professor' : 'student';
-    this.currentRole.set(nextRole);
-    this.showToast(
-      nextRole === 'professor'
-        ? 'Cambiaste a Modo Docente (Puedes certificar respuestas con solución oficial docente)'
-        : 'Cambiaste a Modo Estudiante'
-    );
-  }
 
   /** Comunicación desde ForoFiltersComponent */
   public onFilterChanged(event: ForoFilterPayload): void {

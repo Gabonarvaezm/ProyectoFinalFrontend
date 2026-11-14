@@ -72,6 +72,7 @@
     [chatMessages]="chatMessages()"
     [aiSuggestions]="aiSuggestions()"
     [isAiThinking]="isAiThinking()"
+    [errorMessage]="aiErrorMessage()"
     [(inputText)]="aiInputText"
     (suggestionSelected)="selectSuggestion($event)"
     (messageSubmitted)="onSendAiMessage($event)"

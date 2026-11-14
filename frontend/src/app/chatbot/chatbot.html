@@ -7,6 +7,7 @@
     [activeSessionId]="activeSessionId()"
     [activeMode]="activeMode()"
     [modes]="modes()"
+    [dashboardRoute]="dashboardRoute()"
     (sessionSelected)="handleSessionSelected($event)"
     (modeSelected)="handleModeSelected($event)"
     (newChatRequested)="handleNewChat()"
@@ -43,13 +44,13 @@
         </button>
 
         <a
-          routerLink="/estudiante"
+          [routerLink]="dashboardRoute()"
           class="btn-header-action"
-          title="Regresar al portal principal del estudiante"
-          aria-label="Ir a panel de estudiante"
+          [title]="'Regresar a ' + dashboardLabel()"
+          [attr.aria-label]="'Ir a ' + dashboardLabel()"
         >
           <i class="bi bi-grid-fill" aria-hidden="true"></i>
-          <span class="btn-text">Portal Estudiante</span>
+          <span class="btn-text">{{ dashboardLabel() }}</span>
         </a>
       </div>
     </header>
@@ -62,6 +63,10 @@
       (copyText)="handleCopyText($event)"
       (retryPrompt)="handleRetryPrompt($event)"
     />
+
+    @if (errorMessage()) {
+      <p class="chat-error" role="alert">{{ errorMessage() }}</p>
+    }
 
     <!-- NODO HIJO: Formulario Reactivo y Entrada de Mensajes -->
     <app-chatbot-input

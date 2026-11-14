@@ -14,6 +14,7 @@ export class ChatbotSidebarComponent {
   public readonly activeSessionId = input.required<string>();
   public readonly activeMode = input.required<ChatbotAcademicMode>();
   public readonly modes = input.required<readonly ModeOption[]>();
+  public readonly dashboardRoute = input.required<string>();
 
   public readonly sessionSelected = output<string>();
   public readonly modeSelected = output<ChatbotAcademicMode>();

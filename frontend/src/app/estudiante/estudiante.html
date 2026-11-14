@@ -98,6 +98,7 @@
     [chatMessages]="chatMessages()"
     [quickActions]="quickActions()"
     [isAiThinking]="isAiThinking()"
+    [errorMessage]="aiErrorMessage()"
     [(inputText)]="aiInputText"
     (closeRequested)="closeAiDrawer()"
     (messageSubmitted)="onSendAiMessage($event)"

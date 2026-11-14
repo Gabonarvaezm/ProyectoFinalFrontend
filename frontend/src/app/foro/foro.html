@@ -16,7 +16,7 @@
 
       <nav class="sidebar-nav" aria-label="Menú de navegación">
         <ul class="nav-list">
-          @for (item of navItems; track item.id) {
+          @for (item of navItems(); track item.id) {
             <li class="nav-item">
               <a
                 [routerLink]="item.route"
@@ -55,9 +55,7 @@
     <app-foro-header
       [(searchQuery)]="searchQuery"
       [currentUser]="currentUser()"
-      [currentRole]="currentRole()"
       [isAiPanelOpen]="isAiPanelOpen()"
-      (roleToggled)="toggleRole()"
       (aiToggleClicked)="toggleAiPanel()"
     />
 

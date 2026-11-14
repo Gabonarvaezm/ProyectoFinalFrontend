@@ -26,7 +26,6 @@ describe('ForoHeaderComponent', () => {
     fixture = TestBed.createComponent(ForoHeaderComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('currentUser', mockStudentUser);
-    fixture.componentRef.setInput('currentRole', 'student');
     fixture.detectChanges();
   });
 
@@ -34,19 +33,15 @@ describe('ForoHeaderComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debe emitir roleToggled al pulsar el botón de alternar rol o el avatar', () => {
-    let toggledCount = 0;
-    component.roleToggled.subscribe(() => {
-      toggledCount++;
-    });
+  it('debe ocultar el indicador de rol al estudiante y mostrar el avatar sin alternar perspectiva', () => {
+    const header: HTMLElement = fixture.nativeElement;
+    const roleBadge = header.querySelector('.role-badge');
+    const profile = header.querySelector('.user-profile-badge');
 
-    const roleBtn = fixture.nativeElement.querySelector('.role-badge-btn');
-    const profileBtn = fixture.nativeElement.querySelector('.user-profile-badge');
-
-    roleBtn.click();
-    profileBtn.click();
-
-    expect(toggledCount).toBe(2);
+    expect(roleBadge).toBeNull();
+    expect(profile?.tagName).toBe('DIV');
+    expect(header.querySelector('[aria-label="Alternar rol académico"]')).toBeNull();
+    expect(header.querySelector('button.user-profile-badge')).toBeNull();
   });
 
   it('debe emitir aiToggleClicked al presionar el botón de asistente de IA', () => {
@@ -92,13 +87,10 @@ describe('ForoHeaderComponent', () => {
     expect(initialsEl.textContent.trim()).toBe('AS');
   });
 
-  it('debe reflejar la clase docente cuando el rol es professor', () => {
-    fixture.componentRef.setInput('currentRole', 'professor');
+  it('debe mostrar el perfil docente sin indicador ni selector de rol', () => {
+    fixture.componentRef.setInput('currentUser', { ...mockStudentUser, role: 'professor' });
     fixture.detectChanges();
-
-    const roleBtn = fixture.nativeElement.querySelector('.role-badge-btn');
-    expect(roleBtn.classList.contains('docente')).toBe(true);
-    expect(roleBtn.textContent).toContain('Docente');
+    expect(fixture.nativeElement.querySelector('.role-badge')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.role-badge-btn')).toBeNull();
   });
 });
-
