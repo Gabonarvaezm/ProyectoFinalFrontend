@@ -112,4 +112,22 @@ describe('Repositorio académico local', () => {
     expect(post.replies[0].author.id).toBe('usr-stud-001');
   });
 
+  it('consulta documentos v1 sin migrarlos y conserva el adjunto definitivo al guardar una corrección', () => {
+    let user = teacher(); act(user, 'tarea.publish', task); user = student();
+    const attachment = { name: 'entrega.txt', mime: 'text/plain', base64: btoa('Entrega original persistente') };
+    act(user, 'tarea.submit', { tareaId: task.id, content: 'Definitiva original', attachment });
+    const original = localStorage.getItem(STORAGE_KEYS.LOCAL_ACADEMIC);
+    repository.snapshot(user);
+    expect(localStorage.getItem(STORAGE_KEYS.LOCAL_ACADEMIC)).toBe(original);
+    user = teacher(); const submissionId = repository.snapshot(user).tareas[0].submissions![0].id;
+    act(user, 'tarea.correction', { submissionId, feedback: 'Amplía el desarrollo' });
+    user = student(); const before = repository.snapshot(user).tareas[0].mySubmission!;
+    act(user, 'tarea.draft', { tareaId: task.id, content: 'Corrección aún sin entregar', revision: before.revision });
+    user = teacher(); const submission = repository.snapshot(user).tareas[0].submissions![0];
+    expect(submission.content).toBe('Corrección aún sin entregar');
+    expect(submission.submittedAt).toBeUndefined();
+    expect(submission.history?.find((item) => item.submittedAt)?.content).toBe('Definitiva original');
+    expect(submission.history?.find((item) => item.submittedAt)?.attachment).toEqual(attachment);
+  });
+
 });

@@ -125,4 +125,13 @@ describe('Tarea Component (Smart Parent & Presentational Child Nodes)', () => {
     component.onConfigClicked();
     expect(navigateSpy).toHaveBeenCalledWith(['/configuracion']);
   });
+  it('el detalle abierto consulta la tarea vigente en lugar de conservar una copia obsoleta', () => {
+    const task = tareaService.tareas()[0];
+    component.openDetailModal(task);
+    expect(component.currentDetail()?.id).toBe(task.id);
+    tareaService.tareas.update((tasks) => tasks.map((item) => item.id === task.id ? { ...item, description: 'Avance actualizado en otra lectura' } : item));
+    expect(component.currentDetail()?.description).toBe('Avance actualizado en otra lectura');
+    expect(component.activeTarea()?.description).toBe(task.description);
+  });
+
 });

@@ -6,7 +6,7 @@ export type TareaStatus = 'pendiente' | 'en_progreso' | 'entregada' | 'en_revisi
 export type TareaPriority = 'alta' | 'media' | 'baja';
 
 export interface TareaSubmission {
-  history?: { content: string; grade?: number; feedback?: string; submittedAt?: string; updatedAt?: string }[];
+  history?: { content: string; grade?: number; feedback?: string; submittedAt?: string; updatedAt?: string; attachment?: AcademicFile; attachmentUrl?: string }[];
   attachment?: AcademicFile;
   status?: TareaStatus;
   revision?: number;

@@ -53,12 +53,18 @@
       <div class="content-split-grid">
         <!-- Columna Izquierda: Student Progress Table (NODO HIJO PRESENTACIONAL) -->
         <app-profesor-student-table [students]="filteredStudents()" [totalCount]="filteredStudents().length"
-          (deleteStudent)="onDeleteStudent($event)" (registerStudentClick)="openRegisterModal()" />
+          (deleteStudent)="onDeleteStudent($event)" (registerStudentClick)="openRegisterModal()"
+          (studentSelected)="showTracking($event.id)" (viewAll)="showTracking()" />
 
         <!-- Columna Derecha: Recent Activity + Quick Actions (NODO HIJO PRESENTACIONAL) -->
         <app-profesor-activity-feed [activities]="recentActivities()" [quickActions]="quickActions()"
           (quickActionTriggered)="triggerQuickAction($event)" />
       </div>
+      @if (trackingOpen()) {
+        <section aria-label="Historial académico del estudiante">
+          <app-tarea [isEmbedded]="true" [studentId]="trackingStudent()" />
+        </section>
+      }
       }
     </main>
   </div>

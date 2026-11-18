@@ -1,4 +1,5 @@
 import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
+import { Tarea } from '../tarea/tarea';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChatbotService } from '../core/services/chatbot.service';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
@@ -44,6 +45,7 @@ import {
 
 @Component({
   imports: [
+    Tarea,
     ActionToastComponent,
     Biblioteca,
     ConfiguracionComponent,
@@ -64,6 +66,9 @@ import {
   templateUrl: './profesor.html',
 })
 export class Profesor {
+  readonly trackingStudent = signal('');
+  readonly trackingOpen = signal(false);
+  showTracking(studentId = ''): void { this.trackingStudent.set(studentId); this.trackingOpen.set(true); }
   openTasks(): void { void this.router.navigate(['/tareas']); }
   readonly teacherInitials = computed(() => (this.currentUser()?.fullName ?? 'Docente').split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase());
   private readonly router = inject(Router);

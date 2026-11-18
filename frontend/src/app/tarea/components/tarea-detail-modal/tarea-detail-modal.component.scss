@@ -36,6 +36,8 @@
 }
 
 .modal-header {
+  display: block;
+  padding-inline-end: calc(var(--space-6) + 2rem);
   padding: var(--space-6) var(--space-6) var(--space-4);
   border-bottom: 1px solid var(--color-border);
   position: relative;
@@ -43,6 +45,7 @@
 
 .header-badge-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-2);
@@ -86,6 +89,7 @@
 }
 
 .modal-title {
+  overflow-wrap: anywhere;
   margin: var(--space-2) 0 0;
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-extrabold);

@@ -25,24 +25,32 @@ export class TareaDetailModalComponent {
   public readonly isOpen = input<boolean>(false);
   public readonly tarea = input<Tarea | null>(null);
   public readonly isProfessor = input<boolean>(false);
+  readonly studentId = input('');
+  readonly isSaving = input(false);
+  readonly selectedStudent = signal<{ taskId?: string; studentId: string; open: boolean }>({ studentId: '', open: false });
 
   readonly selectedId = signal('');
   readonly selectedSubmission = computed(() => {
     const task = this.tarea();
-    return this.isProfessor() ? task?.submissions?.find((item) => item.id === this.selectedId()) ?? task?.mySubmission : task?.mySubmission;
+    if (!this.isProfessor()) return task?.mySubmission;
+    const selected = this.selectedStudent().studentId;
+    if (selected) return task?.submissions?.find((item) => item.studentId === selected);
+    return task?.submissions?.find((item) => item.id === this.selectedId()) ?? task?.mySubmission ?? task?.submissions?.[0];
   });
+  selectStudent(studentId: string): void { this.selectedStudent.set({ taskId: this.tarea()?.id, studentId, open: this.isOpen() }); }
   readonly selectedTask = computed(() => {
     const task = this.tarea();
     const submission = this.selectedSubmission();
-    const recipient = task?.recipients?.find((item) => item.studentId === submission?.studentId);
+    const recipient = task?.recipients?.find((item) => item.studentId === (this.selectedStudent().studentId || submission?.studentId));
     return task ? { ...task, mySubmission: submission, status: recipient?.status ?? task.status } : null;
   });
+  readonly lastDelivery = computed(() => [...(this.selectedSubmission()?.history ?? [])].reverse().find((item) => item.submittedAt));
   readonly reviewRequested = output<string>();
   readonly correctionRequested = output<{ submissionId: string; feedback: string }>();
   requestCorrection(): void {
     const submission = this.selectedSubmission();
     const feedback = String(this.gradeForm.value.feedback ?? '').trim();
-    if (submission && feedback) this.correctionRequested.emit({ submissionId: submission.id, feedback });
+    if (this.isProfessor() && submission?.submittedAt && submission.status !== 'requiere_correccion' && feedback && !this.isSaving()) this.correctionRequested.emit({ submissionId: submission.id, feedback });
     else this.gradeForm.controls['feedback'].markAsTouched();
   }
   public readonly closeModal = output<void>();
@@ -55,8 +63,21 @@ export class TareaDetailModalComponent {
   });
 
   constructor() {
+    let selectionKey = '';
+    effect(() => {
+      const taskId = this.tarea()?.id;
+      const studentId = this.studentId();
+      const open = this.isOpen();
+      const key = JSON.stringify([taskId, studentId, open]);
+      if (selectionKey !== key) { selectionKey = key; this.selectedStudent.set({ taskId, studentId, open }); }
+    });
+    let formVersion = '';
     effect(() => {
       const currentTarea = this.selectedTask();
+      const submission = currentTarea?.mySubmission;
+      const version = JSON.stringify([this.isOpen(), currentTarea?.id, submission?.id, submission?.revision, submission?.grade, submission?.feedback]);
+      if (version === formVersion) return;
+      formVersion = version;
       this.gradeForm.controls['grade'].setValidators([Validators.required, Validators.min(0), Validators.max(currentTarea?.maxScore ?? 100)]);
       this.gradeForm.controls['grade'].updateValueAndValidity();
       if (currentTarea?.mySubmission?.grade !== undefined) {
@@ -74,7 +95,7 @@ export class TareaDetailModalComponent {
   }
 
   public onSubmitGrade(): void {
-    if (this.gradeForm.invalid || !this.tarea() || !this.selectedSubmission()) {
+    if (this.isSaving() || !this.isProfessor() || this.gradeForm.invalid || !this.tarea() || !this.selectedSubmission()?.submittedAt || this.selectedSubmission()?.status === 'requiere_correccion') {
       this.gradeForm.markAllAsTouched();
       return;
     }

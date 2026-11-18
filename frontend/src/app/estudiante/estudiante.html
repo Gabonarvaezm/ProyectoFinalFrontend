@@ -49,7 +49,7 @@
       <!-- Tarjeta Destacada: Continuar Aprendiendo (NODO HIJO PRESENTACIONAL) -->
       <app-estudiante-publications [exams]="publishedExams()" [messages]="teacherMessages()" />
       @if (localDemo) {
-        <app-academic-progress [tareas]="localTasks()" />
+        <app-academic-progress [tareas]="localTasks()" (inspect)="viewTasks()" />
         <button type="button" class="btn btn-primary" (click)="viewTasks()">Abrir mis tareas</button>
       } @else {
       <app-estudiante-continue-course
