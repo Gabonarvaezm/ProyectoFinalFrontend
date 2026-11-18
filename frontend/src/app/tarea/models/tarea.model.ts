@@ -6,7 +6,7 @@ export type TareaStatus = 'pendiente' | 'en_progreso' | 'entregada' | 'en_revisi
 export type TareaPriority = 'alta' | 'media' | 'baja';
 
 export interface TareaSubmission {
-  history?: { content: string; grade?: number; feedback?: string; submittedAt?: string; updatedAt?: string; attachment?: AcademicFile; attachmentUrl?: string }[];
+  history?: { content: string; grade?: number; gradeScale?: number; feedback?: string; submittedAt?: string; updatedAt?: string; attachment?: AcademicFile; attachmentUrl?: string }[];
   attachment?: AcademicFile;
   status?: TareaStatus;
   revision?: number;
@@ -20,6 +20,8 @@ export interface TareaSubmission {
   attachmentUrl?: string;
   comments?: string;
   grade?: number;
+  /** Escala guardada con la nota; si falta, se conserva maxScore de la tarea anterior. */
+  gradeScale?: number;
   feedback?: string;
   gradedAt?: string;
 }

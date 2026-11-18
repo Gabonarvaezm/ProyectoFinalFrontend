@@ -119,7 +119,7 @@
               <details><summary>Historial de avances y evaluaciones</summary>
                 @for (attempt of selectedSubmission()!.history!; track $index) {
                   <p>{{ attempt.submittedAt || attempt.updatedAt }} — {{ attempt.content }}</p>
-                  @if (attempt.grade !== undefined) { <p>Nota: {{ attempt.grade }} / {{ tarea()!.maxScore }}</p> }
+                  @if (attempt.grade !== undefined) { <p>Nota: {{ attempt.grade | number:'1.1-1' }} / {{ attempt.gradeScale ?? tarea()!.maxScore }}</p> }
                   @if (attempt.feedback) { <p>{{ attempt.feedback }}</p> }
                   @if (attempt.attachment) { <app-task-file [file]="attempt.attachment" /> }
                 }
@@ -151,8 +151,8 @@
           @if (selectedTask()!.mySubmission!.grade !== undefined) {
             <div class="grade-feedback-card">
               <div class="grade-score">
-                <span class="score-number">{{ selectedTask()!.mySubmission!.grade }}</span>
-                <span class="score-max">/ {{ tarea()!.maxScore }} pts</span>
+                <span class="score-number">{{ selectedTask()!.mySubmission!.grade | number:'1.1-1' }}</span>
+                <span class="score-max">/ {{ selectedSubmission()?.gradeScale ?? tarea()!.maxScore }}</span>
               </div>
               <div class="feedback-text-wrap">
                 <span class="feedback-title">Retroalimentación del Docente</span>
@@ -163,7 +163,7 @@
 
           <!-- Si el profesor desea calificar o actualizar nota -->
           @if (isProfessor() && selectedSubmission()?.submittedAt && selectedSubmission()?.status !== 'requiere_correccion') {
-            @if (selectedSubmission()?.grade === undefined) { <button type="button" class="btn-secondary" [disabled]="isSaving()" (click)="reviewRequested.emit(selectedSubmission()!.id)">Iniciar revisión</button> }
+            @if (selectedSubmission()?.grade === undefined && selectedSubmission()?.status !== 'en_revision') { <button type="button" class="btn-secondary" [disabled]="isSaving()" (click)="reviewRequested.emit(selectedSubmission()!.id)">Iniciar revisión</button> }
             <form [formGroup]="gradeForm" (ngSubmit)="onSubmitGrade()" class="grade-form">
               <h5 class="form-subheading">
                 <i class="bi bi-pencil-square" aria-hidden="true"></i>
@@ -172,15 +172,23 @@
 
               <div class="form-row-grade">
                 <div class="form-group-score">
-                  <label for="grade-input" class="form-label">Calificación (0 - {{ tarea()!.maxScore }})</label>
+                  <label for="grade-input" class="form-label">Calificación (1.0 a 5.0)</label>
                   <input
                     id="grade-input"
                     type="number"
                     formControlName="grade"
                     class="form-control"
-                    min="0"
-                    [max]="tarea()!.maxScore"
+                    min="1"
+                    max="5"
+                    step="0.1"
+                    placeholder="Ej. 4.5"
+                    aria-describedby="grade-help"
+                    [attr.aria-invalid]="gradeForm.controls['grade'].invalid && gradeForm.controls['grade'].touched"
                   />
+                  <p id="grade-help">Usa máximo un decimal.</p>
+                  @if (gradeForm.controls['grade'].invalid && gradeForm.controls['grade'].touched) {
+                    <p class="grade-error" role="alert">Ingresa una nota de 1.0 a 5.0, con máximo un decimal.</p>
+                  }
                 </div>
 
                 <div class="form-group-feedback">

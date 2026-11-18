@@ -53,15 +53,19 @@ describe('Repositorio académico local', () => {
     expect(current.status).toBe('requiere_correccion');
     act(user, 'tarea.submit', { tareaId: task.id, content: 'Respuesta corregida', attachment, revision: current.mySubmission!.revision });
     user = teacher();
-    expect(() => act(user, 'tarea.grade', { submissionId, grade: 21, feedback: 'Fuera de escala' })).toThrow('no es válida');
-    act(user, 'tarea.grade', { submissionId, grade: 18, feedback: 'Buen trabajo experimental' });
+    for (const grade of [0, 0.9, 5.1, 4.55]) {
+      expect(() => act(user, 'tarea.grade', { submissionId, grade, feedback: 'Fuera de escala' })).toThrow('no es válida');
+    }
+    act(user, 'tarea.grade', { submissionId, grade: 4.5, feedback: 'Buen trabajo experimental' });
     user = student(); current = repository.snapshot(user).tareas[0];
-    expect(current.status).toBe('calificada'); expect(current.mySubmission?.grade).toBe(18);
+    expect(current.status).toBe('calificada'); expect(current.mySubmission?.grade).toBe(4.5);
     expect(current.mySubmission?.feedback).toBe('Buen trabajo experimental');
+    expect(current.mySubmission?.gradeScale).toBe(5);
+    expect(repository.snapshot(user).notifications.some((n) => JSON.stringify(n).includes('4.5 / 5.0'))).toBe(true);
     expect(current.mySubmission?.attachment?.base64).toBe(attachment.base64);
     expect(repository.snapshot(user).notifications.some((n) => n.title.includes('calificada'))).toBe(true);
     repository.logout(); expect(repository.login(user.email).user.id).toBe(user.id);
-    expect(repository.snapshot(user).tareas[0].mySubmission?.grade).toBe(18);
+    expect(repository.snapshot(user).tareas[0].mySubmission?.grade).toBe(4.5);
   });
 
   it('rechaza roles falsificados, cuentas ajenas y cambios después de cerrar sesión', () => {

@@ -17,6 +17,10 @@ describe('Seguimiento real', () => {
     expect(component.rows().length).toBe(2);
     expect(component.completion()).toBe('50.0%');
     expect(component.average()).toBe('80.0 / 100');
+    fixture.componentRef.setInput('tareas', [{ ...task, recipients: task.recipients!.map((recipient) =>
+      recipient.submission ? { ...recipient, submission: { ...recipient.submission, grade: 4, gradeScale: 5 } } : recipient),
+    }]);
+    expect(component.average()).toBe('80.0 / 100');
     expect(component.pending()).toBe(1);
     component.student.set('Ana');
     expect(component.completion()).toBe('0.0%');

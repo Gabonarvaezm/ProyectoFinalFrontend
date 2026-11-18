@@ -95,7 +95,7 @@
             title="Ver nota y retroalimentación"
           >
             <i class="bi bi-trophy-fill" aria-hidden="true"></i>
-            <span>Nota: {{ tarea().mySubmission?.grade ?? '?' }}/{{ tarea().maxScore }}</span>
+            <span>Nota: {{ tarea().mySubmission?.grade | number:'1.1-1' }} / {{ tarea().mySubmission?.gradeScale ?? tarea().maxScore }}</span>
           </button>
         } @else {
           <button

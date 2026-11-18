@@ -1,10 +1,10 @@
 import { Component, computed, input, output } from '@angular/core';
-import { TitleCasePipe } from '@angular/common';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { Tarea } from '../../models/tarea.model';
 
 @Component({
   selector: 'app-tarea-card',
-  imports: [TitleCasePipe],
+  imports: [DecimalPipe, TitleCasePipe],
   templateUrl: './tarea-card.component.html',
   styleUrl: './tarea-card.component.scss',
 })
