@@ -187,7 +187,7 @@
         } @empty { <p>No tienes avisos de tareas.</p> }
       </section>
     }
-    <app-academic-progress [tareas]="tareas()" [professor]="isProfessor()" />
+    <app-academic-progress [tareas]="tareas()" [professor]="isProfessor()" [studentId]="selectedStudent()" (studentSelected)="selectedStudent.set($event)" (inspect)="openStudentActivity($event)" />
     <app-tarea-filters
       [selectedStatus]="selectedStatus()"
       [selectedSubject]="selectedSubject()"
@@ -261,7 +261,9 @@
 <!-- Detalle de Tarea & Calificación Docente -->
 <app-tarea-detail-modal
   [isOpen]="isDetailOpen()"
-  [tarea]="activeTarea()"
+  [tarea]="currentDetail()"
+  [studentId]="detailStudentId()"
+  [isSaving]="isSubmitting()"
   [isProfessor]="isProfessor()"
   (closeModal)="closeDetailModal()"
   (deliverClicked)="closeDetailModal(); openSubmitModal($event)"

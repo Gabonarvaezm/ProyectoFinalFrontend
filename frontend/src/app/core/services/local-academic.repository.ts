@@ -198,7 +198,8 @@ export class LocalAcademicRepository {
         status: type === 'tarea.submit' ? 'entregada' : previous?.status === 'requiere_correccion' ? 'requiere_correccion' : 'en_progreso',
         submittedAt: type === 'tarea.submit' ? new Date().toISOString() : undefined, updatedAt: new Date().toISOString(), revision: (previous?.revision ?? 0) + 1,
         feedback: type === 'tarea.draft' ? previous?.feedback : undefined,
-        history: previous ? [...(previous.history ?? []), { content: previous.content, grade: previous.grade, feedback: previous.feedback, submittedAt: previous.submittedAt, updatedAt: previous.updatedAt }] : [] };
+        history: previous ? [...(previous.history ?? []), { content: previous.content, grade: previous.grade, feedback: previous.feedback, submittedAt: previous.submittedAt, updatedAt: previous.updatedAt,
+          ...(previous.submittedAt ? { attachment: previous.attachment, attachmentUrl: previous.attachmentUrl } : {}) }] : [] };
       db.submissions = [submission, ...db.submissions.filter((item) => item.id !== submission.id)];
       if (type === 'tarea.submit') {
         const teacher = db.users.find((item) => item.id === task.ownerId)!;

@@ -38,7 +38,7 @@ test('profesor asigna, estudiante guarda y entrega, profesor revisa y califica e
   await expect(student.locator('.tarea-card .status-badge')).toHaveText('En progreso');
   await teacher.reload();
   await teacher.getByRole('button', { name: 'Entregas (0)', exact: true }).click();
-  await teacher.getByRole('button', { name: 'Ver avances y entrega' }).click();
+  await teacher.getByRole('button', { name: 'Ver avance de Alejandro Silva', exact: true }).click();
   await expect(teacher.getByText('Borrador real con observaciones del experimento.', { exact: true })).toBeVisible();
   await expect(teacher.getByRole('button', { name: 'Guardar Nota' })).toHaveCount(0);
   await teacher.getByRole('button', { name: 'Cerrar', exact: true }).click();

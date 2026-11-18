@@ -88,4 +88,38 @@ describe('TareaDetailModalComponent', () => {
     component.onClose();
     expect(closed).toBe(true);
   });
+  it('abre automáticamente el borrador del alumno elegido y no ofrece calificarlo', () => {
+    const draft = { id: 'draft', tareaId: mockTarea.id, studentId: 'other', studentName: 'Otra alumna', content: 'Avance real sin enviar', status: 'en_progreso' as const, revision: 1, updatedAt: '2026-11-18T12:00:00Z' };
+    fixture.componentRef.setInput('isProfessor', true);
+    fixture.componentRef.setInput('studentId', 'other');
+    fixture.componentRef.setInput('tarea', { ...mockTarea, submissions: [mockTarea.mySubmission!, draft] });
+    fixture.detectChanges();
+    expect(component.selectedSubmission()?.id).toBe('draft');
+    expect(fixture.nativeElement.textContent).toContain('Avance real sin enviar');
+    expect(fixture.nativeElement.querySelector('.grade-form')).toBeNull();
+    const spy = vi.fn(); component.gradeSubmitted.subscribe(spy);
+    component.gradeForm.setValue({ grade: 90, feedback: 'No puede calificar borradores.' });
+    component.onSubmitGrade(); expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('seleccionar un alumno sin avances nunca muestra la entrega de otro y conserva la selección al refrescar', () => {
+    const task = { ...mockTarea, submissions: [mockTarea.mySubmission!], recipients: [{ studentId: 'empty', studentName: 'Sin avance', email: 'empty@test.edu', status: 'pendiente' as const }] };
+    fixture.componentRef.setInput('isProfessor', true);
+    fixture.componentRef.setInput('tarea', task); fixture.detectChanges();
+    component.selectStudent('empty'); fixture.detectChanges();
+    expect(component.selectedSubmission()).toBeUndefined();
+    fixture.componentRef.setInput('tarea', structuredClone(task)); fixture.detectChanges();
+    expect(component.selectedSubmission()).toBeUndefined();
+    expect(fixture.nativeElement.textContent).toContain('todavía no tiene avances');
+    expect(fixture.nativeElement.textContent).not.toContain(mockTarea.mySubmission!.content);
+  });
+
+  it('no borra una nota en edición por un refresco idéntico del repositorio', () => {
+    fixture.componentRef.setInput('isProfessor', true); fixture.detectChanges();
+    component.gradeForm.patchValue({ grade: 75, feedback: 'Comentario que estoy redactando.' });
+    fixture.componentRef.setInput('tarea', structuredClone(mockTarea)); fixture.detectChanges();
+    expect(component.gradeForm.value.grade).toBe(75);
+    expect(component.gradeForm.value.feedback).toBe('Comentario que estoy redactando.');
+  });
+
 });

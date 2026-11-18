@@ -6,6 +6,7 @@ import {
   DestroyRef,
   inject,
   input,
+  linkedSignal,
   signal,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
@@ -60,6 +61,13 @@ export class Tarea {
   // ── Inputs Públicos ───────────────────────────────────────────────────────
   public readonly userRole = input<'student' | 'professor' | null>(null);
   public readonly isEmbedded = input<boolean>(false);
+  readonly studentId = input('');
+  readonly selectedStudent = linkedSignal(() => this.studentId());
+  readonly detailStudentId = signal('');
+  openStudentActivity(value: { tarea: TareaModel; studentId: string }): void {
+    this.openDetailModal(value.tarea);
+    this.detailStudentId.set(value.studentId);
+  }
 
   // ── Usuario y Rol Autenticado ─────────────────────────────────────────────
   public readonly currentUser = this.authService.currentUser;
@@ -129,6 +137,7 @@ export class Tarea {
   public readonly isSubmitOpen = signal<boolean>(false);
   public readonly isDetailOpen = signal<boolean>(false);
   public readonly activeTarea = signal<TareaModel | null>(null);
+  readonly currentDetail = computed(() => this.tareas().find((task) => task.id === this.activeTarea()?.id) ?? null);
   public readonly isSubmitting = signal<boolean>(false);
   public readonly toastMessage = signal<string | null>(null);
   readonly toastTone = signal<'success' | 'error'>('success');
@@ -178,6 +187,7 @@ export class Tarea {
   }
 
   public openDetailModal(tarea: TareaModel): void {
+    this.detailStudentId.set('');
     this.activeTarea.set(tarea);
     this.isDetailOpen.set(true);
   }

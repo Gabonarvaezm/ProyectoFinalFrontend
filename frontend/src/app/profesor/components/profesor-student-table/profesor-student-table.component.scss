@@ -268,3 +268,4 @@
 }
 
 :host { display: block; min-width: 0; max-width: 100%; }
+.student-name-cell .btn-link-action { padding: 0; background: transparent; border: none; color: var(--color-primary); font: inherit; text-align: left; cursor: pointer; text-decoration: underline; }

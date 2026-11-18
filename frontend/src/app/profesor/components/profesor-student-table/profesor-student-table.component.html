@@ -14,7 +14,7 @@
         <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
         <span>Registrar Estudiante</span>
       </button>
-      <button type="button" class="btn-link-action">Ver Todos</button>
+      <button type="button" class="btn-link-action" (click)="viewAll.emit()">Ver Todos</button>
     </div>
   </div>
 
@@ -34,7 +34,7 @@
           <tr>
             <td class="student-name">
               <div class="student-name-cell">
-                <span>{{ student.studentName }}</span>
+                <button type="button" class="btn-link-action" (click)="studentSelected.emit(student)" [attr.aria-label]="'Ver historial de ' + student.studentName">{{ student.studentName }}</button>
                 @if (student.email) {
                   <span class="student-email-sub">{{ student.email }}</span>
                 }

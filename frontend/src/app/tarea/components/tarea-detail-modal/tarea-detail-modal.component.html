@@ -80,7 +80,9 @@
           @for (recipient of tarea()!.recipients ?? []; track recipient.studentId) {
             <p>{{ recipient.studentName }} — {{ recipient.status.replaceAll('_', ' ') }}
               @if (recipient.submission) {
-                <button type="button" class="btn-secondary" (click)="selectedId.set(recipient.submission.id)">Ver avances y entrega</button>
+                <button type="button" class="btn-secondary" (click)="selectStudent(recipient.studentId)" [attr.aria-label]="(recipient.submission.submittedAt && recipient.status !== 'requiere_correccion' ? 'Ver entrega de ' : 'Ver avance de ') + recipient.studentName">{{ recipient.submission.submittedAt && recipient.status !== 'requiere_correccion' ? 'Ver entrega' : 'Ver avance' }}</button>
+              } @else {
+                <button type="button" class="btn-secondary" (click)="selectStudent(recipient.studentId)">Ver actividad de {{ recipient.studentName }}</button>
               }
             </p>
           }
@@ -99,18 +101,27 @@
         <section class="section-box submission-box">
           <h4 class="section-title">
             <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
-            <span>{{ selectedSubmission()?.submittedAt ? 'Entrega registrada' : 'Avance guardado sin entregar' }} • {{ selectedTask()!.mySubmission!.studentName }}</span>
+            <span>{{ selectedSubmission()?.status === 'requiere_correccion' ? 'Corrección en desarrollo' : selectedSubmission()?.submittedAt ? 'Entrega registrada' : 'Avance guardado sin entregar' }} • {{ selectedTask()!.mySubmission!.studentName }}</span>
           </h4>
 
           <div class="submission-content">
+            <p>Última actualización: {{ selectedSubmission()?.updatedAt || 'Sin fecha registrada' }}</p>
+            <p>Fecha de entrega: {{ selectedSubmission()?.submittedAt || 'Todavía no entregada' }}</p>
             <app-task-file [file]="selectedSubmission()?.attachment" />
             <p>{{ selectedTask()!.mySubmission!.content }}</p>
+            @if (selectedSubmission()?.status === 'requiere_correccion' && !selectedSubmission()?.submittedAt && lastDelivery(); as delivery) {
+              <details><summary>Ver última entrega definitiva antes de la corrección</summary>
+                <p>Entregada el {{ delivery.submittedAt }}</p><p>{{ delivery.content }}</p>
+                <app-task-file [file]="delivery.attachment" />
+              </details>
+            }
             @if (selectedSubmission()?.history?.length) {
               <details><summary>Historial de avances y evaluaciones</summary>
                 @for (attempt of selectedSubmission()!.history!; track $index) {
                   <p>{{ attempt.submittedAt || attempt.updatedAt }} — {{ attempt.content }}</p>
                   @if (attempt.grade !== undefined) { <p>Nota: {{ attempt.grade }} / {{ tarea()!.maxScore }}</p> }
                   @if (attempt.feedback) { <p>{{ attempt.feedback }}</p> }
+                  @if (attempt.attachment) { <app-task-file [file]="attempt.attachment" /> }
                 }
               </details>
             }
@@ -152,7 +163,7 @@
 
           <!-- Si el profesor desea calificar o actualizar nota -->
           @if (isProfessor() && selectedSubmission()?.submittedAt && selectedSubmission()?.status !== 'requiere_correccion') {
-            <button type="button" class="btn-secondary" (click)="reviewRequested.emit(selectedSubmission()!.id)">Iniciar revisión</button>
+            @if (selectedSubmission()?.grade === undefined) { <button type="button" class="btn-secondary" [disabled]="isSaving()" (click)="reviewRequested.emit(selectedSubmission()!.id)">Iniciar revisión</button> }
             <form [formGroup]="gradeForm" (ngSubmit)="onSubmitGrade()" class="grade-form">
               <h5 class="form-subheading">
                 <i class="bi bi-pencil-square" aria-hidden="true"></i>
@@ -183,8 +194,8 @@
                   />
                 </div>
 
-                <button type="button" class="btn-secondary" (click)="requestCorrection()">Solicitar corrección con estos comentarios</button>
-                <button type="submit" class="btn-save-grade">
+                <button type="button" class="btn-secondary" [disabled]="isSaving()" (click)="requestCorrection()">Solicitar corrección con estos comentarios</button>
+                <button type="submit" class="btn-save-grade" [disabled]="isSaving()">
                   <i class="bi bi-check-lg" aria-hidden="true"></i>
                   <span>Guardar Nota</span>
                 </button>
@@ -192,6 +203,8 @@
             </form>
           }
         </section>
+      } @else if (isProfessor() && selectedStudent().studentId) {
+        <section class="section-box" role="status"><p>Este estudiante todavía no tiene avances guardados ni entrega.</p></section>
       } @else if (!isProfessor() && tarea()!.status === 'pendiente') {
         <div class="pending-prompt-box">
           <div class="prompt-text">
