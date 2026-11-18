@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { ConfiguracionComponent } from './configuracion';
 import { AuthService } from '../core/services/auth.service';
 import { ThemeService } from '../core/services/theme.service';
@@ -39,7 +40,7 @@ describe('ConfiguracionComponent (Smart/Dumb Pattern & Signals)', () => {
         ConfiguracionNotificacionesComponent,
         ConfiguracionLogoutModalComponent,
       ],
-      providers: [ThemeService, AuthService],
+      providers: [ThemeService, AuthService, provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ConfiguracionComponent);
@@ -48,6 +49,7 @@ describe('ConfiguracionComponent (Smart/Dumb Pattern & Signals)', () => {
     authService = TestBed.inject(AuthService);
 
     fixture.componentRef.setInput('user', mockUser);
+    vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     fixture.detectChanges();
   });
 

@@ -1,47 +1,34 @@
 <div class="config-wrapper" [class.is-embedded]="isEmbedded()">
   <!-- 1. Componente Hijo: Encabezado y Badges de Rol -->
-  <app-configuracion-header [user]="effectiveUser()"></app-configuracion-header>
+  <app-configuracion-header [user]="effectiveUser()" [isEmbedded]="isEmbedded()"
+    [dashboardRoute]="dashboardRoute()"></app-configuracion-header>
 
   <!-- 2. Componente Hijo: Navegación por Pestañas -->
-  <app-configuracion-tabs
-    [sections]="sections"
-    [activeSection]="activeSection()"
-    (sectionSelected)="selectSection($event)"
-  ></app-configuracion-tabs>
+  <app-configuracion-tabs [sections]="sections" [activeSection]="activeSection()"
+    (sectionSelected)="selectSection($event)"></app-configuracion-tabs>
 
   <!-- 3. Formulario Orquestador de Preferencias -->
   <form [formGroup]="preferencesForm" (ngSubmit)="savePreferences()" class="config-content">
     <!-- Sección Cuenta -->
     @if (activeSection() === 'cuenta') {
-      <app-configuracion-cuenta
-        [user]="effectiveUser()"
-        [initials]="userInitials()"
-        (logoutClicked)="promptLogout()"
-      ></app-configuracion-cuenta>
+    <app-configuracion-cuenta [user]="effectiveUser()" [initials]="userInitials()"
+      (logoutClicked)="promptLogout()"></app-configuracion-cuenta>
     }
 
     <!-- Sección Apariencia (Dark/Light) -->
     @if (activeSection() === 'apariencia') {
-      <app-configuracion-apariencia
-        [form]="preferencesForm"
-        [isDarkMode]="isDarkMode()"
-        (themeSelected)="selectTheme($event)"
-        (themeToggled)="toggleTheme()"
-      ></app-configuracion-apariencia>
+    <app-configuracion-apariencia [form]="preferencesForm" [isDarkMode]="isDarkMode()"
+      (themeSelected)="selectTheme($event)" (themeToggled)="toggleTheme()"></app-configuracion-apariencia>
     }
 
     <!-- Sección Asistente IA -->
     @if (activeSection() === 'ia') {
-      <app-configuracion-ia
-        [form]="preferencesForm"
-      ></app-configuracion-ia>
+    <app-configuracion-ia [form]="preferencesForm"></app-configuracion-ia>
     }
 
     <!-- Sección Notificaciones -->
     @if (activeSection() === 'notificaciones') {
-      <app-configuracion-notificaciones
-        [form]="preferencesForm"
-      ></app-configuracion-notificaciones>
+    <app-configuracion-notificaciones [form]="preferencesForm"></app-configuracion-notificaciones>
     }
 
     <!-- Barra Inferior de Acciones Globales -->
@@ -58,14 +45,12 @@
   </form>
 
   <!-- 4. Componente Hijo: Diálogo Modal de Confirmación de Cierre de Sesión -->
-  <app-configuracion-logout-modal
-    [isOpen]="isLogoutConfirmOpen()"
-    (confirmed)="confirmLogout()"
-    (cancelled)="cancelLogout()"
-  ></app-configuracion-logout-modal>
+  <app-configuracion-logout-modal [isOpen]="isLogoutConfirmOpen()" (confirmed)="confirmLogout()"
+    (cancelled)="cancelLogout()"></app-configuracion-logout-modal>
 
   <!-- 5. Mensaje Toast Flotante de Retroalimentación -->
   @if (toastFeedback(); as message) {
-    <app-action-toast [message]="message" tone="success" />
+  <app-action-toast [message]="message" tone="success" />
   }
 </div>
+<div>

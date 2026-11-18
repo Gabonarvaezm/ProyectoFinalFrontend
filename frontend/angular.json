@@ -79,6 +79,16 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "server": {
+              "optimization": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.server.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -94,6 +104,9 @@
             },
             "development": {
               "buildTarget": "DiscerIA:build:development"
+            },
+            "server": {
+              "buildTarget": "DiscerIA:build:server"
             }
           },
           "defaultConfiguration": "development"

@@ -1,3 +1,4 @@
+import { ACADEMIC_MODE } from '../core/services/academic-mode';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -17,7 +18,7 @@ describe('Login Component (Smart Parent & Presentational Child Nodes)', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoginPageComponent, Login, LoginHeroComponent, LoginFormComponent],
-      providers: [provideRouter([]), provideNoopAnimations(), provideHttpClient(), provideHttpClientTesting()],
+      providers: [{ provide: ACADEMIC_MODE, useValue: 'server' }, provideRouter([]), provideNoopAnimations(), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     parentFixture = TestBed.createComponent(LoginPageComponent);

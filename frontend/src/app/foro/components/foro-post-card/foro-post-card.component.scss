@@ -65,7 +65,7 @@
 }
 
 .meta-separator {
-  color: var(--color-slate-400);
+  color: var(--color-text-muted);
 }
 
 .post-time {
@@ -89,24 +89,29 @@
   color: var(--color-primary-700);
 
   &[data-subject="Matemáticas"] {
-    background-color: #e0e7ff;
-    color: #4338ca;
+    background-color: var(--color-ai-100);
+    color: var(--color-forum-teacher-text);
+    border: 1px solid var(--color-ai-300);
   }
   &[data-subject="Historia"] {
-    background-color: #fef3c7;
-    color: #b45309;
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning-text);
+    border: 1px solid var(--color-warning-border);
   }
   &[data-subject="Ciencias"] {
-    background-color: #dcfce7;
-    color: #15803d;
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+    border: 1px solid var(--color-success-border);
   }
   &[data-subject="Lenguaje"] {
-    background-color: #ffe4e6;
-    color: #be123c;
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger-text);
+    border: 1px solid var(--color-danger-border);
   }
   &[data-subject="Tecnología"] {
-    background-color: #e0f2fe;
-    color: #0369a1;
+    background-color: var(--color-info-bg);
+    color: var(--color-info-text);
+    border: 1px solid var(--color-info-border);
   }
 }
 
@@ -136,7 +141,7 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   background-color: var(--color-danger-bg);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   border: 1px solid var(--color-danger-border);
 }
 
@@ -264,7 +269,7 @@
     align-items: center;
     gap: var(--space-1);
     font-size: var(--font-size-xs);
-    color: var(--color-slate-400);
+    color: var(--color-text-muted);
 
     i {
       font-size: 1rem;
@@ -339,7 +344,7 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-full);
-  background-color: var(--color-primary-600);
+  background-color: var(--color-auth-action-bg);
   color: var(--color-white);
   display: flex;
   align-items: center;
@@ -372,7 +377,7 @@
 
 .reply-time {
   font-size: var(--font-size-xs);
-  color: var(--color-slate-400);
+  color: var(--color-text-muted);
   display: block;
 }
 
@@ -492,12 +497,12 @@
   }
 
   &.is-invalid {
-    border-color: var(--color-danger);
+    border-color: var(--color-danger-text);
     background-color: var(--color-danger-bg);
   }
 
   &::placeholder {
-    color: var(--color-slate-400);
+    color: var(--color-text-muted);
   }
 }
 
@@ -506,7 +511,7 @@
   align-items: center;
   gap: var(--space-1);
   font-size: var(--font-size-xs);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   margin: 0;
   font-weight: var(--font-weight-medium);
 }
@@ -567,7 +572,7 @@
   transition: var(--transition-fast);
 
   &:hover:not(:disabled) {
-    background-color: var(--color-primary-700);
+    background-color: var(--color-auth-action-bg);
     box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
   }
 

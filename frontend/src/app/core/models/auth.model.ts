@@ -1,4 +1,9 @@
 export const STORAGE_KEYS = {
+  LOCAL_ACADEMIC: 'disceria_local_academic_v1',
+  LOCAL_SESSION: 'disceria_local_session_v1',
+  THEME: 'disceria_theme_preference',
+  PREFERENCES: 'disceria_preferences_v1',
+  ACTIVITIES: 'disceria_local_activities_v1',
   ACTIVE_SESSION: 'disceria_active_session',
   AUTH_TOKEN: 'disceria_auth_token',
   REGISTERED_USER: 'disceria_registered_user',

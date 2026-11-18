@@ -1,3 +1,4 @@
+import { INITIAL_TAREAS } from './data/tarea.data';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { Tarea } from './tarea';
@@ -21,6 +22,7 @@ describe('Tarea Component (Smart Parent & Presentational Child Nodes)', () => {
     fixture = TestBed.createComponent(Tarea);
     component = fixture.componentInstance;
     await fixture.whenStable();
+    tareaService.tareas.set(structuredClone(INITIAL_TAREAS));
   });
 
   it('debe crearse correctamente e inicializar el catálogo de tareas', () => {
@@ -94,61 +96,24 @@ describe('Tarea Component (Smart Parent & Presentational Child Nodes)', () => {
     expect(component.toastMessage()).toContain('Solo los docentes');
   });
 
-  it('debe procesar la creación de una tarea desde el formulario del profesor', async () => {
-    const initialCount = component.tareas().length;
-    const dto: CreateTareaDto = {
-      title: 'Taller de Programación Dinámica',
-      description: 'Resolución de problemas de la mochila y subsecuencia común más larga.',
-      subject: 'Tecnología',
-      dueDate: '2026-12-10',
-      maxScore: 100,
-      priority: 'alta',
-      attachmentName: 'guia_dinamica.pdf',
-    };
-
-    component.handleCreateTarea(dto);
-    expect(component.isSubmitting()).toBe(true);
-
-    await new Promise((r) => setTimeout(r, 450));
-
+  it('conserva el formulario si el servidor rechaza el guardado', async () => {
+    component.isCreateOpen.set(true);
+    vi.spyOn(tareaService, 'createTarea').mockRejectedValue(new Error('No autorizado'));
+    await component.handleCreateTarea({ title: 'Práctica', description: 'Resolver ejercicios', subject: 'Ciencias', dueDate: '2099-01-01', maxScore: 100, priority: 'media' });
+    expect(component.isCreateOpen()).toBe(true);
     expect(component.isSubmitting()).toBe(false);
-    expect(component.tareas().length).toBe(initialCount + 1);
-    expect(component.tareas()[0].title).toBe('Taller de Programación Dinámica');
-    expect(component.toastMessage()).toContain('publicada con éxito');
+    expect(component.toastMessage()).toBe('No autorizado');
   });
-
-  it('debe procesar la entrega de una tarea desde el formulario del estudiante', async () => {
-    const tareaPendiente = component.tareas().find((t) => t.status === 'pendiente')!;
-    const submitDto: SubmitTareaDto = {
-      tareaId: tareaPendiente.id,
-      content: 'Solución completa de la práctica con gráficos y código adjunto.',
-      attachmentUrl: 'https://drive.google.com/solucion.pdf',
-    };
-
-    component.handleSubmitTarea(submitDto);
+  it('espera la confirmación antes de cerrar el borrador', async () => {
+    let resolve!: () => void;
+    vi.spyOn(tareaService, 'saveDraft').mockImplementation(() => new Promise<void>((done) => { resolve = done; }));
+    component.isSubmitOpen.set(true);
+    const pending = component.handleDraft({ tareaId: 'task', content: 'Avance' });
     expect(component.isSubmitting()).toBe(true);
-
-    await new Promise((r) => setTimeout(r, 450));
-
-    expect(component.isSubmitting()).toBe(false);
-    const updated = component.tareas().find((t) => t.id === tareaPendiente.id)!;
-    expect(updated.status).toBe('entregada');
-    expect(component.toastMessage()).toContain('entregada exitosamente');
-  });
-
-  it('debe calificar una entrega cuando el docente envía la nota', () => {
-    const tareaEntregada = component.tareas().find((t) => t.status === 'entregada')!;
-    const gradeDto: GradeTareaDto = {
-      tareaId: tareaEntregada.id,
-      submissionId: tareaEntregada.mySubmission!.id,
-      grade: 99,
-      feedback: 'Desarrollo impecable con comprobaciones rigurosas.',
-    };
-
-    component.handleGradeTarea(gradeDto);
-    const calificada = component.tareas().find((t) => t.id === tareaEntregada.id)!;
-    expect(calificada.status).toBe('calificada');
-    expect(calificada.mySubmission?.grade).toBe(99);
+    expect(component.isSubmitOpen()).toBe(true);
+    resolve(); await pending;
+    expect(component.isSubmitOpen()).toBe(false);
+    expect(component.toastMessage()).toContain('Todavía no has entregado');
   });
 
   it('debe navegar al chatbot y configuración desde los botones superiores', () => {

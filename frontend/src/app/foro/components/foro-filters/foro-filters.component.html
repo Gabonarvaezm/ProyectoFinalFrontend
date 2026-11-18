@@ -1,28 +1,11 @@
-<section class="filters-section" aria-label="Filtros de temas académicos">
-  <div class="topic-search-wrap">
-    <i class="bi bi-search" aria-hidden="true"></i>
-    <input
-      type="text"
-      class="topic-search-input"
-      placeholder="Buscar por tema..."
-      [value]="searchQuery()"
-      (input)="onSearchInput($event)"
-      aria-label="Filtrar por tema"
-    />
-  </div>
-
-  <div class="subject-pills-row" role="group" aria-label="Filtro de materias académicas">
+<nav class="subjects-nav" aria-label="Filtro de materias académicas">
+  <div class="subjects-scroll-wrapper" role="tablist">
     @for (subj of subjects(); track subj) {
-      <button
-        type="button"
-        class="subject-pill"
-        [class.active]="selectedSubject() === subj"
-        (click)="onSelectSubject(subj)"
-        [attr.aria-pressed]="selectedSubject() === subj"
-      >
-        {{ subj }}
-      </button>
+    <button type="button" class="subject-tab-btn" [class.active]="selectedSubject() === subj"
+      (click)="onSelectSubject(subj)" role="tab" [attr.aria-selected]="selectedSubject() === subj">
+      <i [class]="getSubjectIcon(subj) + ' subject-icon'" aria-hidden="true"></i>
+      <span class="subject-label">{{ subj }}</span>
+    </button>
     }
   </div>
-</section>
-
+</nav>

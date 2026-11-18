@@ -1,3 +1,5 @@
+import { PreferencesRepository } from '../core/services/preferences.repository';
+import { Router } from '@angular/router';
 import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
@@ -6,6 +8,7 @@ import {
   DestroyRef,
   PLATFORM_ID,
   computed,
+  effect,
   inject,
   input,
   output,
@@ -57,8 +60,10 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfiguracionComponent {
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly preferences = inject(PreferencesRepository);
   private readonly themeService = inject(ThemeService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly destroyRef = inject(DestroyRef);
@@ -68,6 +73,10 @@ export class ConfiguracionComponent {
   // Inputs & Outputs (Patrón Smart/Dumb con Signals)
   public readonly user = input<User | null>(null);
   public readonly isEmbedded = input<boolean>(false);
+
+  public readonly dashboardRoute = computed<string>(() =>
+    this.authService.dashboardRoute()
+  );
 
   public readonly logoutRequested = output<void>();
   public readonly preferencesSaved = output<UserPreferences>();
@@ -121,23 +130,6 @@ export class ConfiguracionComponent {
     const authUser = this.authService.currentUser();
     if (authUser) return authUser;
 
-    if (isPlatformBrowser(this.platformId)) {
-      try {
-        const stored = localStorage.getItem('disceria_registered_user');
-        if (stored) {
-          const parsed = JSON.parse(stored) as Partial<User>;
-          return {
-            id: parsed.id ?? 'usr-local',
-            email: parsed.email ?? 'usuario@disceria.edu',
-            fullName: parsed.fullName ?? 'Usuario DiscerIA',
-            role: parsed.role ?? 'student',
-            institution: parsed.institution ?? 'Universidad Tecnológica',
-          };
-        }
-      } catch {
-        // Ignorar
-      }
-    }
 
     return {
       id: 'usr-default',
@@ -171,6 +163,7 @@ export class ConfiguracionComponent {
   });
 
   constructor() {
+    effect(() => { this.preferencesForm.patchValue(this.preferences.read(this.effectiveUser().id)); });
     this.destroyRef.onDestroy(() => {
       this.timerIds.forEach((t) => clearTimeout(t));
     });
@@ -207,8 +200,10 @@ export class ConfiguracionComponent {
   }
 
   public confirmLogout(): void {
+    this.authService.logout();
     this.isLogoutConfirmOpen.set(false);
     this.logoutRequested.emit();
+    void this.router.navigate(['/login']);
   }
 
   public savePreferences(): void {
@@ -219,6 +214,7 @@ export class ConfiguracionComponent {
     }
 
     const value = this.preferencesForm.value as UserPreferences;
+    this.preferences.save(this.effectiveUser().id, value);
     this.preferencesSaved.emit(value);
     this.showToast('Preferencias guardadas exitosamente.');
   }

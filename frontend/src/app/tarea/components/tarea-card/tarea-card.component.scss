@@ -66,12 +66,12 @@
   border-radius: var(--radius-sm);
 
   &.priority-alta {
-    color: var(--color-danger);
+    color: var(--color-danger-text);
     background-color: rgba(239, 68, 68, 0.1);
   }
 
   &.priority-media {
-    color: var(--color-warning);
+    color: var(--color-warning-text);
     background-color: rgba(245, 158, 11, 0.1);
   }
 
@@ -88,23 +88,27 @@
   border-radius: var(--radius-full);
 
   &.badge-warning {
-    color: #b45309;
-    background-color: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning-text);
+    background-color: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
   }
 
   &.badge-info {
-    color: var(--color-primary-700);
-    background-color: var(--color-primary-50);
+    color: var(--color-info-text);
+    background-color: var(--color-info-bg);
+    border: 1px solid var(--color-info-border);
   }
 
   &.badge-success {
-    color: #15803d;
-    background-color: rgba(34, 197, 94, 0.15);
+    color: var(--color-success-text);
+    background-color: var(--color-success-bg);
+    border: 1px solid var(--color-success-border);
   }
 
   &.badge-danger {
-    color: #b91c1c;
-    background-color: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger-text);
+    background-color: var(--color-danger-bg);
+    border: 1px solid var(--color-danger-border);
   }
 }
 
@@ -196,11 +200,11 @@
 }
 
 .btn-card-submit {
-  background: var(--color-primary-700);
+  background: var(--color-auth-action-bg);
   color: var(--color-white);
 
   &:hover {
-    background: var(--color-primary-800);
+    background: var(--color-auth-action-hover);
   }
 }
 
@@ -215,18 +219,20 @@
 }
 
 .btn-card-grade {
-  background: rgba(34, 197, 94, 0.15);
-  color: #15803d;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
 
   &:hover {
-    background: rgba(34, 197, 94, 0.25);
+    background: var(--color-success);
+    color: var(--color-white);
   }
 }
 
 .btn-icon-delete {
   background: transparent;
   border: 1px solid var(--color-border);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
@@ -238,7 +244,7 @@
 
   &:hover {
     background: rgba(239, 68, 68, 0.1);
-    border-color: var(--color-danger);
+    border-color: var(--color-danger-text);
   }
 }
 

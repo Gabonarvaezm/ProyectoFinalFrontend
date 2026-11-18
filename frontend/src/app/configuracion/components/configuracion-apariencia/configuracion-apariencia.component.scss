@@ -42,8 +42,8 @@
       flex-shrink: 0;
 
       &.icon-accent {
-        background-color: #f3e8ff;
-        color: #7e22ce;
+        background-color: var(--color-ai-100);
+        color: var(--color-ai-700);
       }
     }
 

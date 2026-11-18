@@ -97,7 +97,7 @@
   gap: var(--space-2);
   padding: 0.65rem 1.25rem;
   border-radius: var(--radius-md);
-  background: var(--color-primary-700);
+  background: var(--color-auth-action-bg);
   color: var(--color-white);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
@@ -108,7 +108,7 @@
   white-space: nowrap;
 
   &:hover {
-    background-color: var(--color-primary-800);
+    background-color: var(--color-auth-action-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
   }

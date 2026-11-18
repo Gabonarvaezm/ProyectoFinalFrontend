@@ -69,12 +69,12 @@
 }
 
 .btn-primary {
-  background-color: var(--color-primary-700);
+  background-color: var(--color-auth-action-bg);
   color: var(--color-white);
   box-shadow: var(--shadow-sm);
 
   &:hover {
-    background-color: var(--color-primary-800);
+    background-color: var(--color-auth-action-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
   }

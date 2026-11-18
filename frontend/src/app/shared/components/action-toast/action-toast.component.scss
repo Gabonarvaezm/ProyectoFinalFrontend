@@ -51,3 +51,5 @@ span {
 @media (prefers-reduced-motion: reduce) {
   :host { animation: none; }
 }
+:host.is-error { border-color: var(--color-danger-border); }
+:host.is-error i { color: var(--color-danger-text); }

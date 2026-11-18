@@ -19,6 +19,8 @@ import {
 } from './components';
 
 @Component({
+  selector: 'app-chatbot',
+  standalone: true,
   imports: [
     ActionToastComponent,
     ReactiveFormsModule,
@@ -27,9 +29,8 @@ import {
     ChatbotMessagesComponent,
     ChatbotInputComponent,
   ],
-  selector: 'app-chatbot',
-  styleUrl: './chatbot.scss',
   templateUrl: './chatbot.html',
+  styleUrl: './chatbot.scss',
 })
 export class Chatbot {
   private readonly fb = inject(FormBuilder);

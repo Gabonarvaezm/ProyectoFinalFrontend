@@ -1,76 +1,81 @@
-.filters-section {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Foro Filters & Categories Navigation
+// ─────────────────────────────────────────────────────────────────────────────
 
-.topic-search-wrap {
-  position: relative;
-  flex: 1;
-  min-width: 220px;
-
-  i {
-    position: absolute;
-    left: 0.9rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--color-slate-400);
-    pointer-events: none;
-  }
-}
-
-.topic-search-input {
+:host {
+  display: block;
   width: 100%;
-  padding: 0.65rem 1rem 0.65rem 2.4rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  color: var(--color-slate-900);
-  background-color: var(--color-bg-surface);
-  outline: none;
-  transition: var(--transition-fast);
-
-  &::placeholder {
-    color: var(--color-slate-400);
-  }
-
-  &:focus {
-    border-color: var(--color-primary-600);
-    box-shadow: var(--focus-ring);
-  }
 }
 
-.subject-pills-row {
+.subjects-nav {
+  width: 100%;
+  overflow: hidden;
+}
+
+.subjects-scroll-wrapper {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  flex-wrap: wrap;
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate-300) transparent;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-slate-300);
+    border-radius: var(--radius-xs);
+  }
 }
 
-.subject-pill {
+.subject-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.65rem 1.15rem;
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 0.45rem 1rem;
+  border-radius: var(--radius-md);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-slate-600);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-700);
   cursor: pointer;
+  white-space: nowrap;
   transition: var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+
+  .subject-icon {
+    font-size: 0.95rem;
+    color: var(--color-slate-500);
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
 
   &:hover {
     background-color: var(--color-slate-50);
     border-color: var(--color-slate-300);
     color: var(--color-slate-900);
+
+    .subject-icon {
+      color: var(--color-primary-600);
+    }
   }
 
   &.active {
-    background-color: var(--color-primary-600);
+    background-color: var(--color-auth-action-bg);
     border-color: var(--color-primary-600);
     color: var(--color-white);
-    font-weight: var(--font-weight-semibold);
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+
+    .subject-icon {
+      color: var(--color-white);
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 }
-

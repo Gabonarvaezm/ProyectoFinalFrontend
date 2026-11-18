@@ -1,14 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, computed, input, output } from '@angular/core';
+import { TitleCasePipe } from '@angular/common';
 import { Tarea } from '../../models/tarea.model';
 
 @Component({
   selector: 'app-tarea-card',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [TitleCasePipe],
   templateUrl: './tarea-card.component.html',
   styleUrl: './tarea-card.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TareaCardComponent {
   public readonly tarea = input.required<Tarea>();
@@ -35,6 +33,12 @@ export class TareaCardComponent {
 
   public readonly statusLabel = computed(() => {
     switch (this.tarea().status) {
+      case 'en_progreso':
+        return 'En progreso';
+      case 'en_revision':
+        return 'En revisión';
+      case 'requiere_correccion':
+        return 'Requiere corrección';
       case 'pendiente':
         return 'Pendiente';
       case 'entregada':

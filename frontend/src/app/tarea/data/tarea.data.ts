@@ -114,6 +114,9 @@ export const SUBJECTS_LIST: string[] = [
 
 export const STATUS_LIST: { id: string; label: string }[] = [
   { id: 'todas', label: 'Todas las Tareas' },
+  { id: 'en_progreso', label: 'En progreso' },
+  { id: 'en_revision', label: 'En revisión' },
+  { id: 'requiere_correccion', label: 'Requiere corrección' },
   { id: 'pendiente', label: 'Pendientes' },
   { id: 'entregada', label: 'Entregadas' },
   { id: 'calificada', label: 'Calificadas' },

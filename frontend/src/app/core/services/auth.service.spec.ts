@@ -1,3 +1,4 @@
+import { ACADEMIC_MODE } from './academic-mode';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -10,7 +11,7 @@ describe('AuthService con cuentas compartidas', () => {
   let http: HttpTestingController;
   beforeEach(() => {
     localStorage.clear();
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({ providers: [{ provide: ACADEMIC_MODE, useValue: 'server' }, provideHttpClient(), provideHttpClientTesting()] });
     service = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);
   });

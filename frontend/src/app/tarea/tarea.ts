@@ -1,6 +1,6 @@
+import { AcademicProgressComponent } from './components/academic-progress.component';
 import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -8,10 +8,11 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { CommonModule, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { TareaService } from '../core/services/tarea.service';
+import { AcademicSyncService } from '../core/services/academic-sync.service';
 import {
   CreateTareaDto,
   GradeTareaDto,
@@ -29,10 +30,9 @@ import {
 
 @Component({
   selector: 'app-tarea',
-  standalone: true,
   imports: [
+    AcademicProgressComponent,
     ActionToastComponent,
-    CommonModule,
     RouterLink,
     NgTemplateOutlet,
     TareaFiltersComponent,
@@ -43,11 +43,15 @@ import {
   ],
   templateUrl: './tarea.html',
   styleUrl: './tarea.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Tarea {
   private readonly authService = inject(AuthService);
   private readonly tareaService = inject(TareaService);
+  private readonly sync = inject(AcademicSyncService);
+  readonly noticesOpen = signal(false);
+  readonly taskNotices = computed(() => this.sync.snapshot()?.notifications.filter((notice) => notice.type === 'task') ?? []);
+  readonly unreadNotices = computed(() => this.taskNotices().some((notice) => !notice.read));
+  markNoticeRead(id: string): void { this.sync.receipt(id, true); }
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -107,7 +111,7 @@ export class Tarea {
     const q = this.searchQuery().trim().toLowerCase();
 
     return all.filter((t) => {
-      const matchStatus = st === 'todas' || t.status === st;
+      const matchStatus = st === 'todas' || (this.isProfessor() && t.recipients ? t.recipients.some((recipient) => recipient.status === st) : t.status === st);
       const matchSubject = sub === 'Todas las Materias' || t.subject === sub;
       const matchQuery =
         !q ||
@@ -127,6 +131,7 @@ export class Tarea {
   public readonly activeTarea = signal<TareaModel | null>(null);
   public readonly isSubmitting = signal<boolean>(false);
   public readonly toastMessage = signal<string | null>(null);
+  readonly toastTone = signal<'success' | 'error'>('success');
 
   constructor() {
     this.destroyRef.onDestroy(() => {
@@ -141,7 +146,7 @@ export class Tarea {
   }
 
   public onNotificationsClicked(): void {
-    this.showToast('Tienes avisos sobre fechas de entrega y retroalimentación docente.');
+    this.noticesOpen.update((open) => !open);
   }
 
   public onConfigClicked(): void {
@@ -186,7 +191,7 @@ export class Tarea {
     if (this.isProfessor()) {
       this.openDetailModal(tarea);
     } else {
-      if (tarea.status === 'pendiente') {
+      if (['pendiente', 'en_progreso', 'requiere_correccion'].includes(tarea.status)) {
         this.openSubmitModal(tarea);
       } else {
         this.openDetailModal(tarea);
@@ -196,41 +201,37 @@ export class Tarea {
 
   // ── Procesamiento de Eventos Emitidos por los Hijos ───────────────────────
 
-  public handleCreateTarea(dto: CreateTareaDto): void {
+  public async handleCreateTarea(dto: CreateTareaDto): Promise<void> {
+    await this.perform(async () => { await this.tareaService.createTarea(dto, this.userName()); this.closeCreateModal(); }, 'Tarea guardada y asignada.');
+  }
+  public async handleSubmitTarea(dto: SubmitTareaDto): Promise<void> {
+    await this.perform(async () => { await this.tareaService.submitTarea(dto, this.currentUser()); this.closeSubmitModal(); }, 'Entrega definitiva confirmada.');
+  }
+  public async handleDraft(dto: SubmitTareaDto): Promise<void> {
+    await this.perform(async () => { await this.tareaService.saveDraft(dto); this.closeSubmitModal(); }, 'Borrador guardado. Todavía no has entregado la tarea.');
+  }
+  public async handleGradeTarea(dto: GradeTareaDto): Promise<void> {
+    await this.perform(() => this.tareaService.gradeTarea(dto), 'Calificación guardada.');
+  }
+  public async handleReview(id: string): Promise<void> {
+    await this.perform(() => this.tareaService.review(id), 'Entrega en revisión.');
+  }
+  public async handleCorrection(value: { submissionId: string; feedback: string }): Promise<void> {
+    await this.perform(() => this.tareaService.requestCorrection(value.submissionId, value.feedback), 'Nueva entrega autorizada.');
+  }
+  public async handleDeleteTarea(id: string): Promise<void> {
+    await this.perform(() => this.tareaService.deleteTarea(id), 'Tarea eliminada.');
+  }
+  private async perform(action: () => Promise<unknown>, message: string): Promise<void> {
+    if (this.isSubmitting()) return;
     this.isSubmitting.set(true);
-    const timer = setTimeout(() => {
-      const created = this.tareaService.createTarea(dto, this.userName());
-      this.isSubmitting.set(false);
-      this.closeCreateModal();
-      this.showToast(`Tarea "${created.title}" publicada con éxito para los estudiantes.`);
-    }, 400);
-    this.timerIds.push(timer);
-  }
-
-  public handleSubmitTarea(dto: SubmitTareaDto): void {
-    this.isSubmitting.set(true);
-    const timer = setTimeout(() => {
-      this.tareaService.submitTarea(dto, this.currentUser());
-      this.isSubmitting.set(false);
-      this.closeSubmitModal();
-      this.showToast('¡Tu tarea ha sido entregada exitosamente al docente!');
-    }, 400);
-    this.timerIds.push(timer);
-  }
-
-  public handleGradeTarea(dto: GradeTareaDto): void {
-    this.tareaService.gradeTarea(dto);
-    this.showToast(`Calificación (${dto.grade} pts) guardada con éxito.`);
-    // Refrescar modal de detalle con la nueva nota
-    const updated = this.tareas().find((t) => t.id === dto.tareaId);
-    if (updated) {
-      this.activeTarea.set(updated);
-    }
-  }
-
-  public handleDeleteTarea(tareaId: string): void {
-    this.tareaService.deleteTarea(tareaId);
-    this.showToast('Tarea eliminada del catálogo académico.');
+    try {
+      await action();
+      const active = this.activeTarea();
+      if (active) this.activeTarea.set(this.tareas().find((t) => t.id === active.id) ?? null);
+      this.showToast(message);
+    } catch (error: unknown) { this.showToast(error instanceof Error ? error.message : 'No se pudo guardar.', 'error'); }
+    finally { this.isSubmitting.set(false); }
   }
 
   public onFilterStatus(status: string): void {
@@ -245,7 +246,8 @@ export class Tarea {
     this.searchQuery.set(query);
   }
 
-  private showToast(msg: string): void {
+  private showToast(msg: string, tone: 'success' | 'error' = 'success'): void {
+    this.toastTone.set(tone);
     this.toastMessage.set(msg);
     const timer = setTimeout(() => {
       this.toastMessage.set(null);

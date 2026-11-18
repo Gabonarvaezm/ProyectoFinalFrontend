@@ -128,8 +128,8 @@
   }
 
   .mode-tag {
-    background-color: #e0e7ff;
-    color: #4338ca;
+    background-color: var(--color-ai-100);
+    color: var(--color-ai-700);
     padding: 0.15rem 0.45rem;
     border-radius: var(--radius-xs);
     font-size: 0.65rem;
@@ -186,7 +186,7 @@
     margin: 0;
     font-family: var(--font-family-code, monospace);
     font-size: var(--font-size-xs);
-    color: #38bdf8;
+    color: var(--color-primary-300);
   }
 }
 

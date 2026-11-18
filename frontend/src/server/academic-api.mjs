@@ -18,6 +18,17 @@ function text(value, max = 10000) {
 }
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 const initials = (name) => name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
+function academicFile(file) {
+  if (file === undefined || file === null) return undefined;
+  if (!file || typeof file !== 'object' || typeof file.base64 !== 'string' || file.base64.length > 245760 || !/^[A-Za-z0-9+/]*={0,2}$/.test(file.base64)) reject(400, 'Archivo inválido o mayor de 180 KB.');
+  const data = Buffer.from(file.base64, 'base64');
+  const valid = file.mime === 'application/pdf' ? data.subarray(0, 5).toString() === '%PDF-'
+    : file.mime === 'image/png' ? data.subarray(0, 8).toString('hex') === '89504e470d0a1a0a'
+    : file.mime === 'image/jpeg' ? data.subarray(0, 3).toString('hex') === 'ffd8ff'
+    : file.mime === 'text/plain' && !data.includes(0);
+  if (!data.length || data.length > 180 * 1024 || !valid) reject(400, 'El contenido no corresponde a un formato permitido.');
+  return { name: text(file.name, 150).replace(/[\\/\r\n]/g, '_'), mime: file.mime, base64: data.toString('base64') };
+}
 const canRead = (row, user) => row.owner === user.id || row.audience === 'all' || JSON.parse(row.audience).includes(user.email);
 
 export class AcademicStore {
@@ -46,7 +57,7 @@ export class AcademicStore {
     }
     if (!this.db.prepare("SELECT value FROM settings WHERE name='seed'").get()) {
       const owner = this.db.prepare("SELECT id FROM users WHERE email='profesor@universidad.edu'").get().id;
-      for (const [kind, items] of [['book', INITIAL_BOOKS], ['post', INITIAL_FORUM_POSTS], ['tarea', INITIAL_TAREAS]]) {
+      for (const [kind, items] of [['book', INITIAL_BOOKS], ['post', INITIAL_FORUM_POSTS]]) {
         for (const item of items) this.put(kind, item, owner);
       }
       this.db.prepare("INSERT INTO settings VALUES ('seed','1')").run();
@@ -102,11 +113,12 @@ export class AcademicStore {
       .filter((row) => canRead(row, user)).map((row) => JSON.parse(row.payload));
   }
 
-  students() {
+  students(scope) {
     const progress = this.db.prepare("SELECT payload FROM documents WHERE kind='student'").all().map((row) => JSON.parse(row.payload));
-    return this.db.prepare('SELECT profile FROM users').all().map((row) => JSON.parse(row.profile)).filter((user) => user.role === 'student').map((user) => ({
-      id: user.id, email: user.email, studentName: user.fullName, topic: 'Sin asignar', score: 0, status: 'active', statusLabel: 'Activo',
+    return this.db.prepare('SELECT profile FROM users').all().map((row) => JSON.parse(row.profile)).filter((user) => user.role === 'student' && (!scope || user.institution === scope.institution)).map((user) => ({
+      studentName: user.fullName, topic: 'Sin asignar', score: 0, status: 'active', statusLabel: 'Activo',
       ...progress.find((item) => item.email === user.email),
+      id: user.id, email: user.email,
     }));
   }
 
@@ -114,24 +126,39 @@ export class AcademicStore {
     const notifications = this.db.prepare('SELECT n.*, r.is_read, r.deleted FROM notices n LEFT JOIN receipts r ON r.notice_id=n.id AND r.user_id=? ORDER BY n.rowid DESC').all(user.id)
       .filter((row) => !row.deleted && row.owner !== user.id && canRead(row, user))
       .map((row) => ({ ...JSON.parse(row.payload), read: !!row.is_read }));
-    const tareas = this.documents('tarea', user).map((tarea) => {
+    const tareas = this.documents('tarea', user)
+      .filter((tarea) => !INITIAL_TAREAS.some((demo) => JSON.stringify(demo) === JSON.stringify(tarea)))
+      .filter((tarea) => user.role !== 'professor' || this.db.prepare("SELECT owner FROM documents WHERE kind='tarea' AND id=?").get(tarea.id)?.owner === user.id).map((tarea) => {
       const submissions = this.documents('submission', user).filter((item) => item.tareaId === tarea.id);
-      const mySubmission = user.role === 'professor' ? submissions[0] : submissions.find((item) => item.studentId === user.id);
-      return { ...tarea, submissionsCount: submissions.length, mySubmission, status: mySubmission ? (mySubmission.grade !== undefined ? 'calificada' : 'entregada') : 'pendiente' };
+      const statusOf = (submission) => submission?.status === 'requiere_correccion' ? 'requiere_correccion'
+        : submission?.grade !== undefined ? 'calificada'
+        : submission?.submittedAt ? (submission.status === 'en_revision' ? 'en_revision' : 'entregada')
+        : tarea.dueDate && Date.now() > Date.parse(`${tarea.dueDate}T23:59:59-05:00`) ? 'vencida'
+        : submission ? 'en_progreso' : 'pendiente';
+      const mySubmission = user.role === 'professor' ? submissions.find((item) => item.submittedAt) : submissions.find((item) => item.studentId === user.id);
+      const recipients = user.role === 'professor' ? this.students(user).filter((student) => {
+        const profile = JSON.parse(this.db.prepare('SELECT profile FROM users WHERE id=?').get(student.id).profile);
+        return canRead({ owner: '', audience: tarea.recipientEmails ? JSON.stringify(tarea.recipientEmails) : 'all' }, profile) && profile.institution === user.institution;
+      }).map((student) => ({ studentId: student.id, studentName: student.studentName, email: student.email,
+        status: statusOf(submissions.find((item) => item.studentId === student.id)),
+        submission: submissions.find((item) => item.studentId === student.id) })) : undefined;
+      return { ...tarea, recipientEmails: user.role === 'professor' ? tarea.recipientEmails : undefined, recipients, submissions: user.role === 'professor' ? submissions : undefined,
+        submissionsCount: submissions.filter((item) => item.submittedAt && item.status !== 'requiere_correccion').length,
+        mySubmission, status: statusOf(mySubmission) };
     });
     const posts = this.documents('post', user).map((post) => {
       const votes = this.db.prepare('SELECT * FROM votes WHERE post_id=?').all(post.id);
       const withVotes = (item, replyId) => ({ ...item, helpfulCount: item.helpfulCount + votes.filter((vote) => vote.reply_id === replyId).length, userHasVotedHelpful: votes.some((vote) => vote.reply_id === replyId && vote.user_id === user.id) });
       return { ...withVotes(post, ''), replies: post.replies.map((reply) => withVotes(reply, reply.id)) };
     });
-    return { books: this.documents('book', user), posts, exams: this.documents('exam', user), messages: this.documents('message', user), tareas, notifications, students: user.role === 'professor' ? this.students() : [] };
+    return { books: this.documents('book', user), posts, exams: this.documents('exam', user), messages: this.documents('message', user), tareas, notifications, students: user.role === 'professor' ? this.students(user) : [] };
   }
 
   mutate(user, event) {
     const type = text(event.type, 80);
     const p = event.payload;
     if (!p || typeof p !== 'object' || Array.isArray(p)) reject(400, 'Contenido inválido.');
-    const professorOnly = ['book.publish', 'book.recommend', 'exam.publish', 'message.publish', 'student.upsert', 'student.remove', 'tarea.publish', 'tarea.delete', 'tarea.grade'];
+    const professorOnly = ['book.publish', 'book.recommend', 'exam.publish', 'message.publish', 'student.upsert', 'student.remove', 'tarea.publish', 'tarea.delete', 'tarea.grade', 'tarea.review', 'tarea.correction'];
     if (professorOnly.includes(type) && user.role !== 'professor') reject(403, 'Esta acción solo está disponible para docentes.');
     const author = { id: user.id, name: user.fullName, role: user.role, institution: user.institution, initials: initials(user.fullName) };
     if (event.id && this.db.prepare('SELECT id FROM operations WHERE user_id=? AND id=?').get(user.id, event.id)) return this.snapshot(user);
@@ -193,25 +220,61 @@ export class AcademicStore {
         this.db.prepare("DELETE FROM documents WHERE kind='student' AND id=?").run(text(p.email, 254).toLowerCase());
       } else if (type === 'tarea.publish') {
         text(p.title, 150); text(p.description);
-        this.put('tarea', { ...p, assignedBy: user.fullName }, user.id);
-        this.notice(user, 'all', 'task', `Nueva tarea: ${p.title}`, p.description, '/tareas', p.id);
+        if (!Number.isFinite(p.maxScore) || p.maxScore <= 0) reject(400, 'Escala de calificación inválida.');
+        if (p.dueDate && (!/^\d{4}-\d{2}-\d{2}$/.test(p.dueDate) || !Number.isFinite(Date.parse(p.dueDate)))) reject(400, 'Fecha inválida.');
+        const roster = this.db.prepare('SELECT profile FROM users').all().map((row) => JSON.parse(row.profile))
+          .filter((profile) => profile.role === 'student' && profile.institution === user.institution);
+        if (p.recipientEmails !== undefined && (!Array.isArray(p.recipientEmails) || !p.recipientEmails.length || p.recipientEmails.some((email) => !roster.some((s) => s.email === email)))) reject(400, 'Selecciona estudiantes de tu institución.');
+        const audience = p.recipientEmails ?? roster.map((student) => student.email);
+        const { mySubmission, submissions, recipients, ...taskData } = p;
+        this.put('tarea', { ...taskData, material: academicFile(p.material), recipientEmails: audience, assignedBy: user.fullName }, user.id, audience);
+        this.notice(user, audience, 'task', `Nueva tarea: ${p.title}`, p.description, '/tareas', p.id);
       } else if (type === 'tarea.delete') {
-        this.db.prepare("DELETE FROM documents WHERE kind='tarea' AND id=? AND owner=?").run(text(p.id, 200), user.id);
-      } else if (type === 'tarea.submit') {
+        const row = this.db.prepare("SELECT owner FROM documents WHERE kind='tarea' AND id=?").get(text(p.id, 200));
+        if (!row || row.owner !== user.id) reject(403, 'No puedes eliminar esta tarea.');
+        this.db.prepare("DELETE FROM documents WHERE kind='tarea' AND id=? AND owner=?").run(p.id, user.id);
+      } else if (type === 'tarea.submit' || type === 'tarea.draft') {
         if (user.role !== 'student') reject(403, 'Solo los estudiantes pueden entregar tareas.');
         const task = this.db.prepare("SELECT * FROM documents WHERE kind='tarea' AND id=?").get(text(p.tareaId, 200));
         if (!task) reject(404, 'La tarea no está publicada en el servidor.');
+        if (!canRead(task, user)) reject(403, 'No tienes asignada esta tarea.');
+        const id = `${p.tareaId}:${user.id}`;
+        const previous = this.db.prepare("SELECT payload FROM documents WHERE kind='submission' AND id=?").get(id);
+        const saved = previous ? JSON.parse(previous.payload) : undefined;
+        if (saved?.submittedAt && saved.status !== 'requiere_correccion') reject(409, 'La entrega está cerrada. El docente debe autorizar una corrección.');
+        if ((saved?.revision ?? 0) !== (p.revision ?? 0)) reject(409, 'Hay cambios más recientes. Recarga antes de guardar.');
+        const deadline = JSON.parse(task.payload).dueDate;
+        if (deadline && Date.now() > Date.parse(`${deadline}T23:59:59-05:00`) && saved?.status !== 'requiere_correccion') reject(409, 'El plazo de esta tarea ha vencido.');
+        if (type === 'tarea.submit') text(p.content);
+        if (typeof p.content !== 'string' || p.content.length > 10000) reject(400, 'Respuesta inválida.');
+        if (p.attachmentUrl && !/^https:\/\//i.test(p.attachmentUrl)) reject(400, 'El enlace debe usar HTTPS.');
         const teacher = JSON.parse(this.db.prepare('SELECT profile FROM users WHERE id=?').get(task.owner).profile);
-        this.put('submission', { ...p, id: `${p.tareaId}:${user.id}`, studentId: user.id, studentName: user.fullName }, user.id, [user.email, teacher.email]);
-      } else if (type === 'tarea.grade') {
+        this.put('submission', { id, tareaId: p.tareaId, studentId: user.id, studentName: user.fullName,
+          content: p.content.trim(), attachment: academicFile(p.attachment), attachmentUrl: p.attachmentUrl || undefined, comments: typeof p.comments === 'string' ? p.comments.slice(0, 500) : '',
+          feedback: type === 'tarea.draft' ? saved?.feedback : undefined,
+          revision: (saved?.revision ?? 0) + 1, updatedAt: new Date().toISOString(),
+          status: type === 'tarea.submit' ? 'entregada' : saved?.status === 'requiere_correccion' ? 'requiere_correccion' : 'en_progreso',
+          submittedAt: type === 'tarea.submit' ? new Date().toISOString() : undefined,
+          history: saved ? [...(saved.history || []), saved && { content: saved.content, grade: saved.grade, feedback: saved.feedback, submittedAt: saved.submittedAt, updatedAt: saved.updatedAt }] : []
+        }, user.id, [user.email, teacher.email]);
+      } else if (['tarea.grade', 'tarea.review', 'tarea.correction'].includes(type)) {
         const row = this.db.prepare("SELECT * FROM documents WHERE kind='submission' AND id=?").get(text(p.submissionId, 300));
         if (!row || !canRead(row, user)) reject(404, 'No se encontró esa entrega.');
         const submission = JSON.parse(row.payload);
+        if (p.revision !== undefined && p.revision !== (submission.revision ?? 0)) reject(409, 'La entrega cambió. Recarga antes de calificar.');
         const task = this.db.prepare("SELECT * FROM documents WHERE kind='tarea' AND id=?").get(submission.tareaId);
-        if (!task || task.owner !== user.id || !Number.isFinite(p.grade) || p.grade < 0 || p.grade > JSON.parse(task.payload).maxScore) reject(400, 'La calificación no es válida.');
-        this.put('submission', { ...submission, grade: p.grade, feedback: p.feedback, gradedAt: new Date().toISOString() }, row.owner, row.audience);
+        if (!task || task.owner !== user.id) reject(403, 'No puedes gestionar esta entrega.');
+        if (!submission.submittedAt || submission.status === 'requiere_correccion') reject(409, 'Solo puedes revisar entregas definitivas.');
+        if (type === 'tarea.review' && submission.grade !== undefined) reject(409, 'La entrega ya está calificada. Solicita una corrección para reabrirla.');
+        if (type === 'tarea.grade' && (!Number.isFinite(p.grade) || p.grade < 0 || p.grade > JSON.parse(task.payload).maxScore)) reject(400, 'La calificación no es válida.');
+        if (type !== 'tarea.review') text(p.feedback, 2000);
+        this.put('submission', { ...submission, status: type === 'tarea.grade' ? 'calificada' : type === 'tarea.review' ? 'en_revision' : 'requiere_correccion',
+          grade: type === 'tarea.grade' ? p.grade : undefined,
+          feedback: type === 'tarea.review' ? submission.feedback : p.feedback,
+          gradedAt: type === 'tarea.grade' ? new Date().toISOString() : undefined,
+          revision: (submission.revision ?? 0) + 1 }, row.owner, row.audience);
         const student = JSON.parse(this.db.prepare('SELECT profile FROM users WHERE id=?').get(submission.studentId).profile);
-        this.notice(user, [student.email], 'task', 'Tu tarea ha sido calificada', p.feedback || 'Consulta la calificación de tu entrega.', '/tareas', submission.tareaId);
+        this.notice(user, [student.email], 'task', type === 'tarea.grade' ? 'Tu tarea ha sido calificada' : type === 'tarea.review' ? 'Tu tarea está en revisión' : 'Tu tarea requiere corrección', p.feedback || 'Consulta el estado de tu entrega.', '/tareas', submission.tareaId);
       } else if (type === 'notice.receipt') {
         const row = this.db.prepare('SELECT * FROM notices WHERE id=?').get(text(p.id, 200));
         if (!row || !canRead(row, user)) reject(404, 'La notificación no existe.');

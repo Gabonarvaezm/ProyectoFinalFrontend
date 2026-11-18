@@ -2,7 +2,9 @@
   <div class="form-header">
     <h2 class="form-title">Iniciar Sesión</h2>
     <p class="form-subtitle">
-      @if (selectedRole() === 'professor') {
+      @if (localDemo) {
+        Elige tu perfil local con su correo. No se solicita ni verifica una contraseña.
+      } @else if (selectedRole() === 'professor') {
         Ingresa con tus credenciales docentes para gestionar tus clases y materiales.
       } @else {
         Ingresa con tus credenciales estudiantiles para acceder a tus asignaturas y recursos.
@@ -96,6 +98,7 @@
       }
     </div>
 
+    @if (!localDemo) {
     <!-- Campo: Contraseña -->
     <div class="form-group">
       <div class="label-row">
@@ -145,6 +148,7 @@
       }
     </div>
 
+    }
     <!-- Opción: Recordar sesión -->
     <div class="remember-row">
       <label class="checkbox-label" for="rememberMe">

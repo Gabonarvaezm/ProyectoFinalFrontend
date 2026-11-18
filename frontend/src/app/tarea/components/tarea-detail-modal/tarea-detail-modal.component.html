@@ -3,6 +3,7 @@
 
   <div
     class="modal-dialog"
+    appDialogFocus (dismissed)="onClose()"
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-detail-title"
@@ -10,8 +11,8 @@
     <header class="modal-header">
       <div class="header-badge-row">
         <span class="subject-tag">{{ tarea()!.subject }}</span>
-        <span class="status-pill" [class]="'status-' + tarea()!.status">
-          {{ tarea()!.status | uppercase }}
+        <span class="status-pill" [class]="'status-' + selectedTask()!.status">
+          {{ selectedTask()!.status.replaceAll('_', ' ') | uppercase }}
         </span>
       </div>
       <button
@@ -69,33 +70,56 @@
         </h4>
         <p class="consigna-text">{{ tarea()!.description }}</p>
 
-        @if (tarea()!.attachmentName) {
-          <div class="guide-attachment-box">
-            <i class="bi bi-file-earmark-pdf-fill" aria-hidden="true"></i>
-            <div>
-              <span class="file-name">{{ tarea()!.attachmentName }}</span>
-              <span class="file-desc">Guía metodológica y rúbrica oficial</span>
-            </div>
-          </div>
-        }
+        <app-task-file [file]="tarea()!.material" />
+
       </section>
 
+      @if (isProfessor()) {
+        <section class="section-box">
+          <h3>Estudiantes asignados</h3>
+          @for (recipient of tarea()!.recipients ?? []; track recipient.studentId) {
+            <p>{{ recipient.studentName }} — {{ recipient.status.replaceAll('_', ' ') }}
+              @if (recipient.submission) {
+                <button type="button" class="btn-secondary" (click)="selectedId.set(recipient.submission.id)">Ver avances y entrega</button>
+              }
+            </p>
+          }
+        </section>
+      }
+      @if (tarea()!.instructions) { <section class="section-box"><h3>Instrucciones</h3><p>{{ tarea()!.instructions }}</p></section> }
+      @if (tarea()!.criteria) { <section class="section-box"><h3>Criterios de evaluación</h3><p>{{ tarea()!.criteria }}</p></section> }
+      @if (!isProfessor() && ['en_progreso', 'requiere_correccion'].includes(tarea()!.status)) {
+        <button type="button" class="btn-deliver-now" (click)="onDeliver()">Continuar tarea</button>
+      }
+      @if (selectedSubmission()?.feedback && selectedSubmission()?.grade === undefined) {
+        <section class="section-box"><h3>Retroalimentación del docente</h3><p>{{ selectedSubmission()!.feedback }}</p></section>
+      }
       <!-- Sección de Entrega / Calificación según rol -->
-      @if (tarea()!.mySubmission) {
+      @if (selectedTask()!.mySubmission) {
         <section class="section-box submission-box">
           <h4 class="section-title">
             <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
-            <span>Entrega Registrada • {{ tarea()!.mySubmission!.studentName }}</span>
+            <span>{{ selectedSubmission()?.submittedAt ? 'Entrega registrada' : 'Avance guardado sin entregar' }} • {{ selectedTask()!.mySubmission!.studentName }}</span>
           </h4>
 
           <div class="submission-content">
-            <p>{{ tarea()!.mySubmission!.content }}</p>
+            <app-task-file [file]="selectedSubmission()?.attachment" />
+            <p>{{ selectedTask()!.mySubmission!.content }}</p>
+            @if (selectedSubmission()?.history?.length) {
+              <details><summary>Historial de avances y evaluaciones</summary>
+                @for (attempt of selectedSubmission()!.history!; track $index) {
+                  <p>{{ attempt.submittedAt || attempt.updatedAt }} — {{ attempt.content }}</p>
+                  @if (attempt.grade !== undefined) { <p>Nota: {{ attempt.grade }} / {{ tarea()!.maxScore }}</p> }
+                  @if (attempt.feedback) { <p>{{ attempt.feedback }}</p> }
+                }
+              </details>
+            }
 
-            @if (tarea()!.mySubmission!.attachmentUrl) {
+            @if (selectedTask()!.mySubmission!.attachmentUrl) {
               <div class="attachment-link-row">
                 <i class="bi bi-link-45deg" aria-hidden="true"></i>
                 <a
-                  [href]="tarea()!.mySubmission!.attachmentUrl"
+                  [href]="selectedTask()!.mySubmission!.attachmentUrl"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="link-doc"
@@ -105,29 +129,30 @@
               </div>
             }
 
-            @if (tarea()!.mySubmission!.comments) {
+            @if (selectedTask()!.mySubmission!.comments) {
               <p class="submission-comments">
-                <strong>Nota del estudiante:</strong> {{ tarea()!.mySubmission!.comments }}
+                <strong>Nota del estudiante:</strong> {{ selectedTask()!.mySubmission!.comments }}
               </p>
             }
           </div>
 
           <!-- Si ya está calificada -->
-          @if (tarea()!.mySubmission!.grade !== undefined) {
+          @if (selectedTask()!.mySubmission!.grade !== undefined) {
             <div class="grade-feedback-card">
               <div class="grade-score">
-                <span class="score-number">{{ tarea()!.mySubmission!.grade }}</span>
+                <span class="score-number">{{ selectedTask()!.mySubmission!.grade }}</span>
                 <span class="score-max">/ {{ tarea()!.maxScore }} pts</span>
               </div>
               <div class="feedback-text-wrap">
                 <span class="feedback-title">Retroalimentación del Docente</span>
-                <p class="feedback-body">{{ tarea()!.mySubmission!.feedback }}</p>
+                <p class="feedback-body">{{ selectedTask()!.mySubmission!.feedback }}</p>
               </div>
             </div>
           }
 
           <!-- Si el profesor desea calificar o actualizar nota -->
-          @if (isProfessor()) {
+          @if (isProfessor() && selectedSubmission()?.submittedAt && selectedSubmission()?.status !== 'requiere_correccion') {
+            <button type="button" class="btn-secondary" (click)="reviewRequested.emit(selectedSubmission()!.id)">Iniciar revisión</button>
             <form [formGroup]="gradeForm" (ngSubmit)="onSubmitGrade()" class="grade-form">
               <h5 class="form-subheading">
                 <i class="bi bi-pencil-square" aria-hidden="true"></i>
@@ -158,6 +183,7 @@
                   />
                 </div>
 
+                <button type="button" class="btn-secondary" (click)="requestCorrection()">Solicitar corrección con estos comentarios</button>
                 <button type="submit" class="btn-save-grade">
                   <i class="bi bi-check-lg" aria-hidden="true"></i>
                   <span>Guardar Nota</span>

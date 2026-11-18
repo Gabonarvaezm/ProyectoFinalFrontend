@@ -1,3 +1,4 @@
+import { LocalPersistenceService } from './local-persistence.service';
 import { effect } from '@angular/core';
 import { AcademicSyncService } from './academic-sync.service';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
@@ -20,6 +21,7 @@ import { STORAGE_KEYS } from '../models/auth.model';
   providedIn: 'root',
 })
 export class ForumService {
+  private readonly storage = inject(LocalPersistenceService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly sync = inject(AcademicSyncService);
 
@@ -37,9 +39,10 @@ export class ForumService {
   }
 
   private loadInitialPosts(): ForumPost[] {
+    if (this.sync.enabled()) return this.sync.snapshot()?.posts ?? [];
     if (isPlatformBrowser(this.platformId)) {
       try {
-        const stored = localStorage.getItem(STORAGE_KEYS.FORUM_POSTS);
+        const stored = this.storage.readText(STORAGE_KEYS.FORUM_POSTS);
         if (stored) {
           const parsed = JSON.parse(stored) as ForumPost[];
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -54,9 +57,10 @@ export class ForumService {
   }
 
   private persist(): void {
+    if (this.sync.enabled()) return;
     if (isPlatformBrowser(this.platformId)) {
       try {
-        localStorage.setItem(STORAGE_KEYS.FORUM_POSTS, JSON.stringify(this.posts()));
+        this.storage.writeText(STORAGE_KEYS.FORUM_POSTS, JSON.stringify(this.posts()));
       } catch (err) {
         console.warn('[ForumService] Error al persistir publicaciones en localStorage:', err);
       }

@@ -48,3 +48,8 @@ Thumbs.db
 .env.*
 !.env.example
 /data/
+
+/test-results/
+/playwright-report/
+
+/test-results-local/

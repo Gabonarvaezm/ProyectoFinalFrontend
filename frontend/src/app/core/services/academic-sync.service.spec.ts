@@ -1,3 +1,4 @@
+import { ACADEMIC_MODE } from './academic-mode';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
@@ -18,7 +19,7 @@ describe('AcademicSyncService', () => {
     localStorage.clear();
     localStorage.setItem(STORAGE_KEYS.ACTIVE_SESSION, JSON.stringify(teacher));
     localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'teacher-session');
-    TestBed.configureTestingModule({ providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({ providers: [{ provide: ACADEMIC_MODE, useValue: 'server' }, provideRouter([]), provideHttpClient(), provideHttpClientTesting()] });
     service = TestBed.inject(AcademicSyncService);
     http = TestBed.inject(HttpTestingController);
     TestBed.runInInjectionContext(() => service.start());

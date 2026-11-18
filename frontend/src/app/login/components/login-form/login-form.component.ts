@@ -1,5 +1,5 @@
+import { ACADEMIC_MODE } from '../../../core/services/academic-mode';
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   input,
@@ -25,14 +25,13 @@ import { LoginCredentials } from '../../../core/models/auth.model';
 
 @Component({
   selector: 'app-login-form',
-  standalone: true,
   imports: [ReactiveFormsModule, RouterLink, LottieComponent],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',
   animations: [fadeInUp, fadeInOut],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginFormComponent {
+  readonly localDemo = inject(ACADEMIC_MODE) === 'local';
   private readonly fb = inject(FormBuilder);
 
   // Inputs desde el componente padre
@@ -70,6 +69,8 @@ export class LoginFormComponent {
     ],
     rememberMe: [false],
   });
+
+  constructor() { if (this.localDemo) { this.loginForm.controls['password'].clearValidators(); this.loginForm.controls['password'].updateValueAndValidity(); } }
 
   public get emailControl(): AbstractControl | null {
     return this.loginForm.get('email');

@@ -2,11 +2,12 @@
   <!-- Cabecera de la Publicación -->
   <div class="post-header">
     <div class="post-author-wrap">
-      @if (post().author.avatar) {
+      @if (post().author.avatar && !failedAvatars().has(post().author.avatar!)) {
         <img
           [src]="post().author.avatar"
           [alt]="post().author.name"
           class="author-avatar"
+          (error)="avatarFailed(post().author.avatar!)"
         />
       } @else {
         <div class="author-avatar-fallback">
@@ -73,7 +74,6 @@
         class="stat-action-btn"
         [class.active]="isExpanded()"
         (click)="onToggleExpand()"
-        aria-label="Ver respuestas del tema"
         [attr.aria-expanded]="isExpanded()"
       >
         <i class="bi bi-chat-left-text"></i>
@@ -86,7 +86,6 @@
         class="stat-action-btn"
         [class.active-helpful]="post().userHasVotedHelpful"
         (click)="onHelpfulClick()"
-        aria-label="Marcar como útil"
       >
         <i [class]="post().userHasVotedHelpful ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
         <span>{{ post().helpfulCount }} útil</span>
@@ -120,11 +119,12 @@
           <div class="reply-card" [class.reply-verified]="reply.isTeacherVerified">
             <div class="reply-header">
               <div class="reply-author-info">
-                @if (reply.author.avatar) {
+                @if (reply.author.avatar && !failedAvatars().has(reply.author.avatar!)) {
                   <img
                     [src]="reply.author.avatar"
                     [alt]="reply.author.name"
                     class="reply-avatar"
+                    (error)="avatarFailed(reply.author.avatar!)"
                   />
                 } @else {
                   <div class="reply-avatar-initials">{{ reply.author.initials }}</div>
