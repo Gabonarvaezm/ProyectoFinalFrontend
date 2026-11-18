@@ -1,3 +1,4 @@
+import { SupabaseAuthRepository } from './supabase-auth.repository';
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, computed, inject, PLATFORM_ID, DestroyRef, signal } from '@angular/core';
 import { Observable, throwError, tap, catchError, defer } from 'rxjs';
@@ -56,6 +57,11 @@ export class AuthService {
   private readonly local = inject(LocalAcademicRepository);
   private readonly storage = inject(LocalPersistenceService);
   readonly isLocalDemo = this.mode === 'local';
+  readonly isSupabase = this.mode === 'supabase';
+  private readonly supabase = inject(SupabaseAuthRepository);
+  private initialization: Promise<void> = Promise.resolve();
+  private sessionVersion = 0;
+  whenReady(): Promise<void> { return this.initialization; }
   private readonly restored = this.restore();
   private readonly _sessionToken = signal<string | null>(this.restored?.token ?? null);
   private readonly _currentUser = signal<User | null>(this.restored?.user ?? null);
@@ -67,6 +73,35 @@ export class AuthService {
   readonly dashboardRoute = computed(() => this.isProfessor() ? AUTH_ROUTES.PROFESSOR : AUTH_ROUTES.STUDENT);
 
   constructor() {
+    if (this.isSupabase && isPlatformBrowser(this.platformId)) {
+      const destroyRef = inject(DestroyRef);
+      let pendingSession: Promise<void> = Promise.resolve();
+      const unsubscribe = this.supabase.subscribe((session) => {
+        const version = ++this.sessionVersion;
+        pendingSession = new Promise<void>((resolve) => setTimeout(() => {
+          if (destroyRef.destroyed) { resolve(); return; }
+          void (session ? this.supabase.profile(session) : Promise.resolve(null)).then((response) => {
+            if (version !== this.sessionVersion || destroyRef.destroyed) return;
+            this._currentUser.set(response?.user ?? null);
+            this._sessionToken.set(response?.token ?? null);
+          }).catch(() => {
+            if (version === this.sessionVersion) { this._currentUser.set(null); this._sessionToken.set(null); }
+          }).finally(resolve);
+        }, 0));
+      });
+      destroyRef.onDestroy(unsubscribe);
+      const version = this.sessionVersion;
+      this.initialization = this.supabase.restore().then(async (response) => {
+        if (destroyRef.destroyed) return;
+        if (version !== this.sessionVersion) {
+          let observed: number;
+          do { observed = this.sessionVersion; await pendingSession; } while (observed !== this.sessionVersion);
+          return;
+        }
+        this._currentUser.set(response?.user ?? null); this._sessionToken.set(response?.token ?? null);
+      }).catch(() => { /* Login reports connection/schema errors explicitly. */ });
+    }
+
     if (this.isLocalDemo && isPlatformBrowser(this.platformId)) {
       const changed = (event: StorageEvent) => {
         if (event.key === STORAGE_KEYS.LOCAL_SESSION || event.key === STORAGE_KEYS.LOCAL_ACADEMIC || event.key === null) {
@@ -81,7 +116,7 @@ export class AuthService {
     }
   }
   private restore(): AuthResponse | null {
-    if (!isPlatformBrowser(this.platformId)) return null;
+    if (!isPlatformBrowser(this.platformId) || this.isSupabase) return null;
     try {
       if (this.isLocalDemo) return this.local.session();
       const token = this.storage.readText(STORAGE_KEYS.AUTH_TOKEN);
@@ -95,11 +130,11 @@ export class AuthService {
   login(credentials: LoginCredentials): Observable<AuthResponse> {
     const email = credentials.email.trim().toLowerCase();
     if (!email.includes('@')) return throwError(() => new Error('Correo no válido.'));
-    const request = this.isLocalDemo ? defer(() => [this.local.login(email)])
+    const request = this.isSupabase ? defer(() => this.supabase.login(email, credentials.password)) : this.isLocalDemo ? defer(() => [this.local.login(email)])
       : !credentials.password || credentials.password.length < 6 ? throwError(() => new Error('Credenciales incompletas.'))
       : this.http.post<AuthResponse>('/api/academic/login', { email, password: credentials.password });
     return request.pipe(tap((res) => {
-      if (!this.isLocalDemo && isPlatformBrowser(this.platformId)) {
+      if (!this.isLocalDemo && !this.isSupabase && isPlatformBrowser(this.platformId)) {
         this.storage.writeText(STORAGE_KEYS.AUTH_TOKEN, res.token);
         this.storage.write(STORAGE_KEYS.ACTIVE_SESSION, res.user);
       }
@@ -107,13 +142,16 @@ export class AuthService {
       this._currentUser.set(res.user); this._sessionToken.set(res.token);
     }), catchError((error: unknown) => throwError(() => this.toError(error))));
   }
-  register(data: RegisteredUserData & { password: string }): Observable<{ user: User }> {
+  register(data: RegisteredUserData & { password: string }): Observable<{ user: User; message?: string }> {
+    if (this.isSupabase) return defer(() => this.supabase.register(data));
     if (this.isLocalDemo) return defer(() => [{ user: this.local.register(data) }]);
     return this.http.post<{ user: User }>('/api/academic/register', data).pipe(
       tap(({ user }) => { if (isPlatformBrowser(this.platformId)) this.storage.write(STORAGE_KEYS.REGISTERED_USER, user); }),
       catchError((error: unknown) => throwError(() => this.toError(error))));
   }
   logout(): void {
+    this.sessionVersion++;
+    if (this.isSupabase) void this.supabase.logout().catch((error: unknown) => console.error('No se pudo cerrar la sesión de Supabase.', error));
     if (isPlatformBrowser(this.platformId)) {
       if (this.isLocalDemo) this.local.logout();
       else { this.storage.remove(STORAGE_KEYS.ACTIVE_SESSION); this.storage.remove(STORAGE_KEYS.AUTH_TOKEN); }
@@ -122,6 +160,9 @@ export class AuthService {
     this._currentUser.set(null); this._sessionToken.set(null);
   }
   hasRole(role: User['role']): boolean { return this.currentUser()?.role === role || this.currentUser()?.role === 'admin'; }
+  sendPasswordReset(email: string): Observable<void> {
+    return defer(() => this.supabase.sendPasswordReset(email.trim().toLowerCase()));
+  }
   getCurrentRole(): User['role'] | null { return this.currentUser()?.role ?? null; }
   getRegisteredUserData(email: string): RegisteredUserData | null {
     if (!isPlatformBrowser(this.platformId)) return null;

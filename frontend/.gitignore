@@ -53,3 +53,7 @@ Thumbs.db
 /playwright-report/
 
 /test-results-local/
+
+/.vercel/
+/supabase/.temp/
+/supabase/.branches/

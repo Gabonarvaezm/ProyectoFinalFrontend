@@ -91,7 +91,7 @@ export class ProfesorService {
       }
       this._students.set(state.students);
       this._assignmentsCount.set(state.exams.length);
-      if (this.sync.isLocalDemo) {
+      if (this.sync.isLocalDemo || this.sync.isSupabase) {
         this._recentActivities.set(this.storage.read<RecentActivity[]>(`${STORAGE_KEYS.ACTIVITIES}:${this.auth.currentUser()?.id ?? 'guest'}`, []));
         const key = `${STORAGE_KEYS.NOTIFICATIONS}:${this.auth.currentUser()?.id ?? 'guest'}`;
         const personal = this.storage.read<TeacherNotification[]>(key, []);
@@ -502,7 +502,7 @@ export class ProfesorService {
 
   private persistNotifications(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    if (this.sync.isLocalDemo && this.sync.enabled()) {
+    if ((this.sync.isLocalDemo || this.sync.isSupabase) && this.sync.enabled()) {
       const incoming = this.sync.snapshot()?.notifications ?? [];
       for (const notice of incoming) {
         const updated = this._notifications().find((item) => item.id === notice.id);

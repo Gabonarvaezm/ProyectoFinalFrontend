@@ -17,7 +17,6 @@ import { LoginHeroComponent, LoginFormComponent } from './components';
  */
 @Component({
   selector: 'app-login-page',
-  standalone: true,
   imports: [LoginHeroComponent, LoginFormComponent],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
@@ -95,6 +94,13 @@ export class LoginPageComponent {
    */
   public handleForgotPassword(email: string): void {
     this.resetStateMessages();
+    if (this.authService.isSupabase) {
+      this.authService.sendPasswordReset(email).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: () => this.successMessage.set('Si el correo está registrado, recibirás un enlace para cambiar la contraseña.'),
+        error: (error: Error) => this.errorMessage.set(error.message),
+      });
+      return;
+    }
     this.successMessage.set(AUTH_MESSAGES.PASSWORD_RESET_SENT(email));
   }
 

@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  academicMode: 'server' as 'local' | 'server',
+  academicMode: 'supabase' as 'local' | 'server' | 'supabase',
   apiUrl: '/api',
   ai: { endpoint: '/api/chat' },
 };

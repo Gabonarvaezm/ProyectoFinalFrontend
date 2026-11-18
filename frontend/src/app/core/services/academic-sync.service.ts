@@ -1,3 +1,4 @@
+import { SupabaseAcademicError, SupabaseAcademicRepository } from './supabase-academic.repository';
 import { LocalPersistenceService } from './local-persistence.service';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
@@ -16,6 +17,8 @@ export class AcademicSyncService {
   private readonly mode = inject(ACADEMIC_MODE);
   private readonly local = inject(LocalAcademicRepository);
   readonly isLocalDemo = this.mode === 'local';
+  readonly isSupabase = this.mode === 'supabase';
+  private readonly supabase = inject(SupabaseAcademicRepository);
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -139,7 +142,7 @@ export class AcademicSyncService {
     this.stateVersion++;
     this.saving.set(true);
     try {
-      const state = await firstValueFrom(this.http.post<AcademicSnapshot>('/api/academic/events',
+      const state = this.isSupabase ? await this.supabase.commit({ id: crypto.randomUUID(), type, payload }) : await firstValueFrom(this.http.post<AcademicSnapshot>('/api/academic/events',
         { id: crypto.randomUUID(), type, payload },
         { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }).pipe(timeout(15000)));
       if (generation !== this.generation) throw new Error('La sesión cambió durante el guardado.');
@@ -147,6 +150,7 @@ export class AcademicSyncService {
       this.snapshot.set(state);
       return state;
     } catch (error: unknown) {
+      if (this.isSupabase && error instanceof Error) throw error;
       const detail: unknown = error instanceof HttpErrorResponse ? error.error : null;
       throw new Error(typeof detail === 'object' && detail !== null && 'error' in detail && typeof detail.error === 'string'
         ? detail.error : 'No se pudo confirmar el guardado. Revisa la conexión y recarga antes de reintentar.');
@@ -172,14 +176,14 @@ export class AcademicSyncService {
         this.saving.set(true);
         const event = this.queue[0];
         writing = true;
-        const result = await firstValueFrom(this.http.post<AcademicSnapshot>('/api/academic/events', event, { headers }).pipe(timeout(15000)));
+        const result = this.isSupabase ? await this.supabase.commit(event) : await firstValueFrom(this.http.post<AcademicSnapshot>('/api/academic/events', event, { headers }).pipe(timeout(15000)));
         if (generation !== this.generation) return;
         this.queue.shift();
         writing = false;
         this.persistQueue();
         if (stateVersion === this.stateVersion) this.snapshot.set(result);
       }
-      const result = await firstValueFrom(this.http.get<AcademicSnapshot>('/api/academic/state', { headers }).pipe(timeout(15000)));
+      const result = this.isSupabase ? await this.supabase.snapshot() : await firstValueFrom(this.http.get<AcademicSnapshot>('/api/academic/state', { headers }).pipe(timeout(15000)));
       if (generation === this.generation) {
         if (stateVersion === this.stateVersion) this.snapshot.set(result);
         if (!this.failedQueue.length) this.error.set(null);
@@ -187,6 +191,7 @@ export class AcademicSyncService {
       }
     } catch (error: unknown) {
       if (generation !== this.generation) return;
+      if (this.isSupabase && error instanceof Error) this.error.set(error.message);
       if (!writing) {
         if (
           (error instanceof HttpErrorResponse &&
@@ -209,8 +214,9 @@ export class AcademicSyncService {
       if (writing) {
         const detail: unknown = error instanceof HttpErrorResponse ? error.error : null;
         this.error.set(typeof detail === 'object' && detail !== null && 'error' in detail && typeof detail.error === 'string'
-          ? detail.error : 'No se pudo compartir el contenido. Conservamos el envío para reintentarlo.');
-        if (error instanceof HttpErrorResponse && [400, 403, 404, 409].includes(error.status)) {
+          ? detail.error : this.isSupabase && error instanceof Error ? error.message : 'No se pudo compartir el contenido. Conservamos el envío para reintentarlo.');
+        if ((error instanceof HttpErrorResponse && [400, 403, 404, 409].includes(error.status)) ||
+            (error instanceof SupabaseAcademicError && !error.retryable)) {
           const failed = this.queue.shift();
           if (failed) this.failedQueue.push(failed);
           this.persistQueue();
@@ -254,7 +260,7 @@ export class AcademicSyncService {
 
   private outboxKey(): string { return `disceria_outbox:${this.auth.currentUser()?.email}`; }
   private importLegacyContent(state: AcademicSnapshot): void {
-    if (this.migrated || !this.auth.isProfessor()) return;
+    if (this.isSupabase || this.migrated || !this.auth.isProfessor()) return;
     this.migrated = true;
     const migrationKey = `disceria_shared_migration:${this.auth.currentUser()?.email}`;
     if (this.storage.readText(migrationKey)) return;

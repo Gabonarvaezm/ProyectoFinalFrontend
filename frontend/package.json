@@ -12,7 +12,12 @@
     "serve:ssr:DiscerIA": "node dist/DiscerIA/server/server.mjs",
     "test:e2e": "node scripts/run-academic-e2e.mjs",
     "start:server": "node scripts/start.mjs --configuration server",
-    "test:e2e:local": "node scripts/run-local-e2e.mjs"
+    "test:e2e:local": "node scripts/run-local-e2e.mjs",
+    "prestart": "node scripts/prepare-supabase.mjs",
+    "prebuild": "node scripts/prepare-supabase.mjs",
+    "test:supabase": "node --test scripts/supabase-database.test.mjs scripts/supabase-chat.test.mjs",
+    "check:supabase": "node scripts/check-supabase.mjs",
+    "start:local": "ng serve --configuration local"
   },
   "private": true,
   "packageManager": "npm@11.13.0",
@@ -26,6 +31,7 @@
     "@angular/platform-server": "^22.2.0",
     "@angular/router": "^22.2.0",
     "@angular/ssr": "^22.2.2",
+    "@supabase/supabase-js": "^2.119.1",
     "bootstrap-icons": "^1.13.2",
     "express": "^5.1.0",
     "lottie-web": "^5.13.0",
@@ -37,6 +43,7 @@
     "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.2.0",
     "@axe-core/playwright": "^4.14.0",
+    "@electric-sql/pglite": "^0.5.16",
     "@playwright/test": "^1.65.1",
     "@types/express": "^5.0.1",
     "@types/node": "^22.12.0",
@@ -44,5 +51,8 @@
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

@@ -1,0 +1,5 @@
+project_id = "disceria"
+
+[functions.academic-chat]
+# The handler verifies every JWT against Auth /user, including projects with asymmetric signing keys.
+verify_jwt = false

@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-const server = spawn(process.execPath, ['node_modules/@angular/cli/bin/ng.js', 'serve', '--host', '127.0.0.1', '--port', '4311'], { stdio: 'inherit' });
+const server = spawn(process.execPath, ['node_modules/@angular/cli/bin/ng.js', 'serve', '--configuration', 'local', '--host', '127.0.0.1', '--port', '4311'], { stdio: 'inherit' });
 try {
   const deadline = Date.now() + 120000;
   let ready = false;

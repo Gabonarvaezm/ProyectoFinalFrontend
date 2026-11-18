@@ -19,7 +19,6 @@ import {
 
 @Component({
   selector: 'app-register',
-  standalone: true,
   imports: [RegisterHeroComponent, RegisterFormComponent],
   templateUrl: './register.html',
   styleUrl: './register.scss',
@@ -52,9 +51,9 @@ export class Register {
     this.isLoading.set(true);
 
     this.authService.register(payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading.set(false);
-        this.successMessage.set(`¡Cuenta creada exitosamente para ${payload.fullName}! Redirigiendo al inicio de sesión...`);
+        this.successMessage.set(response.message ?? `¡Cuenta creada exitosamente para ${payload.fullName}! Redirigiendo al inicio de sesión...`);
         const timer = setTimeout(() => this.router.navigate([AUTH_ROUTES.LOGIN]), AUTH_TIMERS.REGISTER_REDIRECT_DELAY_MS);
         this.timerIds.push(timer);
       },

@@ -11,10 +11,13 @@ export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
-    return true;
-  }
+  const resolve = () => {
+    if (authService.isAuthenticated()) {
+      return true;
+    }
 
-  return router.createUrlTree([AUTH_ROUTES.LOGIN]);
+    return router.createUrlTree([AUTH_ROUTES.LOGIN]);
+  };
+  return authService.isSupabase ? authService.whenReady().then(resolve) : resolve();
 };
 
