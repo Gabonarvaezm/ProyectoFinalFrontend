@@ -1,0 +1,59 @@
+<section class="popular-courses-section">
+  <div class="popular-courses-container">
+    <div class="section-header-center">
+      <h2 class="popular-title">Colecciones Destacadas de la Biblioteca</h2>
+      <p class="popular-subtitle">
+        Explora los recursos y guías pedagógicas más consultados por docentes y estudiantes de instituciones públicas,
+        con asistencia del chatbot con IA para resolver cualquier interrogante temática.
+      </p>
+    </div>
+
+    <!-- Tarjetas de Recursos de la Biblioteca -->
+    <div class="courses-grid">
+      @for (course of courses(); track course.id) {
+        <article class="course-card anim-fade-up">
+          <!-- Imagen del Recurso -->
+          <div class="course-img-wrap">
+            <img [src]="course.image" [alt]="course.title" loading="lazy" />
+          </div>
+
+          <div class="course-body">
+            <!-- Categoría y Rating -->
+            <div class="course-tags-row">
+              <span class="course-badge">{{ course.category }}</span>
+              <span class="course-rating">
+                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                <span>{{ course.rating }}</span>
+              </span>
+            </div>
+
+            <!-- Título del Recurso -->
+            <h3 class="course-card-title">{{ course.title }}</h3>
+
+            <!-- Meta: Capítulos y Consultas -->
+            <div class="course-meta-row">
+              <span class="meta-item">
+                <i class="bi bi-book" aria-hidden="true"></i>
+                <span>{{ course.classesCount }} Capítulos</span>
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+                <span>{{ course.studentsCount }} Consultas</span>
+              </span>
+            </div>
+
+            <!-- Estado de Acceso e Institución/Docente -->
+            <div class="course-footer-row">
+              <span class="course-price">{{ course.price }}</span>
+              <div class="instructor-pill">
+                <img [src]="course.instructorAvatar" [alt]="course.instructorName" width="28" height="28" loading="lazy" />
+                <span class="instructor-name">{{ course.instructorName }}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+

@@ -1,0 +1,80 @@
+<header class="top-header" role="banner">
+  <div class="header-search-wrap">
+    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+    <input
+      type="search"
+      class="header-search-input"
+      placeholder="Buscar discusiones, dudas o publicaciones..."
+      [value]="searchQuery()"
+      (input)="onSearchInput($event)"
+      aria-label="Buscar en los foros académicos"
+    />
+    @if (searchQuery()) {
+      <button
+        type="button"
+        class="btn-clear-search"
+        (click)="clearSearch()"
+        aria-label="Limpiar búsqueda"
+        title="Limpiar búsqueda"
+      >
+        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+
+  <div class="header-actions">
+    <button
+      type="button"
+      class="icon-btn btn-ai-toggle"
+      [class.active]="isAiPanelOpen()"
+      (click)="aiToggleClicked.emit()"
+      title="Asistente de Comunidad Context AI"
+      aria-label="Alternar Asistente de Comunidad"
+      [attr.aria-expanded]="isAiPanelOpen()"
+    >
+      <i class="bi bi-robot" aria-hidden="true"></i>
+    </button>
+
+    <!-- Notificaciones del foro -->
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="notificationsClicked.emit()"
+      aria-label="Notificaciones del foro"
+      title="Respuestas académicas recientes"
+    >
+      <i class="bi bi-bell" aria-hidden="true"></i>
+      @if (notificationsCount() > 0) {
+        <span class="notification-indicator" aria-hidden="true"></span>
+      }
+      <span class="visually-hidden">Tienes notificaciones académicas nuevas</span>
+    </button>
+
+    <!-- Configuración -->
+    <a
+      routerLink="/configuracion"
+      class="icon-btn"
+      aria-label="Configuración de preferencias"
+      title="Configuración"
+    >
+      <i class="bi bi-gear" aria-hidden="true"></i>
+    </a>
+
+    <!-- Perfil de usuario con fallback seguro de avatar -->
+    <div
+      class="user-profile-badge"
+      [title]="currentUser().name + ' (' + (currentUser().roleTitle || currentUser().role) + ')'"
+    >
+      @if (currentUser().avatar && !avatarLoadError()) {
+        <img
+          [src]="currentUser().avatar"
+          [alt]="currentUser().name"
+          class="user-avatar"
+          (error)="onAvatarError()"
+        />
+      } @else {
+        <div class="user-avatar-initials" aria-hidden="true">{{ currentUser().initials }}</div>
+      }
+    </div>
+  </div>
+</header>

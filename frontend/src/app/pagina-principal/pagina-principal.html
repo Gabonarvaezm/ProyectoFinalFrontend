@@ -1,0 +1,41 @@
+<div class="landing-page">
+  <!-- 1. Navbar de Navegación Institucional (Nodo Hijo) -->
+  <app-landing-navbar
+    [mobileMenuOpen]="mobileMenuOpen()"
+    (toggleMobileMenu)="toggleMobileMenu()"
+    (closeMobileMenu)="closeMobileMenu()"
+  />
+
+  <!-- 2. Hero Section con Asistente IA y Badges (Nodo Hijo) -->
+  <app-landing-hero />
+
+  <!-- 3. Ribbon de Compromiso con Educación Pública (Nodo Hijo) -->
+  <app-landing-partners />
+
+  <!-- 4. Buscador de la Biblioteca Virtual (Nodo Hijo) -->
+  <app-landing-search
+    [(searchQuery)]="searchQuery"
+    (searchSubmitted)="onSearch($event)"
+  />
+
+  <!-- 5. Beneficios para la Comunidad Educativa Pública (Nodo Hijo) -->
+  <app-landing-benefits />
+
+  <!-- 6. Colecciones Destacadas de la Biblioteca (Nodo Hijo) -->
+  <app-landing-courses [courses]="courses()" />
+
+  <!-- 7. Sección Especializada para Docentes Públicos (Nodo Hijo) -->
+  <app-landing-docentes />
+
+  <!-- 8. Testimonios de Docentes y Estudiantes (Nodo Hijo con Paginador) -->
+  <app-landing-testimonials
+    [testimonials]="testimonials()"
+    [currentPage]="currentTestimonialPage()"
+    [totalPages]="totalTestimonialPages"
+    (prevClicked)="prevTestimonial()"
+    (nextClicked)="nextTestimonial()"
+  />
+
+  <!-- 9. Footer y Enlaces Institucionales (Nodo Hijo) -->
+  <app-landing-footer />
+</div>

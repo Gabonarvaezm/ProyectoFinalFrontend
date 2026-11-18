@@ -1,0 +1,54 @@
+<section class="forums-section" aria-label="Preguntas recientes de la comunidad en foros">
+  <div class="section-title-row">
+    <h2 class="section-heading">Preguntas Recientes en Foros</h2>
+    <button type="button" class="btn-link-action" (click)="viewAllRequested.emit()">
+      Ir a Foros
+    </button>
+  </div>
+
+  <div class="forum-questions-list">
+    @for (q of questions(); track q.id) {
+      <div class="forum-item-card">
+        <div class="forum-author-avatar">
+          @if (!isAvatarBroken(q.id)) {
+            <img
+              [src]="q.avatar"
+              [alt]="'Avatar de ' + q.authorName"
+              width="42"
+              height="42"
+              (error)="avatarErrorOccurred.emit(q.id)"
+            />
+          } @else {
+            <div
+              class="avatar-fallback"
+              [style.background-color]="q.avatarFallbackBg"
+              [style.color]="q.avatarFallbackColor"
+              aria-hidden="true"
+            >
+              {{ q.initials }}
+            </div>
+          }
+        </div>
+
+        <div class="forum-content">
+          <h3 class="forum-title">{{ q.title }}</h3>
+          <div class="forum-meta-row">
+            <span class="forum-tag" [class]="q.tagClass">
+              <i [class]="q.tagIcon"></i>
+              <span>{{ q.tagText }}</span>
+            </span>
+            <span class="forum-bullet">•</span>
+            <span class="forum-time">{{ q.timeAgo }} en {{ q.subject }}</span>
+          </div>
+        </div>
+
+        <div class="forum-action">
+          <button type="button" class="btn-outline-pill" (click)="viewThreadRequested.emit(q)">
+            Ver hilo
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+

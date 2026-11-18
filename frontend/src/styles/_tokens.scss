@@ -1,0 +1,312 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA Design System — Tokens & Custom Properties
+// ─────────────────────────────────────────────────────────────────────────────
+
+:root {
+  --color-auth-invalid-bg: #fffbfa;
+  --color-auth-action-bg: #1d4ed8;
+  --color-auth-action-hover: #1e40af;
+  --color-auth-hero-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1e40af 140%);
+  --color-auth-hero-text: #f8fafc;
+  --color-auth-hero-secondary: #cbd5e1;
+  --color-auth-hero-muted: #94a3b8;
+
+  --color-landing-navbar-bg: rgba(255, 255, 255, 0.95);
+  --color-landing-card-bg: rgba(255, 255, 255, 0.96);
+  --color-landing-card-border: rgba(255, 255, 255, 0.8);
+  --color-landing-action-bg: #1d4ed8;
+  --color-landing-action-hover: #1e40af;
+  --color-landing-soft-green: #f0fdf4;
+  --color-landing-soft-cyan: #f0f9ff;
+
+  // ── Paleta de Colores Primarios (Azul Académico de Confianza) ──────────────
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary: var(--color-primary-700);
+  --color-primary-hover: var(--color-primary-800);
+  --color-primary-light: var(--color-primary-50);
+
+  // ── Acentos de Inteligencia Artificial (Violeta / Indigo Eléctrico) ────────
+  --color-ai-50: #eef2ff;
+  --color-ai-100: #e0e7ff;
+  --color-ai-300: #a5b4fc;
+  --color-ai-500: #6366f1;
+  --color-ai-600: #4f46e5;
+  --color-ai-700: #4338ca;
+  --color-ai-gradient: linear-gradient(135deg, #2563eb 0%, #6366f1 50%, #8b5cf6 100%);
+  --color-ai-gradient-subtle: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+
+  // ── Escala de Neutros / Slate (Superficies & Tipografía) ────────────────────
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-white: #ffffff;
+
+  // ── Mapeo Semántico de Textos y Fondos ─────────────────────────────────────
+  --color-bg-app: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-elevated: #ffffff;
+  --color-bg-muted: #f1f5f9;
+  --color-text-main: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-600);
+  --color-text-muted: var(--color-slate-500);
+  --color-border: var(--color-slate-200);
+  --color-border-subtle: #f1f5f9;
+  --color-border-focus: var(--color-primary-600);
+
+  // Confirmaciones flotantes: independientes de la escala de texto del tema.
+  --color-toast-bg: #0f172a;
+  --color-toast-text: #ffffff;
+  --color-toast-border: #334155;
+  --color-toast-info: #7dd3fc;
+  --color-toast-success: #6ee7b7;
+  --shadow-toast: 0 12px 28px rgba(15, 23, 42, 0.25);
+  --z-index-toast: 10000;
+  --color-notification-unread-bg: #eff6ff;
+  --color-notification-unread-border: #93c5fd;
+  --color-notification-success: #047857;
+  --color-notification-info: #1d4ed8;
+  --color-notification-warning: #92400e;
+  --color-notification-ai: #4338ca;
+  --color-notification-active-bg: #1d4ed8;
+
+  --color-forum-verified-bg: #fefce8;
+  --color-forum-verified-border: #fef08a;
+  --color-forum-verified-badge-bg: #fef9c3;
+  --color-forum-verified-label: #a16207;
+  --color-forum-verified-icon: #eab308;
+  --color-forum-teacher-bg: #e0e7ff;
+  --color-forum-teacher-text: #4338ca;
+
+  // ── Estados Semánticos (Feedback y Alertas con Alto Contraste WCAG AA) ──────
+  --color-success: #10b981;
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #a7f3d0;
+  --color-success-text: #065f46;
+
+  --color-danger: #ef4444;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #991b1b;
+
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-warning-text: #92400e;
+
+  --color-info: #0284c7;
+  --color-info-bg: #f0f9ff;
+  --color-info-border: #bae6fd;
+  --color-info-text: #0369a1;
+
+  // ── Tipografía ─────────────────────────────────────────────────────────────
+  --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-code: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  --font-size-xs: 0.75rem;    // 12px
+  --font-size-sm: 0.875rem;   // 14px
+  --font-size-base: 1rem;     // 16px
+  --font-size-md: 1.125rem;   // 18px
+  --font-size-lg: 1.25rem;    // 20px
+  --font-size-xl: 1.5rem;     // 24px
+  --font-size-2xl: 1.875rem;  // 30px
+  --font-size-3xl: 2.25rem;   // 36px
+  --font-size-4xl: 3rem;      // 48px
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.65;
+
+  // ── Espaciado (Grid de 4px) ────────────────────────────────────────────────
+  --space-1: 0.25rem;  // 4px
+  --space-2: 0.5rem;   // 8px
+  --space-3: 0.75rem;  // 12px
+  --space-4: 1rem;     // 16px
+  --space-5: 1.25rem;  // 20px
+  --space-6: 1.5rem;   // 24px
+  --space-8: 2rem;     // 32px
+  --space-10: 2.5rem;  // 40px
+  --space-12: 3rem;    // 48px
+  --space-16: 4rem;    // 64px
+
+  // ── Radios de Borde ────────────────────────────────────────────────────────
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  // ── Sombras & Elevaciones Elegantes ─────────────────────────────────────────
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.09), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  --shadow-card-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.1);
+  --shadow-glow-ai: 0 0 35px -5px rgba(99, 102, 241, 0.25);
+  --shadow-glow-primary: 0 0 30px -5px rgba(37, 99, 235, 0.25);
+
+  // ── Curvas de Animación & Tiempos (Soberbias y Elegantes) ───────────────────
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce-subtle: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 450ms;
+  --duration-slower: 600ms;
+
+  --transition-fast: all var(--duration-fast) var(--ease-out-expo);
+  --transition-normal: all var(--duration-normal) var(--ease-out-expo);
+  --transition-slow: all var(--duration-slow) var(--ease-out-expo);
+
+  // ── Accesibilidad: Anillo de Foco WCAG AA ───────────────────────────────────
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  --focus-ring-offset: 2px;
+
+  // ── Dimensiones de Layout Estándar ──────────────────────────────────────────
+  --sidebar-width: 256px;
+  --header-height: 70px;
+  --chat-panel-width: 380px;
+  --max-content-width: 1440px;
+}
+
+// ── Variables de Tema Oscuro (Dark Mode & Alto Contraste WCAG AA) ─────────────
+[data-theme='dark'],
+.dark-theme {
+  --color-auth-invalid-bg: #2c1d2a;
+  --color-auth-action-bg: #2563eb;
+  --color-auth-action-hover: #1d4ed8;
+
+  --color-landing-navbar-bg: rgba(15, 23, 42, 0.97);
+  --color-landing-card-bg: rgba(30, 41, 59, 0.97);
+  --color-landing-card-border: #475569;
+  --color-landing-action-bg: #2563eb;
+  --color-landing-action-hover: #1d4ed8;
+  --color-landing-soft-green: rgba(16, 185, 129, 0.18);
+  --color-landing-soft-cyan: rgba(2, 132, 199, 0.18);
+
+  // Superficies y Fondos
+  --color-bg-app: #0b1120;
+  --color-bg-surface: #0f172a;
+  --color-bg-surface-elevated: #1e293b;
+  --color-bg-muted: #1e293b;
+
+  // Textos y Contraste Óptimo (Mapeo a tonos claros/blancos legibles #F8FAFC, #E2E8F0)
+  --color-text-main: #f8fafc;        // Blanco puro legible
+  --color-text-secondary: #e2e8f0;   // Gris muy claro (#E2E8F0) de alto contraste
+  --color-text-muted: #cbd5e1;       // Gris claro suave para metadatos y fechas
+
+  // Escala Completa Invertida para Textos, Etiquetas y Celdas de Tabla
+  --color-slate-900: #f8fafc;        // Títulos y encabezados principales (#F8FAFC)
+  --color-slate-800: #f1f5f9;        // Subtítulos y texto semi-destacado
+  --color-slate-700: #e2e8f0;        // Etiquetas de formulario, nombres y labels (#E2E8F0)
+  --color-slate-600: #e2e8f0;        // Textos secundarios, descripciones y celdas (#E2E8F0)
+  --color-slate-500: #cbd5e1;        // Encabezados de tabla (th) e iconos secundarios
+  --color-slate-400: #94a3b8;        // Placeholders e hints
+  --color-slate-300: #475569;        // Divisores y bordes activos
+  --color-slate-200: #334155;        // Bordes de tarjetas y contenedores
+  --color-slate-100: #1e293b;        // Fondos de hover, tags y botones secundarios
+  --color-slate-50: #131d31;         // Fondos sutiles (hover en filas de tablas, inputs)
+  --color-white: #ffffff;
+
+  // Bordes
+  --color-border: #334155;
+  --color-border-subtle: #1e293b;
+  --color-border-focus: #60a5fa;
+
+  --color-toast-bg: #1e293b;
+  --color-toast-text: #f8fafc;
+  --color-toast-border: #94a3b8;
+  --shadow-toast: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --color-notification-unread-bg: #172b4d;
+  --color-notification-unread-border: #60a5fa;
+  --color-notification-success: #6ee7b7;
+  --color-notification-info: #93c5fd;
+  --color-notification-warning: #fcd34d;
+  --color-notification-ai: #c7d2fe;
+
+  --color-forum-verified-bg: #172033;
+  --color-forum-verified-border: #a38a4a;
+  --color-forum-verified-badge-bg: #332b16;
+  --color-forum-verified-label: #fcd34d;
+  --color-forum-verified-icon: #fbbf24;
+  --color-forum-teacher-bg: #312e81;
+  --color-forum-teacher-text: #c7d2fe;
+
+  // Primarios Adaptados (más luminosos para contraste sobre fondo oscuro)
+  --color-primary-50: rgba(37, 99, 235, 0.2);
+  --color-primary-100: rgba(37, 99, 235, 0.3);
+  --color-primary-200: rgba(59, 130, 246, 0.4);
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #3b82f6;
+  --color-primary-700: #60a5fa;
+  --color-primary-800: #93c5fd;
+  --color-primary-900: #bfdbfe;
+  --color-primary: var(--color-primary-700);
+  --color-primary-hover: var(--color-primary-800);
+  --color-primary-light: var(--color-primary-50);
+
+  // Acentos de IA adaptados
+  --color-ai-50: rgba(99, 102, 241, 0.2);
+  --color-ai-100: rgba(99, 102, 241, 0.3);
+  --color-ai-300: #c7d2fe;
+  --color-ai-gradient-subtle: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(99, 102, 241, 0.25) 100%);
+
+  // Alertas y Feedback con legibilidad garantizada y alto contraste WCAG AA
+  --color-success: #34d399;
+  --color-success-bg: rgba(16, 185, 129, 0.18);
+  --color-success-border: rgba(16, 185, 129, 0.4);
+  --color-success-text: #6ee7b7;
+
+  --color-danger: #f87171;
+  --color-danger-bg: rgba(239, 68, 68, 0.18);
+  --color-danger-border: rgba(239, 68, 68, 0.4);
+  --color-danger-text: #fca5a5;
+
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(245, 158, 11, 0.18);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
+  --color-warning-text: #fde68a;
+
+  --color-info: #38bdf8;
+  --color-info-bg: rgba(2, 132, 199, 0.18);
+  --color-info-border: rgba(2, 132, 199, 0.4);
+  --color-info-text: #7dd3fc;
+
+  // Sombras y Resplandor Adaptados
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.55);
+}
+

@@ -1,0 +1,650 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA Global Component Styles — Buttons, Forms, Cards & UI Elements
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Clases Utilitarias Flex & Layout ─────────────────────────────────────────
+
+.d-flex-center {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.d-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// ── Botones (Jerarquía y Microinteracciones) ──────────────────────────────────
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.625rem 1.25rem;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: var(--transition-fast);
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  &:disabled,
+  &.is-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Tamaños
+  &.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-sm);
+  }
+
+  &.btn-lg {
+    padding: 0.875rem 1.75rem;
+    font-size: var(--font-size-base);
+    border-radius: var(--radius-lg);
+  }
+
+  &.btn-icon {
+    padding: 0.625rem;
+    border-radius: var(--radius-md);
+    aspect-ratio: 1;
+  }
+}
+
+.btn-primary {
+  background-color: var(--color-auth-action-bg);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    background-color: var(--color-auth-action-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-xs);
+  }
+}
+
+.btn-ai {
+  background: var(--color-ai-gradient);
+  color: var(--color-white);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-secondary {
+  background-color: var(--color-slate-100);
+  color: var(--color-slate-800);
+  border-color: var(--color-slate-200);
+
+  &:hover {
+    background-color: var(--color-slate-200);
+    color: var(--color-slate-900);
+  }
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary-700);
+  border-color: var(--color-primary-300);
+
+  &:hover {
+    background-color: var(--color-primary-50);
+    border-color: var(--color-primary-600);
+  }
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-slate-600);
+
+  &:hover {
+    background-color: var(--color-slate-100);
+    color: var(--color-slate-900);
+  }
+}
+
+// ── Campos de Formulario (Accesibles y Coherentes) ───────────────────────────
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  text-align: left;
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-slate-700);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .required-star {
+    color: var(--color-danger);
+    margin-left: 2px;
+  }
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 0.6875rem 0.875rem;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-900);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: var(--transition-fast);
+
+  &::placeholder {
+    color: var(--color-slate-400);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-slate-300);
+  }
+
+  &:focus {
+    border-color: var(--color-primary-600);
+    box-shadow: var(--focus-ring);
+  }
+
+  &.has-error {
+    border-color: var(--color-danger);
+    background-color: #fffbfa;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    }
+  }
+
+  &:disabled {
+    background-color: var(--color-slate-100);
+    color: var(--color-slate-400);
+    cursor: not-allowed;
+  }
+}
+
+.form-feedback-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+.form-feedback-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+// ── Tarjetas y Superficies ───────────────────────────────────────────────────
+
+.card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-normal);
+  overflow: hidden;
+
+  &.card-interactive {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+      border-color: var(--color-slate-300);
+    }
+  }
+
+  &.card-glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+}
+
+.card-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-body {
+  padding: var(--space-5);
+}
+
+.card-footer {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-slate-50);
+}
+
+// ── Insignias (Badges) y Píldoras ────────────────────────────────────────────
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.25rem 0.625rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+
+  &.badge-pill {
+    border-radius: var(--radius-full);
+  }
+
+  &.badge-primary {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+    border: 1px solid var(--color-primary-200);
+  }
+
+  &.badge-ai {
+    background: var(--color-ai-gradient-subtle);
+    color: var(--color-ai-700);
+    border: 1px solid var(--color-ai-300);
+  }
+
+  &.badge-success {
+    background-color: var(--color-success-bg);
+    color: #065f46;
+    border: 1px solid var(--color-success-border);
+  }
+
+  &.badge-danger {
+    background-color: var(--color-danger-bg);
+    color: #991b1b;
+    border: 1px solid var(--color-danger-border);
+  }
+}
+
+// ── Cajas de Alerta ──────────────────────────────────────────────────────────
+
+.alert-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+
+  i {
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &.alert-danger {
+    background-color: var(--color-danger-bg);
+    border: 1px solid var(--color-danger-border);
+    color: #b91c1c;
+  }
+
+  &.alert-success {
+    background-color: var(--color-success-bg);
+    border: 1px solid var(--color-success-border);
+    color: #047857;
+  }
+
+  &.alert-info {
+    background-color: var(--color-info-bg);
+    border: 1px solid var(--color-info-border);
+    color: #0369a1;
+  }
+}
+
+
+// ── Layout Unificado para Portales y Dashboards ─────────────────────────────
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-bg-app);
+  color: var(--color-text-main);
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+}
+
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.dashboard-canvas {
+  flex: 1;
+  padding: var(--space-6) var(--space-8);
+  max-width: var(--max-content-width);
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  @media (max-width: 768px) {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+}
+
+// ── Banners de Bienvenida Unificados ─────────────────────────────────────────
+
+.welcome-banner {
+  background: linear-gradient(135deg, var(--color-white) 0%, var(--color-slate-50) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  box-shadow: var(--shadow-sm);
+
+  .welcome-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-slate-900);
+    letter-spacing: -0.025em;
+    margin-bottom: var(--space-1);
+    line-height: var(--line-height-tight);
+  }
+
+  .welcome-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+
+    strong, .stat-highlight {
+      color: var(--color-primary-700);
+      font-weight: var(--font-weight-bold);
+    }
+  }
+}
+
+// ── Barra de Progreso Unificada ──────────────────────────────────────────────
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-slate-100);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: var(--color-ai-gradient);
+    transition: width var(--duration-normal) var(--ease-out-expo);
+
+    &.fill-primary {
+      background: var(--color-primary-600);
+    }
+
+    &.fill-success {
+      background: var(--color-success);
+    }
+  }
+}
+
+// ── Avatares Unificados ──────────────────────────────────────────────────────
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  flex-shrink: 0;
+  user-select: none;
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  border: 2px solid var(--color-white);
+  box-shadow: var(--shadow-xs);
+
+  &.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-xs);
+  }
+
+  &.avatar-md {
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-sm);
+  }
+
+  &.avatar-lg {
+    width: 48px;
+    height: 48px;
+    font-size: var(--font-size-base);
+  }
+}
+
+// ── Modales de Diálogo Accesibles Unificados ─────────────────────────────────
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: fadeIn var(--duration-fast) var(--ease-out-expo);
+}
+
+.modal-dialog {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleUp var(--duration-fast) var(--ease-out-expo);
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+
+    .modal-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-slate-900);
+      margin: 0;
+    }
+  }
+
+  .modal-body {
+    padding: var(--space-6);
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-slate-50);
+  }
+}
+
+// ── Estados Vacíos (Empty States) ───────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  background-color: var(--color-bg-surface);
+  border: 2px dashed var(--color-slate-200);
+  border-radius: var(--radius-lg);
+
+  .empty-state-icon {
+    font-size: 2.5rem;
+    color: var(--color-slate-400);
+    margin-bottom: var(--space-3);
+  }
+
+  .empty-state-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-800);
+    margin-bottom: var(--space-1);
+  }
+
+  .empty-state-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    max-width: 380px;
+    margin: 0;
+  }
+}
+
+// ── Refuerzos de Legibilidad y Contraste para Modo Oscuro ─────────────────────
+
+[data-theme='dark'],
+.dark-theme {
+  color-scheme: dark;
+
+  // Banner de bienvenida con degradado oscuro suave
+  .welcome-banner {
+    background: linear-gradient(135deg, var(--color-bg-surface-elevated) 0%, var(--color-bg-surface) 100%);
+    border-color: var(--color-border);
+  }
+
+  // Inputs, selects y textareas
+  .form-input,
+  .form-select,
+  .form-textarea {
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-main);
+    border-color: var(--color-border);
+
+    &::placeholder {
+      color: var(--color-slate-400);
+    }
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-slate-400);
+    }
+
+    &:focus {
+      border-color: var(--color-primary-400);
+      background-color: var(--color-bg-surface-elevated);
+    }
+
+    &:disabled {
+      background-color: var(--color-bg-muted);
+      color: var(--color-slate-500);
+    }
+  }
+
+  // Badges
+  .badge-primary {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-400);
+    border-color: var(--color-primary-200);
+  }
+
+  .badge-success {
+    background-color: var(--color-success-bg);
+    color: #6ee7b7;
+    border-color: var(--color-success-border);
+  }
+
+  .badge-danger {
+    background-color: var(--color-danger-bg);
+    color: #fca5a5;
+    border-color: var(--color-danger-border);
+  }
+
+  // Alertas
+  .alert-box {
+    &.alert-danger {
+      color: #fca5a5;
+    }
+    &.alert-success {
+      color: #6ee7b7;
+    }
+    &.alert-info {
+      color: #7dd3fc;
+    }
+  }
+
+  // Tablas
+  table, .progress-table {
+    th {
+      color: var(--color-slate-500);
+    }
+
+    td {
+      color: var(--color-text-secondary);
+    }
+
+    tbody tr:hover {
+      background-color: var(--color-slate-50);
+    }
+  }
+}
+

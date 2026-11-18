@@ -1,0 +1,152 @@
+<div class="dashboard-layout">
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 1. BARRA LATERAL IZQUIERDA (NODO HIJO PRESENTACIONAL)                   -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <app-profesor-sidebar [navItems]="navItems()" [(activeNav)]="activeNav" (navSelected)="selectNav($event)"
+    (newAnalysis)="onNewAnalysis()" />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 2. CONTENIDO PRINCIPAL (HEADER + KPIS + TABLA + ACTIVIDAD)            -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="main-wrapper">
+    <!-- Barra superior de búsqueda y perfil (NODO HIJO PRESENTACIONAL) -->
+    <app-profesor-header
+      [teacherName]="currentUser()?.fullName || 'Docente'"
+      [teacherInitials]="teacherInitials()"
+      [(searchQuery)]="searchQuery"
+      [notificationsCount]="unreadNotificationsCount()"
+      [isAiDrawerOpen]="isAiDrawerOpen()"
+      [isNotificationsDrawerOpen]="isNotificationsDrawerOpen()"
+      (notificationsClicked)="onNotificationsClick()"
+      (configClicked)="selectNav('configuracion')"
+      (aiToggleClicked)="toggleAiDrawer()"
+    />
+
+    <!-- Contenido Scrollable / Dashboard Canvas -->
+    <main class="dashboard-canvas">
+      @if (activeNav() === 'biblioteca') {
+      <app-biblioteca
+        [userRole]="'professor'"
+        [isEmbedded]="true"
+        (bookRecommended)="onBookRecommended($event)"
+      />
+      } @else if (activeNav() === 'configuracion' || activeNav() === 'perfil') {
+      <app-configuracion
+        [user]="currentUser()"
+        [isEmbedded]="true"
+        (logoutRequested)="onLogout()"
+      />
+      } @else {
+      <!-- Banner de Bienvenida -->
+      <section class="welcome-card" aria-label="Bienvenida al docente">
+        <h1 class="welcome-title">¡Hola, {{ currentUser()?.fullName || 'Docente' }}!</h1>
+        <p class="welcome-subtitle">
+          Consulta el rendimiento de tus estudiantes y las entregas registradas.
+        </p>
+        <button type="button" class="btn btn-primary" (click)="openTasks()">Gestionar tareas</button>
+      </section>
+
+      <!-- Tarjetas de Métricas (NODO HIJO PRESENTACIONAL) -->
+      <app-profesor-kpi-cards [kpiMetrics]="kpiMetrics()" />
+
+      <!-- Cuadrícula de Contenido: Student Progress + Actividad & Acciones -->
+      <div class="content-split-grid">
+        <!-- Columna Izquierda: Student Progress Table (NODO HIJO PRESENTACIONAL) -->
+        <app-profesor-student-table [students]="filteredStudents()" [totalCount]="filteredStudents().length"
+          (deleteStudent)="onDeleteStudent($event)" (registerStudentClick)="openRegisterModal()"
+          (studentSelected)="showTracking($event.id)" (viewAll)="showTracking()" />
+
+        <!-- Columna Derecha: Recent Activity + Quick Actions (NODO HIJO PRESENTACIONAL) -->
+        <app-profesor-activity-feed [activities]="recentActivities()" [quickActions]="quickActions()"
+          (quickActionTriggered)="triggerQuickAction($event)" />
+      </div>
+      @if (trackingOpen()) {
+        <section aria-label="Historial académico del estudiante">
+          <app-tarea [isEmbedded]="true" [studentId]="trackingStudent()" />
+        </section>
+      }
+      }
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 3. PANEL DRAWER ASISTENTE IA                                             -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (isAiDrawerOpen()) {
+    <div class="ai-drawer-backdrop" (click)="closeAiDrawer()" aria-hidden="true"></div>
+  }
+
+  <app-profesor-ai-chat
+    [isOpen]="isAiDrawerOpen()"
+    [chatMessages]="chatMessages()"
+    [aiSuggestions]="aiSuggestions()"
+    [isAiThinking]="isAiThinking()"
+    [errorMessage]="aiErrorMessage()"
+    [(inputText)]="aiInputText"
+    (suggestionSelected)="selectSuggestion($event)"
+    (messageSubmitted)="onSendAiMessage($event)"
+    (closeRequested)="closeAiDrawer()"
+  />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 4. PANEL DRAWER NOTIFICACIONES ACADÉMICAS                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  @if (isNotificationsDrawerOpen()) {
+    <div class="notifications-drawer-backdrop" (click)="closeNotificationsDrawer()" aria-hidden="true"></div>
+  }
+
+  <app-profesor-notifications-drawer
+    [isOpen]="isNotificationsDrawerOpen()"
+    [notifications]="notifications()"
+    (closeRequested)="closeNotificationsDrawer()"
+    (markAsRead)="onMarkNotificationAsRead($event)"
+    (toggleRead)="onToggleNotificationRead($event)"
+    (markAllAsRead)="onMarkAllNotificationsAsRead()"
+    (deleteNotification)="onDeleteNotification($event)"
+    (notificationSelected)="onNotificationSelected($event)"
+  />
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- 5. MODALES INTERACTIVOS (NODOS HIJOS PRESENTACIONALES)                 -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Modal 5.1: Registro de Estudiante -->
+  <app-profesor-create-student-modal
+    [isOpen]="isRegisterModalOpen()"
+    [isSubmitting]="isSubmittingStudent()"
+    (closeModal)="closeRegisterModal()"
+    (studentSubmitted)="onRegisterStudentSubmit($event)"
+  />
+
+  <!-- Modal 5.2: Crear Examen / Evaluación -->
+  <app-profesor-create-exam-modal
+    [isOpen]="isCreateExamModalOpen()"
+    [isSubmitting]="isSubmittingExam()"
+    (closeModal)="closeCreateExamModal()"
+    (examSubmitted)="onCreateExamSubmit($event)"
+  />
+
+  <!-- Modal 5.3: Enviar Mensaje a la Clase -->
+  <app-profesor-send-message-modal
+    [isOpen]="isSendMessageModalOpen()"
+    [isSubmitting]="isSubmittingMessage()"
+    [defaultTargetGroup]="messageDefaultGroup()"
+    (closeModal)="closeSendMessageModal()"
+    (messageSubmitted)="onSendMessageSubmit($event)"
+  />
+
+  <!-- Modal 5.4: Diagnóstico y Análisis de Cohorte -->
+  <app-profesor-analysis-modal
+    [isOpen]="isAnalysisModalOpen()"
+    [summary]="cohortAnalysis()"
+    [students]="students()"
+    (closeModal)="closeAnalysisModal()"
+    (consultAi)="onConsultAiFromAnalysis($event)"
+    (messageAtRisk)="onMessageAtRiskFromAnalysis()"
+  />
+
+  <!-- Toast Notification para Interacciones Rápidas -->
+  @if (actionNotification(); as message) {
+    <app-action-toast [message]="message" tone="info" />
+  }
+</div>

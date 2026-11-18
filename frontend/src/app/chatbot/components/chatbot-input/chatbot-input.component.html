@@ -1,0 +1,68 @@
+<footer class="chatbot-input-footer" aria-label="Área de redacción de consulta">
+  <!-- Píldoras de Prompts Rápidos Sugeridos -->
+  <div class="quick-prompts-bar" role="group" aria-label="Sugerencias rápidas de consulta">
+    <span class="prompts-kicker">
+      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+      <span>Sugerencias:</span>
+    </span>
+    <div class="prompts-scroll">
+      @for (prompt of quickPrompts(); track prompt.id) {
+        <button
+          type="button"
+          class="prompt-pill-btn"
+          (click)="promptSelected.emit(prompt)"
+          [title]="prompt.promptText"
+        >
+          <i [class]="prompt.icon" aria-hidden="true"></i>
+          <span>{{ prompt.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Formulario Reactivo de Entrada -->
+  <form [formGroup]="form()" (ngSubmit)="onSubmit()" class="input-form" novalidate>
+    <div class="input-box-wrapper" [class.is-invalid]="isFieldInvalid()">
+      <textarea
+        #chatArea
+        formControlName="message"
+        class="chat-textarea"
+        rows="2"
+        placeholder="Pregúntale a DiscerIA sobre conceptos académicos, resolución de ejercicios o resúmenes... (Enter para enviar, Shift+Enter para salto de línea)"
+        (keydown)="onKeydown($event)"
+        [attr.aria-invalid]="isFieldInvalid() ? 'true' : null"
+        [attr.aria-describedby]="isFieldInvalid() ? 'chat-input-error' : null"
+        aria-label="Escribe tu consulta académica"
+      ></textarea>
+
+      <div class="input-actions-row">
+        <div class="input-left-tools">
+          <span class="char-counter" [class.warn]="currentLength() > 1800">
+            {{ currentLength() }} / 2000
+          </span>
+        </div>
+
+        <button
+          type="submit"
+          class="btn-send-message"
+          [disabled]="form().invalid || isThinking()"
+          aria-label="Enviar mensaje a la IA"
+        >
+          @if (isThinking()) {
+            <span class="spinner-sm" aria-hidden="true"></span>
+          } @else {
+            <i class="bi bi-send-fill" aria-hidden="true"></i>
+          }
+        </button>
+      </div>
+    </div>
+
+    @if (isFieldInvalid()) {
+      <p id="chat-input-error" class="input-error-msg" role="alert">
+        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+        Por favor ingresa una consulta académica de al menos 2 caracteres (máximo 2000).
+      </p>
+    }
+  </form>
+</footer>
+

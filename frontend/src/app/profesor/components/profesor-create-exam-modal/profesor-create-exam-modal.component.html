@@ -1,0 +1,154 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop"
+    (click)="onClose()"
+    (keydown.escape)="onClose()"
+    role="presentation"
+  >
+    <div
+      class="modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-exam-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div class="modal-icon-badge">
+          <i class="bi bi-file-earmark-plus-fill" aria-hidden="true"></i>
+        </div>
+        <div class="modal-title-wrapper">
+          <h2 id="modal-exam-title" class="modal-title">Crear Nuevo Examen</h2>
+          <p class="modal-subtitle">Diseña una evaluación académica para los estudiantes de tu cohorte.</p>
+        </div>
+        <button
+          type="button"
+          class="btn-close-modal"
+          (click)="onClose()"
+          aria-label="Cerrar modal"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="examForm" (ngSubmit)="onSubmit()" class="modal-form" novalidate>
+        <div class="form-group">
+          <label for="examTitle" class="form-label">Título de la Evaluación *</label>
+          <input
+            type="text"
+            id="examTitle"
+            formControlName="title"
+            class="form-control"
+            placeholder="Ej: Evaluación Parcial: Mitosis y Ciclo Celular"
+            required
+          />
+          @if (examForm.get('title')?.touched && examForm.get('title')?.errors?.['required']) {
+            <span class="form-error">El título del examen es obligatorio.</span>
+          }
+          @if (examForm.get('title')?.touched && examForm.get('title')?.errors?.['minlength']) {
+            <span class="form-error">Debe tener al menos 4 caracteres.</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="examSubject" class="form-label">Materia *</label>
+            <select id="examSubject" formControlName="subject" class="form-control" required>
+              <option value="Ciencias">Ciencias</option>
+              <option value="Matemáticas">Matemáticas</option>
+              <option value="Historia">Historia</option>
+              <option value="Lengua">Lengua</option>
+              <option value="Tecnología">Tecnología</option>
+            </select>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="examDifficulty" class="form-label">Dificultad *</label>
+            <select id="examDifficulty" formControlName="difficulty" class="form-control" required>
+              <option value="Baja">Baja (Introductoria)</option>
+              <option value="Media">Media (Estándar)</option>
+              <option value="Alta">Alta (Avanzada)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="examTopic" class="form-label">Tópico Temático *</label>
+          <input
+            type="text"
+            id="examTopic"
+            formControlName="topic"
+            class="form-control"
+            placeholder="Ej: Biología Celular: Fases de la Meiosis"
+            required
+          />
+          @if (examForm.get('topic')?.touched && examForm.get('topic')?.errors?.['required']) {
+            <span class="form-error">El tópico temático es obligatorio.</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="examQuestions" class="form-label">Nº de Preguntas (1-50) *</label>
+            <input
+              type="number"
+              id="examQuestions"
+              formControlName="questionsCount"
+              class="form-control"
+              min="1"
+              max="50"
+              required
+            />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="examDuration" class="form-label">Duración (minutos) *</label>
+            <input
+              type="number"
+              id="examDuration"
+              formControlName="durationMinutes"
+              class="form-control"
+              min="10"
+              max="180"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="examInstructions" class="form-label">Instrucciones Generales</label>
+          <textarea
+            id="examInstructions"
+            formControlName="instructions"
+            class="form-control textarea"
+            rows="3"
+            placeholder="Indicaciones para los alumnos..."
+          ></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="onClose()"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="examForm.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-sm" aria-hidden="true"></span>
+              <span>Guardando...</span>
+            } @else {
+              <i class="bi bi-check2-circle" aria-hidden="true"></i>
+              <span>Publicar Examen</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,92 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DiscerIA — Dashboard de Estudiante (Orquestador Padre - Layout)
+// ─────────────────────────────────────────────────────────────────────────────
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.student-dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  align-items: stretch;
+  background-color: var(--color-bg-app);
+  position: relative;
+  overflow-x: hidden;
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+  }
+}
+
+.main-content {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-app);
+  transition: padding var(--duration-normal) var(--ease-out-expo);
+  padding: var(--space-6) var(--space-8);
+  gap: var(--space-6);
+
+  @media (max-width: 768px) {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+}
+
+.welcome-section {
+  .welcome-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-slate-900);
+    letter-spacing: -0.025em;
+    margin: 0 0 var(--space-1) 0;
+  }
+
+  .welcome-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+
+    strong {
+      color: var(--color-primary-700);
+      font-weight: var(--font-weight-bold);
+    }
+  }
+}
+
+.middle-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--space-6);
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Columna izquierda: Biblioteca + Gráfico en stack vertical
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+
+
+.notifications-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 95;
+  animation: fadeIn var(--duration-fast) var(--ease-out-expo);
+
+  @media (min-width: 1201px) {
+    display: none;
+  }
+}

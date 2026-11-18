@@ -1,0 +1,131 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop"
+    (click)="onClose()"
+    (keydown.escape)="onClose()"
+    role="presentation"
+  >
+    <div
+      class="modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-analysis-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div class="modal-icon-badge">
+          <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+        </div>
+        <div class="modal-title-wrapper">
+          <h2 id="modal-analysis-title" class="modal-title">Diagnóstico y Análisis de Cohorte</h2>
+          <p class="modal-subtitle">Reporte analítico generado en tiempo real con Inteligencia Artificial.</p>
+        </div>
+        <button
+          type="button"
+          class="btn-close-modal"
+          (click)="onClose()"
+          aria-label="Cerrar modal"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tarjetas de métricas analíticas -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-label">Promedio de Clase</span>
+            <span class="metric-value" [class.good]="summary().averageScore >= 70" [class.warn]="summary().averageScore < 70">
+              {{ summary().averageScore }}%
+            </span>
+            <span class="metric-sub">Calificación promedio</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Tasa de Aprobación</span>
+            <span class="metric-value good">{{ summary().passingRate }}%</span>
+            <span class="metric-sub">{{ summary().totalStudents - summary().atRiskCount }} de {{ summary().totalStudents }} alumnos</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Atención Prioritaria</span>
+            <span class="metric-value" [class.danger]="summary().atRiskCount > 0" [class.good]="summary().atRiskCount === 0">
+              {{ summary().atRiskCount }}
+            </span>
+            <span class="metric-sub">Alumnos con nota &lt; 50%</span>
+          </div>
+        </div>
+
+        <!-- Tópicos clave -->
+        <div class="topics-row">
+          <div class="topic-box topic-strength">
+            <div class="topic-header">
+              <i class="bi bi-award-fill"></i>
+              <strong>Mayor Consolidación</strong>
+            </div>
+            <span>{{ summary().topPerformingTopic }}</span>
+          </div>
+
+          <div class="topic-box topic-weakness">
+            <div class="topic-header">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <strong>Requiere Refuerzo</strong>
+            </div>
+            <span>{{ summary().challengingTopic }}</span>
+          </div>
+        </div>
+
+        <!-- Caja de Recomendación Pedagógica IA -->
+        <div class="ai-insight-card">
+          <div class="ai-header">
+            <div class="ai-badge">
+              <i class="bi bi-robot"></i>
+              <span>DiscerIA Context AI</span>
+            </div>
+            <span class="ai-tag">Dictamen Pedagógico</span>
+          </div>
+          <p class="ai-text">{{ summary().aiPedagogicalAdvice }}</p>
+        </div>
+
+        <!-- Lista de Estudiantes en Riesgo (si existen) -->
+        @if (studentsNeedingAttention().length > 0) {
+          <div class="at-risk-section">
+            <h4 class="section-title">
+              <i class="bi bi-person-exclamation"></i>
+              Estudiantes que requieren intervención pedagógica:
+            </h4>
+            <div class="students-list">
+              @for (std of studentsNeedingAttention(); track std.id) {
+                <div class="student-item">
+                  <div class="student-info">
+                    <span class="student-name">{{ std.studentName }}</span>
+                    <span class="student-topic">{{ std.topic }}</span>
+                  </div>
+                  <span class="student-score">{{ std.score }}%</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="onClose()">
+          Cerrar
+        </button>
+
+        @if (summary().atRiskCount > 0) {
+          <button type="button" class="btn-warning-action" (click)="onMessageAtRisk()">
+            <i class="bi bi-envelope-exclamation-fill"></i>
+            <span>Mensaje a Alumnos en Riesgo</span>
+          </button>
+        }
+
+        <button type="button" class="btn-ai-action" (click)="onConsultAi()">
+          <i class="bi bi-stars"></i>
+          <span>Profundizar con IA</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}

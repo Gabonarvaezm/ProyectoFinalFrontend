@@ -1,0 +1,19 @@
+<div class="login-wrapper">
+  <!-- Componente Hijo Presentacional: Hero Lateral y Branding -->
+  <app-login-hero></app-login-hero>
+
+  <!-- Componente Hijo Auxiliar: Formulario Reactivo y Gestión Local de Campos -->
+  <main class="form-section">
+    <app-login-form
+      [selectedRole]="currentRole()"
+      [isLoading]="isLoading()"
+      [errorMessage]="errorMessage()"
+      [successMessage]="successMessage()"
+      (roleChange)="onRoleChange($event)"
+      (submitLogin)="handleLogin($event)"
+      (loginSubmitted)="handleLogin($event)"
+      (forgotPasswordRequested)="handleForgotPassword($event)"
+    ></app-login-form>
+  </main>
+</div>
+

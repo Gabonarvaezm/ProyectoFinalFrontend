@@ -1,0 +1,118 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop"
+    (click)="onClose()"
+    (keydown.escape)="onClose()"
+    role="presentation"
+  >
+    <div
+      class="modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-register-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div class="modal-icon-badge">
+          <i class="bi bi-person-plus-fill"></i>
+        </div>
+        <div class="modal-title-wrapper">
+          <h2 id="modal-register-title" class="modal-title">Registrar Nuevo Estudiante</h2>
+          <p class="modal-subtitle">Añade a un alumno a tu cohorte para seguimiento en el dashboard.</p>
+        </div>
+        <button
+          type="button"
+          class="btn-close-modal"
+          (click)="onClose()"
+          aria-label="Cerrar ventana"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="studentForm" (ngSubmit)="onSubmit()" class="modal-form" novalidate>
+        <div class="form-group">
+          <label for="studentName" class="form-label">Nombre Completo *</label>
+          <input
+            type="text"
+            id="studentName"
+            formControlName="studentName"
+            class="form-control"
+            placeholder="Ej: Andrés Narváez"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="studentEmail" class="form-label">Correo Institucional *</label>
+          <input
+            type="email"
+            id="studentEmail"
+            formControlName="email"
+            class="form-control"
+            placeholder="alumno@universidad.edu"
+            required
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="studentTopic" class="form-label">Asignatura / Módulo *</label>
+            <input
+              type="text"
+              id="studentTopic"
+              formControlName="topic"
+              class="form-control"
+              placeholder="Ej: Biología: Mitosis"
+              required
+            />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="studentStatus" class="form-label">Estado Inicial *</label>
+            <select id="studentStatus" formControlName="status" class="form-control">
+              <option value="active">Activo</option>
+              <option value="needs-attention">Requiere Atención</option>
+              <option value="completed">Completado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="studentScore" class="form-label">Puntaje / Progreso Inicial (%)</label>
+            <span class="score-display-pill">{{ studentForm.get('score')?.value }}%</span>
+          </div>
+          <input
+            type="range"
+            id="studentScore"
+            formControlName="score"
+            class="form-range"
+            min="0"
+            max="100"
+            step="5"
+          />
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="onClose()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="isSubmitting()"
+          >
+            <i class="bi bi-check-lg" aria-hidden="true"></i>
+            <span>Registrar Estudiante</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+

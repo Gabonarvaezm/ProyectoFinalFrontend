@@ -1,0 +1,74 @@
+<div class="section-pane fade-in">
+  <!-- Tarjeta de Perfil Institucional -->
+  <section class="card config-card profile-card" aria-labelledby="card-profile-title">
+    <div class="card-header">
+      <div class="header-icon-box">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <div>
+        <h2 id="card-profile-title" class="card-title">Perfil Institucional</h2>
+        <p class="card-subtitle">Datos asociados a tu matrícula y acreditación académica.</p>
+      </div>
+    </div>
+
+    <div class="profile-details-grid">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">{{ initials() }}</div>
+        <div class="profile-status-indicator" title="Sesión activa"></div>
+      </div>
+
+      <div class="profile-meta">
+        <h3 class="profile-name">{{ user().fullName }}</h3>
+        <p class="profile-email">
+          <i class="bi bi-envelope-fill"></i>
+          <span>{{ user().email }}</span>
+        </p>
+        <div class="profile-tags">
+          <span class="meta-tag">
+            <i class="bi bi-building"></i>
+            {{ user().institution || 'Universidad Tecnológica' }}
+          </span>
+          <span class="meta-tag meta-tag-role">
+            <i [class]="user().role === 'professor' ? 'bi bi-person-workspace' : 'bi bi-mortarboard-fill'"></i>
+            {{ user().role === 'professor' ? 'Catedrático' : 'Estudiante Pregrado' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tarjeta de Gestión de Sesión y Seguridad -->
+  <section class="card config-card security-card" aria-labelledby="card-session-title">
+    <div class="card-header">
+      <div class="header-icon-box icon-danger">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <div>
+        <h2 id="card-session-title" class="card-title">Seguridad y Gestión de Sesión</h2>
+        <p class="card-subtitle">Controla el acceso seguro a tu cuenta y cierra tu sesión activa.</p>
+      </div>
+    </div>
+
+    <div class="session-info-row">
+      <div class="session-desc">
+        <span class="session-status-badge">
+          <span class="dot-live"></span> Sesión iniciada actualmente
+        </span>
+        <p class="session-hint">
+          Al cerrar sesión se limpiarán tus credenciales y datos temporales en este dispositivo.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="btn-danger-outline"
+        (click)="onLogout()"
+        aria-label="Cerrar sesión actual de DiscerIA"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Cerrar Sesión</span>
+      </button>
+    </div>
+  </section>
+</div>
+

@@ -1,0 +1,113 @@
+@if (book(); as currentBook) {
+  <div
+    class="modal-backdrop"
+    (click)="onClose()"
+    (keydown.escape)="onClose()"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'modal-title-' + currentBook.id"
+  >
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-badge-format">{{ currentBook.format.toUpperCase() }}</span>
+          <span class="modal-badge-category">{{ currentBook.category.toUpperCase() }}</span>
+        </div>
+        <button
+          type="button"
+          class="btn-close-modal"
+          (click)="onClose()"
+          aria-label="Cerrar detalles del libro"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="modal-body-scroll">
+        <div class="modal-hero-cover" [class]="'cover-theme-' + (currentBook.coverTheme || 'blue')">
+          <i class="bi bi-journal-bookmark-fill modal-hero-icon" aria-hidden="true"></i>
+          <span class="modal-hero-subject">{{ currentBook.subject || currentBook.categoryLabel }}</span>
+        </div>
+
+        <div class="modal-main-details">
+          <div class="rating-row">
+            <div class="stars-group">
+              <i class="bi bi-star-fill star-gold" aria-hidden="true"></i>
+              <span class="rating-number">{{ currentBook.rating }} / 5.0</span>
+            </div>
+            <span class="downloads-stat">
+              <i class="bi bi-download" aria-hidden="true"></i>
+              {{ currentBook.downloadsCount || currentBook.readsCount }} descargas académicas
+            </span>
+          </div>
+
+          <h2 [id]="'modal-title-' + currentBook.id" class="modal-book-title">
+            {{ currentBook.title }}
+          </h2>
+          <p class="modal-author-text">
+            Autor: <strong>{{ currentBook.author }}</strong>
+          </p>
+
+          <div class="meta-pills-row">
+            <span class="meta-item-pill">
+              <i class="bi bi-bank" aria-hidden="true"></i>
+              {{ currentBook.institution }}
+            </span>
+            <span class="meta-item-pill">
+              <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+              {{ currentBook.pages }} páginas
+            </span>
+            <span class="meta-item-pill">
+              <i class="bi bi-calendar-event" aria-hidden="true"></i>
+              Año {{ currentBook.year }}
+            </span>
+          </div>
+
+          <div class="synopsis-box">
+            <h4 class="synopsis-title">Sinopsis y Contenido Pedagógico</h4>
+            <p class="synopsis-text">{{ currentBook.description }}</p>
+          </div>
+
+          <div class="modal-tags-section">
+            <h4 class="tags-section-title">Palabras Clave y Temas de Aprendizaje</h4>
+            <div class="tags-row">
+              @for (tag of currentBook.tags; track tag) {
+                <span class="modal-tag">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button
+          type="button"
+          class="btn-modal-bookmark"
+          [class.active]="isBookmarked()"
+          (click)="onBookmark($event, currentBook)"
+        >
+          <i [class]="isBookmarked() ? 'bi bi-bookmark-fill' : 'bi bi-bookmark'" aria-hidden="true"></i>
+          <span>{{ isBookmarked() ? 'Guardado' : 'Guardar' }}</span>
+        </button>
+        <button
+          type="button"
+          class="btn-modal-download"
+          (click)="onDownload($event, currentBook)"
+        >
+          <i class="bi bi-cloud-arrow-down-fill" aria-hidden="true"></i>
+          <span>Descargar</span>
+        </button>
+        <button
+          type="button"
+          class="btn-modal-read"
+          (click)="onStartReading(currentBook)"
+        >
+          <i class="bi bi-book-half" aria-hidden="true"></i>
+          <span>Abrir Lectura</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+}
+

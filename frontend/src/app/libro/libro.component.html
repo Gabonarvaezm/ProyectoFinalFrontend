@@ -1,0 +1,266 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop"
+    (click)="onClose()"
+    (keydown.escape)="onClose()"
+    role="presentation"
+  >
+    <div
+      class="modal-dialog modal-libro"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-libro-title"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- ── Cabecera del Modal ─────────────────────────────────────────── -->
+      <div class="modal-header">
+        <div class="modal-icon-badge">
+          <i class="bi bi-book-half" aria-hidden="true"></i>
+        </div>
+        <div class="modal-title-wrapper">
+          <h2 id="modal-libro-title" class="modal-title">Publicar Recurso Académico</h2>
+          <p class="modal-subtitle">
+            Añade nuevo material bibliográfico al repositorio digital universitario.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="btn-close-modal"
+          (click)="onClose()"
+          aria-label="Cerrar ventana de publicación"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- ── Formulario Reactivo ───────────────────────────────────────── -->
+      <form [formGroup]="bookForm" (ngSubmit)="onSubmit()" class="modal-form" novalidate>
+
+        <!-- Título -->
+        <div class="form-group">
+          <label for="bookTitle" class="form-label">
+            Título del Libro / Texto <span class="required-star" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            id="bookTitle"
+            formControlName="title"
+            class="form-control"
+            [class.has-error]="isFieldInvalid('title')"
+            placeholder="Ej: Biología Celular: Estructura y Función"
+            autocomplete="off"
+          />
+          @if (isFieldInvalid('title')) {
+            <span class="form-feedback-error" role="alert">
+              <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+              Título requerido (mínimo 3, máximo 150 caracteres).
+            </span>
+          }
+        </div>
+
+        <!-- Autor -->
+        <div class="form-group">
+          <label for="bookAuthor" class="form-label">
+            Autor / Autores <span class="required-star" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            id="bookAuthor"
+            formControlName="author"
+            class="form-control"
+            [class.has-error]="isFieldInvalid('author')"
+            placeholder="Ej: Dra. Elena Ramos & Dr. Carlos Mendoza"
+            autocomplete="off"
+          />
+          @if (isFieldInvalid('author')) {
+            <span class="form-feedback-error" role="alert">
+              <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+              Autor requerido (mínimo 3, máximo 100 caracteres).
+            </span>
+          }
+        </div>
+
+        <!-- Categoría + Formato (fila) -->
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="bookCategory" class="form-label">
+              Disciplina / Categoría <span class="required-star" aria-hidden="true">*</span>
+            </label>
+            <select
+              id="bookCategory"
+              formControlName="category"
+              class="form-control"
+              [class.has-error]="isFieldInvalid('category')"
+            >
+              @for (cat of selectableCategories(); track cat.id) {
+                <option [value]="cat.id">{{ cat.label }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('category')) {
+              <span class="form-feedback-error" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                Selecciona una disciplina.
+              </span>
+            }
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="bookFormat" class="form-label">
+              Formato <span class="required-star" aria-hidden="true">*</span>
+            </label>
+            <select
+              id="bookFormat"
+              formControlName="format"
+              class="form-control"
+              [class.has-error]="isFieldInvalid('format')"
+            >
+              @for (fmt of availableFormats; track fmt) {
+                <option [value]="fmt">{{ fmt }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('format')) {
+              <span class="form-feedback-error" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                Selecciona un formato.
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- Páginas + Año (fila) -->
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="bookPages" class="form-label">
+              Número de Páginas <span class="required-star" aria-hidden="true">*</span>
+            </label>
+            <input
+              type="number"
+              id="bookPages"
+              formControlName="pages"
+              class="form-control"
+              [class.has-error]="isFieldInvalid('pages')"
+              placeholder="Ej: 284"
+              min="1"
+              max="5000"
+            />
+            @if (isFieldInvalid('pages')) {
+              <span class="form-feedback-error" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                Ingresa un número válido entre 1 y 5000.
+              </span>
+            }
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="bookYear" class="form-label">
+              Año de Publicación <span class="required-star" aria-hidden="true">*</span>
+            </label>
+            <input
+              type="number"
+              id="bookYear"
+              formControlName="year"
+              class="form-control"
+              [class.has-error]="isFieldInvalid('year')"
+              min="1900"
+              [max]="currentYear + 1"
+            />
+            @if (isFieldInvalid('year')) {
+              <span class="form-feedback-error" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                Año entre 1900 y {{ currentYear + 1 }}.
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- Etiquetas -->
+        <div class="form-group">
+          <label for="bookTags" class="form-label">
+            Etiquetas / Palabras Clave <span class="required-star" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            id="bookTags"
+            formControlName="tags"
+            class="form-control"
+            [class.has-error]="isFieldInvalid('tags')"
+            placeholder="Ej: Genética, Mitosis, ADN, Célula (separadas por coma)"
+          />
+          @if (isFieldInvalid('tags')) {
+            <span class="form-feedback-error" role="alert">
+              <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+              Ingresa al menos una etiqueta temática.
+            </span>
+          }
+        </div>
+
+        <!-- URL de Portada (Opcional) -->
+        <div class="form-group">
+          <label for="bookCover" class="form-label">URL de Portada (Opcional)</label>
+          <input
+            type="url"
+            id="bookCover"
+            formControlName="coverImage"
+            class="form-control"
+            placeholder="https://ejemplo.com/portada.jpg"
+          />
+          <span class="form-feedback-hint">
+            Si no indicas una imagen, el sistema asignará una portada automática según la disciplina.
+          </span>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <div class="label-row">
+            <label for="bookDescription" class="form-label">
+              Descripción / Sinopsis <span class="required-star" aria-hidden="true">*</span>
+            </label>
+            <span class="char-counter" [class.counter-warn]="getDescriptionLength() > 750">
+              {{ getDescriptionLength() }}/800
+            </span>
+          </div>
+          <textarea
+            id="bookDescription"
+            formControlName="description"
+            class="form-control form-textarea"
+            [class.has-error]="isFieldInvalid('description')"
+            rows="4"
+            placeholder="Describe el contenido, objetivos pedagógicos y nivel educativo del recurso..."
+          ></textarea>
+          @if (isFieldInvalid('description')) {
+            <span class="form-feedback-error" role="alert">
+              <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+              Descripción requerida (mínimo 15, máximo 800 caracteres).
+            </span>
+          }
+        </div>
+
+        <!-- Footer con acciones -->
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="onClose()"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="btn-spinner" aria-hidden="true"></span>
+              <span>Publicando...</span>
+            } @else {
+              <i class="bi bi-cloud-arrow-up-fill" aria-hidden="true"></i>
+              <span>Publicar en Biblioteca</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+

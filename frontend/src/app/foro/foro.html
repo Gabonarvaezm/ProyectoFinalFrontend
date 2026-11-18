@@ -1,0 +1,125 @@
+<div class="foro-layout">
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN INSTITUCIONAL)                  -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar" aria-label="Navegación principal de DiscerIA">
+    <div class="sidebar-top">
+      <a routerLink="/" class="brand-link">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">DiscerIA</span>
+          <span class="brand-sub">Investigación Académica</span>
+        </div>
+      </a>
+
+      <nav class="sidebar-nav" aria-label="Menú de navegación">
+        <ul class="nav-list">
+          @for (item of navItems(); track item.id) {
+          <li class="nav-item">
+            <a [routerLink]="item.route" class="nav-btn" [class.active]="item.id === 'foros'"
+              [attr.aria-current]="item.id === 'foros' ? 'page' : null">
+              <i [class]="item.icon + ' nav-icon'"></i>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          </li>
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <!-- Botón de Acción Principal (+ Nueva Consulta Académica) -->
+      <button type="button" class="new-topic-btn" (click)="openCreateModal()"
+        aria-label="Abrir formulario para crear una nueva publicación académica">
+        <i class="bi bi-plus-lg"></i>
+        <span>Nueva Publicación</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- 2. CONTENIDO PRINCIPAL: ORQUESTACIÓN DE NODOS HIJOS                   -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div class="main-wrapper">
+    <!-- NODO HIJO: Header Superior con Búsqueda y Notificaciones -->
+    <app-foro-header [(searchQuery)]="searchQuery" [currentUser]="currentUser()" [isAiPanelOpen]="isAiPanelOpen()"
+      (aiToggleClicked)="toggleAiPanel()" (notificationsClicked)="onNotificationsClicked()" />
+
+    <!-- Contenedor con Feed Central y Panel Lateral Derecho de Asistente -->
+    <div class="content-columns" [class.ai-collapsed]="!isAiPanelOpen()">
+      <!-- ── COLUMNA CENTRAL: FEED DE DISCUSIÓN ── -->
+      <main class="feed-column">
+        <div class="feed-header">
+          <div class="feed-header-top">
+            <div class="header-titles">
+              <div class="header-badge">
+                <i class="bi bi-chat-square-text-fill" aria-hidden="true"></i>
+                <span>Comunidad Académica de Consulta</span>
+              </div>
+              <h1 class="forum-title">Foro de Discusión Académica</h1>
+              <p class="forum-subtitle">
+                Únete a la conversación, resuelve tus dudas y colabora con otros estudiantes e investigadores.
+              </p>
+            </div>
+            <div class="header-action-wrap">
+              <button type="button" class="btn-new-topic" (click)="openCreateModal()"
+                aria-label="Abrir formulario para crear una nueva publicación académica">
+                <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+                <span>Nueva Publicación</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NODO HIJO: Filtros de Búsqueda y Píldoras de Materias -->
+        <app-foro-filters [(selectedSubject)]="selectedSubject" [(searchQuery)]="searchQuery" [subjects]="subjects()"
+          (filterChanged)="onFilterChanged($event)" />
+
+        <!-- Lista de Nodos Hijos: Publicaciones Académicas -->
+        <section class="posts-list" aria-label="Lista de publicaciones académicas">
+          @if (filteredPosts().length === 0) {
+          <div class="empty-state-card">
+            <i class="bi bi-chat-square-quote empty-icon"></i>
+            <h3>No se encontraron publicaciones</h3>
+            <p>Intenta con otros términos de búsqueda o selecciona otra materia en los filtros.</p>
+            <button type="button" class="btn-primary" (click)="openCreateModal()">
+              <i class="bi bi-plus-lg"></i> Iniciar una consulta académica
+            </button>
+          </div>
+          }
+
+          @for (post of filteredPosts(); track post.id) {
+          <app-foro-post-card [post]="post" [isExpanded]="activeExpandedPostId() === post.id"
+            [currentRole]="currentRole()" [currentUser]="currentUser()"
+            [draftContent]="activeExpandedPostId() === post.id ? activeDraftContent() : ''"
+            (toggleExpand)="toggleExpandPost($event)" (helpfulVote)="handleHelpfulVote($event)"
+            (replyHelpfulVote)="handleReplyHelpfulVote($event)" (replySubmit)="handleReplySubmit($event)" />
+          }
+        </section>
+      </main>
+
+      <!-- NODO HIJO: Asistente IA, Temas Relacionados y Normas de Etiqueta -->
+      @if (isAiPanelOpen()) {
+      <app-foro-ai-widget [aiSuggestion]="aiSuggestion()" [relatedTopics]="relatedTopics()"
+        [etiquetteRules]="forumEtiquette" (draftRequested)="handleAiDraftRequested($event)"
+        (topicSelected)="handleRelatedTopicSelected($event)" />
+      }
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- 3. NODO HIJO: MODAL REACTIVO DE NUEVA PUBLICACIÓN                      -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <app-foro-create-modal [isOpen]="isCreateModalOpen()" [defaultSubject]="selectedSubject()"
+    [isSubmitting]="isSubmittingPost()" (closeModal)="closeCreateModal()"
+    (postSubmitted)="handlePostSubmitted($event)" />
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- 4. MENSAJE TOAST FLOTANTE DE RETROALIMENTACIÓN                         -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  @if (toastMessage(); as message) {
+  <app-action-toast [message]="message" tone="info" />
+  }
+</div>

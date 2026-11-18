@@ -1,0 +1,22 @@
+<section class="search-section" id="biblioteca">
+  <div class="search-container">
+    <h2 class="search-title">Buscador de la Biblioteca Virtual</h2>
+
+    <form class="search-form" (submit)="onFormSubmit($event)" role="search">
+      <div class="search-input-wrapper">
+        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+        <input
+          #searchInput
+          type="search"
+          class="search-input"
+          placeholder="Buscar libros, artículos, guías pedagógicas o temas de estudio..."
+          [value]="searchQuery()"
+          (input)="onInput(searchInput.value)"
+          aria-label="Buscar en la biblioteca virtual"
+        />
+      </div>
+      <button type="submit" class="btn-search">Buscar</button>
+    </form>
+  </div>
+</section>
+

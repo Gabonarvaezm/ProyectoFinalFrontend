@@ -1,0 +1,10 @@
+<div class="register-wrapper">
+  <!-- Componente Hijo Presentacional: Hero Lateral y Beneficios -->
+  <app-register-hero></app-register-hero>
+
+  <!-- Componente Hijo Auxiliar: Formulario Reactivo y Gestión Local de Registro -->
+  <main class="form-section">
+    <app-register-form [isLoading]="isLoading()" [errorMessage]="errorMessage()" [successMessage]="successMessage()"
+      (registerSubmitted)="handleRegister($event)"></app-register-form>
+  </main>
+</div>

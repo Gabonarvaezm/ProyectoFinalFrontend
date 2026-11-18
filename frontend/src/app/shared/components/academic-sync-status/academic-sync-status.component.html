@@ -1,0 +1,9 @@
+@if (error()) {
+  <div class="status error" role="alert">
+    <span>{{ error() }}</span>
+    <button type="button" (click)="retry.emit()">Reintentar</button>
+    @if (!localDemo()) { <button type="button" (click)="discard.emit()">Descartar envío</button> }
+  </div>
+} @else if (saving()) {
+  <div class="status" role="status" aria-live="polite">{{ localDemo() ? 'Guardando en este navegador…' : 'Compartiendo el contenido con sus destinatarios…' }}</div>
+}

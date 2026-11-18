@@ -1,0 +1,23 @@
+<div class="side-cards-col">
+  <!-- Tarjeta: Examen de Práctica -->
+  <div class="practice-exam-card">
+    <h3 class="exam-title">{{ practiceExam().title }}</h3>
+    <h4 class="exam-subtitle">{{ practiceExam().topic }}</h4>
+
+    <div class="exam-meta-row">
+      <span class="exam-meta-item">
+        <i class="bi bi-list-task"></i>
+        <span>{{ practiceExam().questionsCount }} Preguntas</span>
+      </span>
+      <span class="exam-meta-item">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dificultad: {{ practiceExam().difficulty }}</span>
+      </span>
+    </div>
+
+    <button type="button" class="btn-start-exam" (click)="startExamClicked.emit()">
+      {{ isPublished() ? 'Ver examen publicado' : 'Iniciar Examen' }}
+    </button>
+  </div>
+</div>
+

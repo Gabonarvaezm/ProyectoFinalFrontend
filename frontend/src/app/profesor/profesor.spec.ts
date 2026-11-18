@@ -1,0 +1,317 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { Profesor } from './profesor';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TeacherNotification } from './models/profesor.model';
+
+describe('Profesor Component', () => {
+  let component: Profesor;
+  let fixture: ComponentFixture<Profesor>;
+  let http: HttpTestingController;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Profesor],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Profesor);
+    component = fixture.componentInstance;
+    http = TestBed.inject(HttpTestingController);
+    await fixture.whenStable();
+  });
+
+  it('debe crearse correctamente', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('debe inicializar las métricas y la navegación por defecto', () => {
+    expect(component.activeNav()).toBe('dashboard');
+    expect(component.navItems().length).toBe(3);
+    expect(component.navItems().some((item) => item.id === 'configuracion')).toBe(false);
+    expect(component.navItems().some((item) => item.id === 'foros')).toBe(true);
+    expect(component.kpiMetrics().length).toBe(3);
+    expect(component.students().length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('debe permitir cambiar la pestaña de navegación activa', () => {
+    component.selectNav('biblioteca');
+    expect(component.activeNav()).toBe('biblioteca');
+  });
+
+  it('debe abrir, resetear y cerrar el modal de registro de estudiantes', () => {
+    expect(component.isRegisterModalOpen()).toBe(false);
+
+    component.openRegisterModal();
+    expect(component.isRegisterModalOpen()).toBe(true);
+    expect(component.studentForm.get('score')?.value).toBe(75);
+
+    component.closeRegisterModal();
+    expect(component.isRegisterModalOpen()).toBe(false);
+  });
+
+  it('debe validar y registrar un nuevo estudiante a través del formulario reactivo', () => {
+    component.openRegisterModal();
+
+    // Formulario inválido inicialmente
+    component.studentForm.setValue({
+      studentName: '',
+      email: 'correo-invalido',
+      topic: '',
+      score: 150, // Inválido (> 100)
+      status: 'active',
+    });
+    expect(component.studentForm.invalid).toBe(true);
+
+    component.onRegisterStudentSubmit();
+    expect(component.isRegisterModalOpen()).toBe(true); // No se cierra si es inválido
+
+    // Completar con datos válidos
+    const initialCount = component.students().length;
+    component.studentForm.setValue({
+      studentName: 'Gabriel Narváez',
+      email: 'gabriel@universidad.edu',
+      topic: 'Biología Celular',
+      score: 90,
+      status: 'active',
+    });
+    expect(component.studentForm.valid).toBe(true);
+
+    vi.useFakeTimers();
+    component.onRegisterStudentSubmit();
+    vi.advanceTimersByTime(450);
+
+    expect(component.isRegisterModalOpen()).toBe(false);
+    expect(component.students().length).toBe(initialCount + 1);
+    expect(component.students()[0].studentName).toBe('Gabriel Narváez');
+    vi.useRealTimers();
+  });
+
+  it('debe filtrar los estudiantes reactivamente al buscar', () => {
+    component.searchQuery.set('María');
+    expect(component.filteredStudents().length).toBe(1);
+    expect(component.filteredStudents()[0].studentName).toBe('María López');
+
+    component.searchQuery.set('InexistenteXYZ');
+    expect(component.filteredStudents().length).toBe(0);
+
+    component.searchQuery.set('');
+    expect(component.filteredStudents().length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('debe enviar consultas al Asistente de IA y mostrar la respuesta de la API', () => {
+    vi.useFakeTimers();
+
+    component.aiInputText.set('¿Cuáles estudiantes necesitan atención prioritaria?');
+    component.submitAiMessage();
+
+    expect(component.chatMessages().length).toBe(1);
+    expect(component.isAiThinking()).toBe(true);
+
+    http.expectOne('/api/chat').flush({ text: 'Revisa el progreso de Carlos Pérez con una actividad de refuerzo.' });
+
+    expect(component.isAiThinking()).toBe(false);
+    expect(component.chatMessages().length).toBe(2);
+    expect(component.chatMessages()[1].sender).toBe('ai');
+    // La respuesta debe identificar dinámicamente a los alumnos con score < 50
+    expect(component.chatMessages()[1].text).toContain('Carlos Pérez');
+
+    vi.useRealTimers();
+  });
+
+  it('debe permitir eliminar un estudiante de la lista', () => {
+    const student = component.students()[0];
+    const initialCount = component.students().length;
+
+    const dummyEvent = new MouseEvent('click');
+    component.onDeleteStudent(student, dummyEvent);
+
+    expect(component.students().length).toBe(initialCount - 1);
+    expect(component.actionNotification()).toContain('eliminado');
+  });
+
+  it('debe registrar recomendación de libro en la clase', () => {
+    const mockBook = {
+      id: 'bk-test',
+      title: 'Biología General',
+      author: 'Autor Test',
+      category: 'ciencias' as const,
+      categoryLabel: 'Ciencias Naturales',
+      description: 'Desc',
+      coverImage: 'img.jpg',
+      pages: 100,
+      year: 2024,
+      format: 'PDF' as const,
+      rating: 5,
+      reviewsCount: 1,
+      readsCount: 10,
+      institution: 'Inst',
+      tags: ['bio'],
+      featured: false,
+    };
+
+    component.onBookRecommended(mockBook);
+    expect(component.actionNotification()).toContain('Biología General');
+  });
+
+  // ── Pruebas del Panel de Notificaciones Académicas ───────────────────────
+
+  it('debe alternar la apertura y cierre del panel de notificaciones', () => {
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+
+    component.onNotificationsClick();
+    expect(component.isNotificationsDrawerOpen()).toBe(true);
+
+    component.closeNotificationsDrawer();
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+  });
+
+  it('debe cerrar el panel de IA al abrir el panel de notificaciones y viceversa', () => {
+    component.openAiDrawer();
+    expect(component.isAiDrawerOpen()).toBe(true);
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+
+    component.openNotificationsDrawer();
+    expect(component.isNotificationsDrawerOpen()).toBe(true);
+    expect(component.isAiDrawerOpen()).toBe(false);
+
+    component.toggleAiDrawer();
+    expect(component.isAiDrawerOpen()).toBe(true);
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+  });
+
+  it('debe marcar todas las notificaciones como leídas y mostrar toast', () => {
+    component.onMarkAllNotificationsAsRead();
+    expect(component.unreadNotificationsCount()).toBe(0);
+    expect(component.actionNotification()).toContain('leídas');
+  });
+
+  it('debe eliminar una notificación y mostrar feedback', () => {
+    const target = component.notifications()[0];
+    const initialCount = component.notifications().length;
+
+    component.onDeleteNotification(target.id);
+    expect(component.notifications().length).toBe(initialCount - 1);
+    expect(component.actionNotification()).toContain('eliminada');
+  });
+
+  it('debe navegar o mostrar toast al seleccionar una notificación', () => {
+    const notifWithRoute: TeacherNotification = {
+      id: 'notif-test-1',
+      type: 'teacher_post',
+      title: 'Nuevo Recurso',
+      message: 'Mensaje de prueba',
+      timeAgo: 'Hace 1 min',
+      timestamp: '2026-11-09T17:00:00.000Z',
+      read: false,
+      authorName: 'Prof. Test',
+      authorRole: 'professor',
+      authorInitials: 'PT',
+      category: 'Ciencias',
+      actionRoute: 'biblioteca',
+    };
+
+    component.openNotificationsDrawer();
+    component.onNotificationSelected(notifWithRoute);
+
+    expect(component.activeNav()).toBe('biblioteca');
+    expect(component.isNotificationsDrawerOpen()).toBe(false);
+  });
+
+  // ── Pruebas de las Nuevas Funcionalidades: Examen, Mensaje y Análisis ─────
+
+  it('debe abrir el modal de crear examen mediante acción rápida y registrar la evaluación', () => {
+    vi.useFakeTimers();
+
+    const initialAssignments = component.kpiMetrics().find((k) => k.id === 'assignments')?.value;
+
+    component.triggerQuickAction({
+      id: 'create-exam',
+      label: 'Crear Examen',
+      icon: 'bi bi-file-earmark-plus',
+    });
+
+    expect(component.isCreateExamModalOpen()).toBe(true);
+
+    component.onCreateExamSubmit({
+      title: 'Examen de Mitosis',
+      subject: 'Ciencias',
+      topic: 'División Celular',
+      questionsCount: 10,
+      difficulty: 'Media',
+      durationMinutes: 45,
+    });
+
+    expect(component.isSubmittingExam()).toBe(true);
+    vi.advanceTimersByTime(450);
+
+    expect(component.isSubmittingExam()).toBe(false);
+    expect(component.isCreateExamModalOpen()).toBe(false);
+    expect(component.actionNotification()).toContain('Examen "Examen de Mitosis"');
+
+    const updatedAssignments = component.kpiMetrics().find((k) => k.id === 'assignments')?.value;
+    expect(Number(updatedAssignments)).toBe(Number(initialAssignments) + 1);
+
+    vi.useRealTimers();
+  });
+
+  it('debe abrir el modal de enviar mensaje a la clase y difundir el comunicado', () => {
+    vi.useFakeTimers();
+
+    component.triggerQuickAction({
+      id: 'message-class',
+      label: 'Enviar Mensaje a la Clase',
+      icon: 'bi bi-chat-square-text',
+    });
+
+    expect(component.isSendMessageModalOpen()).toBe(true);
+    expect(component.messageDefaultGroup()).toBe('all');
+
+    component.onSendMessageSubmit({
+      targetGroup: 'all',
+      subject: 'Aviso de Laboratorio',
+      message: 'Traer batas para la práctica de mitosis.',
+      priority: 'urgent',
+      sendToForums: false,
+    });
+
+    expect(component.isSubmittingMessage()).toBe(true);
+    vi.advanceTimersByTime(450);
+
+    expect(component.isSubmittingMessage()).toBe(false);
+    expect(component.isSendMessageModalOpen()).toBe(false);
+    expect(component.actionNotification()).toContain('Aviso de Laboratorio');
+
+    vi.useRealTimers();
+  });
+
+  it('debe abrir el modal de nuevo análisis, diagnosticar la cohorte y permitir profundizar con IA', () => {
+    vi.useFakeTimers();
+
+    component.onNewAnalysis();
+    expect(component.isAnalysisModalOpen()).toBe(true);
+    expect(component.cohortAnalysis()).toBeTruthy();
+    expect(component.cohortAnalysis().totalStudents).toBeGreaterThan(0);
+
+    // Debe permitir profundizar en la consulta con el Asistente IA
+    component.onConsultAiFromAnalysis('Analizar la cohorte actual');
+    expect(component.isAnalysisModalOpen()).toBe(false);
+    expect(component.isAiDrawerOpen()).toBe(true);
+
+    http.expectOne('/api/chat').flush({ text: 'Diagnóstico pedagógico recibido de la API.' });
+    expect(component.chatMessages().length).toBeGreaterThanOrEqual(2);
+
+    vi.useRealTimers();
+  });
+
+  it('debe permitir enviar mensaje a estudiantes en riesgo desde el modal de análisis', () => {
+    component.onNewAnalysis();
+    expect(component.isAnalysisModalOpen()).toBe(true);
+
+    component.onMessageAtRiskFromAnalysis();
+    expect(component.isAnalysisModalOpen()).toBe(false);
+    expect(component.isSendMessageModalOpen()).toBe(true);
+    expect(component.messageDefaultGroup()).toBe('needs-attention');
+  });
+});

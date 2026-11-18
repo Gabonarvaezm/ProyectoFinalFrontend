@@ -1,0 +1,179 @@
+.chatbot-input-footer {
+  background-color: var(--color-bg-surface);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-8) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+
+  @media (max-width: 768px) {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+}
+
+.quick-prompts-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  overflow: hidden;
+
+  .prompts-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .prompts-scroll {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+
+.prompt-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-slate-100);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-700);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-fast);
+
+  &:hover {
+    background-color: var(--color-primary-50);
+    border-color: var(--color-primary-200);
+    color: var(--color-primary-700);
+  }
+}
+
+.input-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.input-box-wrapper {
+  background-color: var(--color-slate-50);
+  border: 1.5px solid var(--color-slate-300);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: var(--transition-fast);
+
+  &:focus-within {
+    background-color: var(--color-bg-surface);
+    border-color: var(--color-primary-600);
+    box-shadow: var(--focus-ring);
+  }
+
+  &.is-invalid {
+    border-color: var(--color-danger);
+    background-color: var(--color-danger-bg);
+  }
+}
+
+.chat-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-900);
+  line-height: var(--line-height-base);
+  min-height: 48px;
+  max-height: 140px;
+
+  &::placeholder {
+    color: var(--color-slate-400);
+  }
+}
+
+.input-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.char-counter {
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-400);
+  font-weight: var(--font-weight-medium);
+
+  &.warn {
+    color: var(--color-warning);
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.btn-send-message {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-600) 100%);
+  color: var(--color-white);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+  transition: var(--transition-fast);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.spinner-sm {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: var(--color-white);
+  border-radius: var(--radius-full);
+  animation: spin 0.6s linear infinite;
+}
+
+.input-error-msg {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+

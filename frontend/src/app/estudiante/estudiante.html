@@ -1,0 +1,141 @@
+<div class="student-dashboard-layout">
+  <!-- ── 1. BARRA LATERAL IZQUIERDA (NAVEGACIÓN - NODO HIJO PRESENTACIONAL) ── -->
+  <app-estudiante-sidebar
+    [navItems]="navItems()"
+    [(activeNav)]="activeNav"
+    [institution]="studentInstitution()"
+    (navSelected)="selectNav($event)"
+    (logoutClicked)="onLogout()"
+  />
+
+  <!-- ── 2. ÁREA CENTRAL DE CONTENIDO (DASHBOARD) ── -->
+  <main class="main-content">
+    <!-- Header Superior con Buscador y Notificaciones (NODO HIJO PRESENTACIONAL) -->
+    <app-estudiante-header
+      [(searchQuery)]="searchQuery"
+      [studentName]="studentName()"
+      [userInitials]="userInitials()"
+      [notificationsCount]="notificationsCount()"
+      [isAiDrawerOpen]="isAiDrawerOpen()"
+      [isNotificationsDrawerOpen]="isNotificationsDrawerOpen()"
+      (searchChanged)="onSearchChange($event)"
+      (notificationsClicked)="onNotificationsClick()"
+      (profileClicked)="selectNav('perfil')"
+      (configClicked)="selectNav('configuracion')"
+      (aiToggleClicked)="toggleAiDrawer()"
+    />
+
+    @if (activeNav() === 'biblioteca') {
+      <app-biblioteca
+        [userRole]="'student'"
+        [initialCategory]="selectedSubjectCategory()"
+        [isEmbedded]="true"
+      />
+    } @else if (activeNav() === 'configuracion' || activeNav() === 'perfil') {
+      <app-configuracion
+        [user]="currentUser()"
+        [isEmbedded]="true"
+        (logoutRequested)="onLogout()"
+      />
+    } @else {
+      <!-- Saludo y Bienvenida -->
+      <section class="welcome-section" aria-label="Bienvenida al estudiante">
+        <h1 class="welcome-title">¡Hola, {{ studentName() }}!</h1>
+        <p class="welcome-subtitle">
+          Consulta tus actividades, entregas y resultados académicos.
+        </p>
+      </section>
+
+      <!-- Tarjeta Destacada: Continuar Aprendiendo (NODO HIJO PRESENTACIONAL) -->
+      <app-estudiante-publications [exams]="publishedExams()" [messages]="teacherMessages()" />
+      @if (localDemo) {
+        <app-academic-progress [tareas]="localTasks()" (inspect)="viewTasks()" />
+        <button type="button" class="btn btn-primary" (click)="viewTasks()">Abrir mis tareas</button>
+      } @else {
+      <app-estudiante-continue-course
+        [course]="currentCourse()"
+        (continueClicked)="onContinueCourse()"
+      />
+      }
+
+      <!-- Sección Intermedia: Layout Biblioteca + Progreso | Examen -->
+      <div class="middle-grid">
+
+        <!-- Columna Izquierda: Biblioteca + Gráfico de Progreso Semanal -->
+        <div class="left-col">
+          <!-- NODO HIJO: Cuadrícula de Biblioteca Digital -->
+          <app-estudiante-subjects-grid
+            [subjects]="filteredSubjects()"
+            (subjectSelected)="onSelectSubject($event)"
+            (viewAllRequested)="onViewAllLibrary()"
+          />
+
+          <!-- NODO HIJO: Gráfico de Progreso Semanal (interactivo) -->
+          @if (!localDemo) {
+          <app-estudiante-weekly-progress
+            [items]="weeklyProgress()"
+            [highlightedId]="highlightedSubjectId()"
+            (barClicked)="onProgressBarSelected($event)"
+            (clearClicked)="onClearSubjectHighlight()"
+          />
+          }
+        </div>
+
+        <!-- Columna Derecha: Examen de Práctica -->
+        <app-estudiante-exam-card
+          [practiceExam]="practiceExam()"
+          [isPublished]="publishedExams().length > 0"
+          [weeklyProgress]="[]"
+          (startExamClicked)="onStartExam()"
+        />
+      </div>
+
+      <!-- Sección Inferior: Preguntas Recientes en Foros (NODO HIJO PRESENTACIONAL) -->
+      <app-estudiante-forum-preview
+        [questions]="forumQuestions()"
+        [brokenAvatars]="avatarErrors()"
+        (viewAllRequested)="onViewAllForums()"
+        (viewThreadRequested)="onViewThread($event)"
+        (avatarErrorOccurred)="onAvatarError($event)"
+      />
+    }
+  </main>
+
+  <!-- ── 3. PANEL LATERAL DERECHO DESPLEGABLE (DRAWER ASISTENTE IA - NODO HIJO) ── -->
+  <app-estudiante-ai-drawer
+    [isOpen]="isAiDrawerOpen()"
+    [chatMessages]="chatMessages()"
+    [quickActions]="quickActions()"
+    [isAiThinking]="isAiThinking()"
+    [errorMessage]="aiErrorMessage()"
+    [(inputText)]="aiInputText"
+    (closeRequested)="closeAiDrawer()"
+    (messageSubmitted)="onSendAiMessage($event)"
+    (quickActionTriggered)="onQuickAction($event)"
+  />
+
+  <!-- ── 4. PANEL LATERAL DERECHO DESPLEGABLE (NOTIFICACIONES Y TAREAS) ── -->
+  @if (isNotificationsDrawerOpen()) {
+    <div
+      class="notifications-drawer-backdrop"
+      (click)="closeNotificationsDrawer()"
+      aria-hidden="true"
+    ></div>
+  }
+
+  <app-estudiante-notifications-drawer
+    [isOpen]="isNotificationsDrawerOpen()"
+    [notifications]="notifications()"
+    (closeRequested)="closeNotificationsDrawer()"
+    (markAsRead)="onMarkNotificationAsRead($event)"
+    (toggleRead)="onToggleNotificationRead($event)"
+    (markAllAsRead)="onMarkAllNotificationsAsRead()"
+    (deleteNotification)="onDeleteNotification($event)"
+    (notificationSelected)="onNotificationSelected($event)"
+  />
+
+  <!-- Toast flotante para feedback de acciones -->
+  @if (toastMessage(); as message) {
+    <app-action-toast [message]="message" tone="info" />
+  }
+</div>

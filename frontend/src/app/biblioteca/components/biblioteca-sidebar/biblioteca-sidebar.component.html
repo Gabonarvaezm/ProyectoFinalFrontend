@@ -1,0 +1,52 @@
+<aside class="sidebar" aria-label="Navegación principal de DiscerIA">
+  <div class="sidebar-top">
+    <a routerLink="/" class="brand-link" aria-label="Ir al inicio de DiscerIA">
+      <div class="brand-icon">
+        <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">DiscerIA</span>
+        <span class="brand-sub">Biblioteca Digital</span>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav" aria-label="Menú de navegación de biblioteca">
+      <ul class="nav-list">
+        @for (item of navItems(); track item.id) {
+          <li class="nav-item">
+            <a
+              [routerLink]="item.route"
+              class="nav-btn"
+              [class.active]="item.id === activeNav()"
+              [attr.aria-current]="item.id === activeNav() ? 'page' : null"
+            >
+              <i [class]="item.icon + ' nav-icon'" aria-hidden="true"></i>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="sidebar-bottom">
+    @if (isProfessor()) {
+      <button
+        type="button"
+        class="new-book-btn"
+        (click)="publishBookClicked.emit()"
+        aria-label="Publicar nuevo libro en el repositorio"
+        title="Publicar nuevo libro"
+      >
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        <span>Publicar Libro</span>
+      </button>
+    } @else {
+      <div class="institution-badge" [title]="institution()">
+        <i class="bi bi-building" aria-hidden="true"></i>
+        <span>{{ institution() }}</span>
+      </div>
+    }
+  </div>
+</aside>
+

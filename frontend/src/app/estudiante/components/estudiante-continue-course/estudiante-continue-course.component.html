@@ -1,0 +1,23 @@
+<section class="continue-learning-card" aria-label="Continuar aprendizaje del curso activo">
+  <div class="course-icon-box">
+    <i class="bi bi-radioactive"></i>
+  </div>
+
+  <div class="course-info-box">
+    <span class="course-category-tag">{{ course().category }}</span>
+    <h2 class="course-title">{{ course().title }}</h2>
+    <div class="progress-bar-container">
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="course().progress"></div>
+      </div>
+      <span class="progress-label">{{ course().progress }}% completado</span>
+    </div>
+  </div>
+
+  <div class="course-action-box">
+    <button type="button" class="btn-continue" (click)="continueClicked.emit()">
+      Continuar
+    </button>
+  </div>
+</section>
+

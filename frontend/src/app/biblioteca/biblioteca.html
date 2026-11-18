@@ -1,0 +1,154 @@
+@if (!isEmbedded()) {
+  <div class="biblioteca-layout">
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- 1. BARRA LATERAL IZQUIERDA (NAVBAR VERTICAL INSTITUCIONAL)              -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <app-biblioteca-sidebar
+      [activeNav]="'biblioteca'"
+      [isProfessor]="isProfessor()"
+      [institution]="userInstitution()"
+      [dashboardRoute]="dashboardRoute()"
+      (publishBookClicked)="openCreateBookModal()"
+    />
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- 2. CONTENEDOR PRINCIPAL (NAVBAR HORIZONTAL + CATÁLOGO ACADÉMICO)        -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="main-wrapper">
+      <app-biblioteca-topbar
+        [searchQuery]="searchQuery()"
+        [currentUser]="currentUser()"
+        [userInitials]="userInitials()"
+        [userName]="userName()"
+        [isProfessor]="isProfessor()"
+        (searchQueryChange)="onTopbarSearch($event)"
+        (aiClicked)="onAiClicked()"
+        (notificationsClicked)="onNotificationsClicked()"
+        (configClicked)="onConfigClicked()"
+      />
+
+      <main class="biblioteca-canvas">
+        <ng-container *ngTemplateOutlet="catalogContent"></ng-container>
+      </main>
+    </div>
+  </div>
+} @else {
+  <ng-container *ngTemplateOutlet="catalogContent"></ng-container>
+}
+
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<!-- PLANTILLA REUTILIZABLE DEL CATÁLOGO DE LA BIBLIOTECA                    -->
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<ng-template #catalogContent>
+  <div class="biblioteca-container">
+    <!-- 1. NODO HIJO: ENCABEZADO CON BUSCADOR Y BOTÓN DOCENTE -->
+    <app-biblioteca-header
+      [(searchQuery)]="searchQuery"
+      [(selectedFormat)]="selectedFormat"
+      [isProfessor]="isProfessor()"
+      (formatChanged)="onFormatChanged($event)"
+      (createBookClicked)="openCreateBookModal()"
+    />
+
+    <!-- 2. NODO HIJO: NAVEGACIÓN POR CATEGORÍAS DISCIPLINARIAS -->
+    <app-biblioteca-category-nav
+      [categories]="categories()"
+      [(selectedCategory)]="selectedCategory"
+      (categorySelected)="onCategorySelected($event)"
+    />
+
+    <!-- 3. BARRA DE RESULTADOS Y FILTROS ACTIVOS -->
+    <div class="results-bar">
+      <div class="results-info">
+        <span class="count-badge">{{ totalCount() }}</span>
+        <span class="results-text">
+          recursos académicos encontrados
+          @if (selectedCategory() !== 'all') {
+            en <strong>{{ selectedCategory().toUpperCase() }}</strong>
+          }
+          @if (selectedFormat() !== 'all') {
+            (Formato: <strong>{{ selectedFormat().toUpperCase() }}</strong>)
+          }
+        </span>
+      </div>
+
+      @if (searchQuery() || selectedCategory() !== 'all' || selectedFormat() !== 'all') {
+        <button
+          type="button"
+          class="btn-reset-filters"
+          (click)="clearFilters()"
+          aria-label="Restablecer todos los filtros"
+        >
+          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+          <span>Restablecer filtros</span>
+        </button>
+      }
+    </div>
+
+    <!-- 4. CATÁLOGO / GRILLA DE NODOS HIJOS: LIBROS ACADÉMICOS -->
+    @if (filteredBooks().length === 0) {
+      <div class="empty-results-box" role="status">
+        <i class="bi bi-journal-x empty-icon" aria-hidden="true"></i>
+        <h3 class="empty-title">No se encontraron textos con estos criterios</h3>
+        <p class="empty-desc">
+          Intenta modificando los términos de búsqueda o selecciona otra disciplina en el menú superior.
+        </p>
+        <button
+          type="button"
+          class="btn-reset-filters-large"
+          (click)="clearFilters()"
+        >
+          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+          <span>Ver todo el catálogo</span>
+        </button>
+      </div>
+    } @else {
+      <section class="books-grid" aria-label="Catálogo de libros disponibles">
+        @for (book of filteredBooks(); track book.id) {
+          <app-biblioteca-book-card
+            [book]="book"
+            [isBookmarked]="isBookmarked(book.id)"
+            [userRole]="userRole()"
+            (cardClicked)="openBookModal($event)"
+            (bookmarkToggled)="toggleBookmark($event)"
+            (recommended)="onRecommend($event)"
+            (downloaded)="onDownload($event)"
+          />
+        }
+      </section>
+    }
+  </div>
+</ng-template>
+
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<!-- 5. NODO HIJO: MODAL DE DETALLE Y LECTURA                                -->
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<app-biblioteca-detail-modal
+  [book]="selectedBook()"
+  [isBookmarked]="selectedBook() ? isBookmarked(selectedBook()!.id) : false"
+  (closeModal)="closeBookModal()"
+  (bookmarkToggled)="toggleBookmark($event)"
+  (startReading)="onStartReading($event)"
+  (downloaded)="onDownload($event)"
+/>
+
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<!-- 6. NODO HIJO: MODAL REACTIVO DE CREACIÓN DE LIBRO (SOLO PROFESORES)     -->
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+@if (isProfessor()) {
+  <app-libro
+    [isOpen]="isCreateBookOpen()"
+    [isSubmitting]="isSavingBook()"
+    [categories]="categories()"
+    [userInstitution]="userInstitution()"
+    (closeModal)="closeCreateBookModal()"
+    (bookCreated)="handleBookCreated($event)"
+  />
+}
+
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<!-- 7. NOTIFICACIÓN TOAST FLOTANTE                                          -->
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+@if (toastFeedback(); as message) {
+    <app-action-toast [message]="message" tone="success" />
+  }

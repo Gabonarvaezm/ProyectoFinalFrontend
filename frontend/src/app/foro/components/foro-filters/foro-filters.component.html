@@ -1,0 +1,11 @@
+<nav class="subjects-nav" aria-label="Filtro de materias académicas">
+  <div class="subjects-scroll-wrapper" role="tablist">
+    @for (subj of subjects(); track subj) {
+    <button type="button" class="subject-tab-btn" [class.active]="selectedSubject() === subj"
+      (click)="onSelectSubject(subj)" role="tab" [attr.aria-selected]="selectedSubject() === subj">
+      <i [class]="getSubjectIcon(subj) + ' subject-icon'" aria-hidden="true"></i>
+      <span class="subject-label">{{ subj }}</span>
+    </button>
+    }
+  </div>
+</nav>

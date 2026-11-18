@@ -1,0 +1,19 @@
+<nav class="categories-nav" aria-label="Categorías del repositorio">
+  <div class="categories-scroll-wrapper" role="tablist">
+    @for (cat of categories(); track cat.id) {
+      <button
+        type="button"
+        class="cat-tab-btn"
+        [class.active]="selectedCategory() === cat.id"
+        (click)="onSelect(cat.id)"
+        role="tab"
+        [attr.aria-selected]="selectedCategory() === cat.id"
+      >
+        <i [class]="cat.icon + ' cat-icon'" aria-hidden="true"></i>
+        <span class="cat-label">{{ cat.label }}</span>
+        <span class="cat-count">{{ cat.count ?? 0 }}</span>
+      </button>
+    }
+  </div>
+</nav>
+

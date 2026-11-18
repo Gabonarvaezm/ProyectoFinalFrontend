@@ -1,0 +1,19 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.lottie-host-wrapper {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 100%;
+
+  svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+}
+

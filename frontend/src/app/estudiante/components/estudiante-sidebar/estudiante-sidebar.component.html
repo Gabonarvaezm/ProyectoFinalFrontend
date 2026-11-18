@@ -1,0 +1,41 @@
+<aside class="sidebar" aria-label="Panel lateral de navegación">
+  <div class="sidebar-header">
+    <a routerLink="/" class="brand-link" aria-label="Ir a inicio de DiscerIA">
+      <div class="brand-logo-wrap">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">DiscerIA</span>
+          <span class="brand-sub">Portal Estudiante</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Navegación del estudiante">
+    <ul class="nav-list">
+      @for (item of navItems(); track item.id) {
+        <li class="nav-item">
+          <button
+            type="button"
+            class="nav-btn"
+            [class.active]="activeNav() === item.id"
+            (click)="onSelectNav(item.id)"
+          >
+            <i [class]="item.icon + ' nav-icon'"></i>
+            <span class="nav-label">{{ item.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="institution-badge" [title]="institution()">
+      <i class="bi bi-building"></i>
+      <span>{{ institution() }}</span>
+    </div>
+  </div>
+</aside>
+
