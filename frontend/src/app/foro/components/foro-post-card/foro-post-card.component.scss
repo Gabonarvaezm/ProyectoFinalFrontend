@@ -118,12 +118,12 @@
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  background-color: #fef9c3;
-  color: #a16207;
-  border: 1px solid #fef08a;
+  background-color: var(--color-forum-verified-badge-bg);
+  color: var(--color-forum-verified-label);
+  border: 1px solid var(--color-forum-verified-border);
 
   i {
-    color: #eab308;
+    color: var(--color-forum-verified-icon);
     font-size: 0.85rem;
   }
 }
@@ -310,8 +310,8 @@
   padding: var(--space-4);
 
   &.reply-verified {
-    background-color: #fefce8;
-    border-color: #fef08a;
+    background-color: var(--color-forum-verified-bg);
+    border-color: var(--color-forum-verified-border);
   }
 }
 
@@ -364,8 +364,8 @@
   font-size: 0.65rem;
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  background-color: #e0e7ff;
-  color: #4338ca;
+  background-color: var(--color-forum-teacher-bg);
+  color: var(--color-forum-teacher-text);
   padding: 0.15rem 0.45rem;
   border-radius: var(--radius-xs);
 }
@@ -382,10 +382,10 @@
   gap: 0.3rem;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  color: #a16207;
+  color: var(--color-forum-verified-label);
 
   i {
-    color: #eab308;
+    color: var(--color-forum-verified-icon);
   }
 }
 

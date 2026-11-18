@@ -178,7 +178,7 @@
     font-weight: var(--font-weight-bold);
 
     &.badge-unread {
-      background: var(--color-primary-600);
+      background: var(--color-notification-active-bg);
       color: var(--color-white);
     }
   }
@@ -190,7 +190,7 @@
   }
 
   &.active {
-    background: var(--color-primary-600);
+    background: var(--color-notification-active-bg);
     border-color: var(--color-primary-600);
     color: var(--color-white);
 
@@ -273,8 +273,8 @@
   }
 
   &.unread {
-    background-color: #fcfdff;
-    border-color: var(--color-primary-300);
+    background-color: var(--color-notification-unread-bg);
+    border-color: var(--color-notification-unread-border);
 
     &::before {
       content: '';
@@ -311,8 +311,8 @@
     justify-content: center;
 
     &.teacher-avatar {
-      background: #eef2ff;
-      color: #3730a3;
+      background: var(--color-ai-100);
+      color: var(--color-notification-ai);
     }
   }
 
@@ -363,18 +363,19 @@
   border-radius: var(--radius-full);
 
   &.pill-type-task {
-    background-color: #ecfdf5;
-    color: #047857;
+    background-color: var(--color-success-bg);
+    color: var(--color-notification-success);
   }
 
-  &.pill-type-forum_reply {
-    background-color: #eff6ff;
-    color: #1d4ed8;
+  &.pill-type-forum_reply,
+  &.pill-type-exam {
+    background-color: var(--color-primary-50);
+    color: var(--color-notification-info);
   }
 
   &.pill-type-teacher_announcement {
-    background-color: #fef3c7;
-    color: #b45309;
+    background-color: var(--color-warning-bg);
+    color: var(--color-notification-warning);
   }
 }
 

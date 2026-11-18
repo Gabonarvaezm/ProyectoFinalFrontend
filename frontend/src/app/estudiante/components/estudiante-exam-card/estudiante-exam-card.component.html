@@ -16,7 +16,7 @@
     </div>
 
     <button type="button" class="btn-start-exam" (click)="startExamClicked.emit()">
-      Iniciar Examen
+      {{ isPublished() ? 'Ver examen publicado' : 'Iniciar Examen' }}
     </button>
   </div>
 </div>

@@ -476,28 +476,7 @@
 }
 
 // ── Toast de Feedback ───────────────────────────────────────────────────────
-.tarea-toast {
-  position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
-  background-color: var(--color-slate-900);
-  color: var(--color-white);
-  padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  z-index: 1200;
-  animation: slideUp var(--duration-fast) var(--ease-out-expo);
 
-  .toast-icon {
-    color: var(--color-success);
-    font-size: 1.15rem;
-  }
-}
 
 @keyframes slideUp {
   from {

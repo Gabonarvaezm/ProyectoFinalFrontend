@@ -137,10 +137,7 @@
   />
 
   <!-- Toast Notification para Interacciones Rápidas -->
-  @if (actionNotification()) {
-  <div class="toast-feedback" role="status" aria-live="polite">
-    <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-    <span>{{ actionNotification() }}</span>
-  </div>
+  @if (actionNotification(); as message) {
+    <app-action-toast [message]="message" tone="info" />
   }
 </div>

@@ -98,7 +98,7 @@ $gradient-teacher-arch: linear-gradient(145deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8
 
   .btn-instructor {
     display: inline-block;
-    background: var(--color-primary-700);
+    background: var(--color-landing-action-bg);
     color: var(--color-white);
     font-size: 1rem;
     font-weight: var(--font-weight-semibold);
@@ -109,7 +109,7 @@ $gradient-teacher-arch: linear-gradient(145deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8
     transition: all var(--duration-fast) ease;
 
     &:hover {
-      background: var(--color-primary-800);
+      background: var(--color-landing-action-hover);
       transform: translateY(-2px);
       box-shadow: 0 10px 24px rgba(29, 78, 216, 0.4);
     }

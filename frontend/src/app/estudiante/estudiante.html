@@ -47,6 +47,7 @@
       </section>
 
       <!-- Tarjeta Destacada: Continuar Aprendiendo (NODO HIJO PRESENTACIONAL) -->
+      <app-estudiante-publications [exams]="publishedExams()" [messages]="teacherMessages()" />
       <app-estudiante-continue-course
         [course]="currentCourse()"
         (continueClicked)="onContinueCourse()"
@@ -76,6 +77,7 @@
         <!-- Columna Derecha: Examen de Práctica -->
         <app-estudiante-exam-card
           [practiceExam]="practiceExam()"
+          [isPublished]="publishedExams().length > 0"
           [weeklyProgress]="[]"
           (startExamClicked)="onStartExam()"
         />
@@ -126,10 +128,7 @@
   />
 
   <!-- Toast flotante para feedback de acciones -->
-  @if (toastMessage()) {
-    <div class="student-toast anim-fade-in" role="status" aria-live="polite">
-      <i class="bi bi-info-circle-fill"></i>
-      <span>{{ toastMessage() }}</span>
-    </div>
+  @if (toastMessage(); as message) {
+    <app-action-toast [message]="message" tone="info" />
   }
 </div>

@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
@@ -15,7 +17,7 @@ describe('Login Component (Smart Parent & Presentational Child Nodes)', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoginPageComponent, Login, LoginHeroComponent, LoginFormComponent],
-      providers: [provideRouter([]), provideNoopAnimations()],
+      providers: [provideRouter([]), provideNoopAnimations(), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     parentFixture = TestBed.createComponent(LoginPageComponent);
@@ -61,6 +63,8 @@ describe('Login Component (Smart Parent & Presentational Child Nodes)', () => {
 
       expect(parentComponent.isLoading()).toBe(true);
 
+      TestBed.inject(HttpTestingController).expectOne('/api/academic/login').flush({ user: { id: 'student-test', email: 'estudiante.test@universidad.edu', fullName: 'Estudiante', role: 'student' }, token: 'test-session' });
+
       // Avanza el delay del AuthService (900ms)
       await vi.advanceTimersByTimeAsync(950);
       expect(parentComponent.isLoading()).toBe(false);
@@ -90,6 +94,7 @@ describe('Login Component (Smart Parent & Presentational Child Nodes)', () => {
 
       expect(parentComponent.isLoading()).toBe(true);
 
+      TestBed.inject(HttpTestingController).expectOne('/api/academic/login').flush({ user: { id: 'professor-test', email: 'profesor.test@universidad.edu', fullName: 'Docente', role: 'professor' }, token: 'test-session' });
       await vi.advanceTimersByTimeAsync(950);
       expect(parentComponent.successMessage()).toContain('panel docente');
 

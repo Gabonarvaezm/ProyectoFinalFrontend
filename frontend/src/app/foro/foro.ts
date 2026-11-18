@@ -1,3 +1,4 @@
+import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
@@ -29,6 +30,7 @@ import {
 
 @Component({
   imports: [
+    ActionToastComponent,
     RouterLink,
     ForoHeaderComponent,
     ForoFiltersComponent,
@@ -68,6 +70,13 @@ export class Foro {
     this.isAiPanelOpen.update((open) => !open);
   }
 
+  public onNotificationsClicked(): void {
+    const unansweredCount = this.posts().filter((post) => post.isUnanswered).length;
+    this.showToast(unansweredCount > 0
+      ? `Hay ${unansweredCount} consultas sin responder en el foro.`
+      : 'No hay consultas pendientes de respuesta en el foro.');
+  }
+
   // ── Estado Global del Foro (Gestión Central del Componente Padre) ───────
   public readonly currentRole = computed<UserRole>(
     () => this.authService.currentUser()?.role ?? 'student'
@@ -94,7 +103,7 @@ export class Foro {
     const authUser = this.authService.currentUser();
     if (this.currentRole() === 'professor') {
       return {
-        id: 'prof-carlos',
+        id: authUser?.id ?? 'prof-carlos',
         name: authUser?.role === 'professor' ? authUser.fullName : 'Prof. Carlos Mendoza',
         role: 'professor',
         roleTitle: 'Docente Titular de Ciencias',
@@ -104,7 +113,7 @@ export class Foro {
       };
     }
     return {
-      id: 'student-alejandro',
+      id: authUser?.id ?? 'student-alejandro',
       name: authUser?.fullName || 'Alejandro Silva',
       role: 'student',
       roleTitle: 'Estudiante Académico',

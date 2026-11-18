@@ -3,6 +3,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 :root {
+  --color-auth-invalid-bg: #fffbfa;
+  --color-auth-action-bg: #1d4ed8;
+  --color-auth-action-hover: #1e40af;
+  --color-auth-hero-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1e40af 140%);
+  --color-auth-hero-text: #f8fafc;
+  --color-auth-hero-secondary: #cbd5e1;
+  --color-auth-hero-muted: #94a3b8;
+
+  --color-landing-navbar-bg: rgba(255, 255, 255, 0.95);
+  --color-landing-card-bg: rgba(255, 255, 255, 0.96);
+  --color-landing-card-border: rgba(255, 255, 255, 0.8);
+  --color-landing-action-bg: #1d4ed8;
+  --color-landing-action-hover: #1e40af;
+  --color-landing-soft-green: #f0fdf4;
+  --color-landing-soft-cyan: #f0f9ff;
+
   // ── Paleta de Colores Primarios (Azul Académico de Confianza) ──────────────
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
@@ -52,6 +68,30 @@
   --color-border: var(--color-slate-200);
   --color-border-subtle: #f1f5f9;
   --color-border-focus: var(--color-primary-600);
+
+  // Confirmaciones flotantes: independientes de la escala de texto del tema.
+  --color-toast-bg: #0f172a;
+  --color-toast-text: #ffffff;
+  --color-toast-border: #334155;
+  --color-toast-info: #7dd3fc;
+  --color-toast-success: #6ee7b7;
+  --shadow-toast: 0 12px 28px rgba(15, 23, 42, 0.25);
+  --z-index-toast: 10000;
+  --color-notification-unread-bg: #eff6ff;
+  --color-notification-unread-border: #93c5fd;
+  --color-notification-success: #047857;
+  --color-notification-info: #1d4ed8;
+  --color-notification-warning: #92400e;
+  --color-notification-ai: #4338ca;
+  --color-notification-active-bg: #1d4ed8;
+
+  --color-forum-verified-bg: #fefce8;
+  --color-forum-verified-border: #fef08a;
+  --color-forum-verified-badge-bg: #fef9c3;
+  --color-forum-verified-label: #a16207;
+  --color-forum-verified-icon: #eab308;
+  --color-forum-teacher-bg: #e0e7ff;
+  --color-forum-teacher-text: #4338ca;
 
   // ── Estados Semánticos (Feedback y Alertas) ─────────────────────────────────
   --color-success: #10b981;
@@ -154,6 +194,18 @@
 // ── Variables de Tema Oscuro (Dark Mode & Alto Contraste WCAG AA) ─────────────
 [data-theme='dark'],
 .dark-theme {
+  --color-auth-invalid-bg: #2c1d2a;
+  --color-auth-action-bg: #2563eb;
+  --color-auth-action-hover: #1d4ed8;
+
+  --color-landing-navbar-bg: rgba(15, 23, 42, 0.97);
+  --color-landing-card-bg: rgba(30, 41, 59, 0.97);
+  --color-landing-card-border: #475569;
+  --color-landing-action-bg: #2563eb;
+  --color-landing-action-hover: #1d4ed8;
+  --color-landing-soft-green: rgba(16, 185, 129, 0.18);
+  --color-landing-soft-cyan: rgba(2, 132, 199, 0.18);
+
   // Superficies y Fondos
   --color-bg-app: #0b1120;
   --color-bg-surface: #0f172a;
@@ -182,6 +234,25 @@
   --color-border: #334155;
   --color-border-subtle: #1e293b;
   --color-border-focus: #60a5fa;
+
+  --color-toast-bg: #1e293b;
+  --color-toast-text: #f8fafc;
+  --color-toast-border: #94a3b8;
+  --shadow-toast: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --color-notification-unread-bg: #172b4d;
+  --color-notification-unread-border: #60a5fa;
+  --color-notification-success: #6ee7b7;
+  --color-notification-info: #93c5fd;
+  --color-notification-warning: #fcd34d;
+  --color-notification-ai: #c7d2fe;
+
+  --color-forum-verified-bg: #172033;
+  --color-forum-verified-border: #a38a4a;
+  --color-forum-verified-badge-bg: #332b16;
+  --color-forum-verified-label: #fcd34d;
+  --color-forum-verified-icon: #fbbf24;
+  --color-forum-teacher-bg: #312e81;
+  --color-forum-teacher-text: #c7d2fe;
 
   // Primarios Adaptados (más luminosos para contraste sobre fondo oscuro)
   --color-primary-50: rgba(37, 99, 235, 0.2);

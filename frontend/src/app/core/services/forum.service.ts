@@ -1,3 +1,5 @@
+import { effect } from '@angular/core';
+import { AcademicSyncService } from './academic-sync.service';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
@@ -12,15 +14,27 @@ import { STORAGE_KEYS } from '../models/auth.model';
 
 /**
  * Servicio Centralizado de Foros Académicos (ForumService / ForoService).
- * Maneja publicaciones, respuestas, votos de utilidad y verificación docente con persistencia en LocalStorage.
+ * Maneja publicaciones, respuestas, votos de utilidad y verificación docente con persistencia compartida y caché local.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class ForumService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly sync = inject(AcademicSyncService);
 
   public readonly posts = signal<ForumPost[]>(this.loadInitialPosts());
+
+  constructor() {
+    effect(() => {
+      const state = this.sync.snapshot();
+      if (!state) {
+        if (this.sync.enabled()) this.posts.set([...INITIAL_FORUM_POSTS]);
+        return;
+      }
+      this.posts.set(state.posts);
+    });
+  }
 
   private loadInitialPosts(): ForumPost[] {
     if (isPlatformBrowser(this.platformId)) {
@@ -54,7 +68,7 @@ export class ForumService {
    */
   public createPost(payload: CreatePostPayload, author: ForumAuthor): ForumPost {
     const newPost: ForumPost = {
-      id: `post-${Date.now()}`,
+      id: `post-${crypto.randomUUID()}`,
       title: payload.title.trim(),
       content: payload.content.trim(),
       subject: payload.subject,
@@ -72,6 +86,7 @@ export class ForumService {
 
     this.posts.update((list) => [newPost, ...list]);
     this.persist();
+    this.sync.publish('post.publish', newPost);
     return newPost;
   }
 
@@ -80,7 +95,7 @@ export class ForumService {
    */
   public addReply(payload: CreateReplyPayload, author: ForumAuthor): ForumReply {
     const newReply: ForumReply = {
-      id: `reply-${Date.now()}`,
+      id: `reply-${crypto.randomUUID()}`,
       postId: payload.postId,
       author,
       content: payload.content.trim(),
@@ -106,6 +121,7 @@ export class ForumService {
       })
     );
     this.persist();
+    this.sync.publish('post.reply', newReply);
     return newReply;
   }
 
@@ -127,6 +143,7 @@ export class ForumService {
       })
     );
     this.persist();
+    this.sync.publish('post.vote', { postId, voted: this.posts().find((post) => post.id === postId)?.userHasVotedHelpful ?? false });
   }
 
   /**
@@ -153,6 +170,7 @@ export class ForumService {
       })
     );
     this.persist();
+    this.sync.publish('post.vote', { postId, replyId, voted: this.posts().find((post) => post.id === postId)?.replies.find((reply) => reply.id === replyId)?.userHasVotedHelpful ?? false });
   }
 
   /**

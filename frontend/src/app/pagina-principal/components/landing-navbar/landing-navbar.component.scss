@@ -2,11 +2,15 @@
 // DiscerIA — Landing Navbar Component Styles
 // ─────────────────────────────────────────────────────────────────────────────
 
-.navbar {
+:host {
+  display: block;
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
+}
+
+.navbar {
+  background: var(--color-landing-navbar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
@@ -19,6 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1.25rem;
   }
 
   .brand-logo {
@@ -60,9 +65,9 @@
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
 
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
       display: none;
     }
 
@@ -96,43 +101,43 @@
     }
   }
 
+  .btn-signin {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-slate-700);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    transition: all var(--duration-fast) ease;
+
+    &:hover {
+      color: var(--color-primary-700);
+      background-color: var(--color-slate-100);
+    }
+  }
+
+  .btn-freetrial {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+    background: var(--color-landing-action-bg);
+    text-decoration: none;
+    padding: 0.625rem 1.4rem;
+    border-radius: var(--radius-full);
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
+    transition: all var(--duration-fast) ease;
+
+    &:hover {
+      background: var(--color-landing-action-hover);
+      box-shadow: 0 6px 18px rgba(29, 78, 216, 0.4);
+      transform: translateY(-1px);
+    }
+  }
+
   .nav-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
-
-    .btn-signin {
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-slate-700);
-      text-decoration: none;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-full);
-      transition: all var(--duration-fast) ease;
-
-      &:hover {
-        color: var(--color-primary-700);
-        background-color: var(--color-slate-100);
-      }
-    }
-
-    .btn-freetrial {
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-white);
-      background: var(--color-primary-700);
-      text-decoration: none;
-      padding: 0.625rem 1.4rem;
-      border-radius: var(--radius-full);
-      box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
-      transition: all var(--duration-fast) ease;
-
-      &:hover {
-        background: var(--color-primary-800);
-        box-shadow: 0 6px 18px rgba(29, 78, 216, 0.4);
-        transform: translateY(-1px);
-      }
-    }
 
     .mobile-menu-toggle {
       display: none;
@@ -140,16 +145,21 @@
       color: var(--color-slate-900);
       cursor: pointer;
       padding: 0.25rem;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
       background: none;
       border: none;
 
-      @media (max-width: 900px) {
+      @media (max-width: 1024px) {
         display: block;
       }
     }
   }
 
   .mobile-dropdown {
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     padding: 1rem 1.5rem 1.5rem;
@@ -183,3 +193,16 @@
   }
 }
 
+
+@media (min-width: 1025px) {
+  .navbar .mobile-dropdown { display: none; }
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0.75rem 0;
+    .nav-container { padding-inline: 1rem; }
+    .nav-actions > a { display: none; }
+    .mobile-dropdown .mobile-actions a { box-sizing: border-box; min-height: 44px; }
+  }
+}

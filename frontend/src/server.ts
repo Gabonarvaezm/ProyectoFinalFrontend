@@ -7,6 +7,7 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 import { createChatbotRouter } from './server/chatbot-api';
+import { createAcademicRouter } from './server/academic-api.mjs';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -14,6 +15,7 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 app.use('/api/chat', createChatbotRouter());
+app.use('/api/academic', createAcademicRouter());
 
 /**
  * Example Express Rest API endpoints can be defined here.

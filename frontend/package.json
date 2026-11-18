@@ -8,7 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:api": "node --test scripts/chatbot-api.test.mjs scripts/server-environment.test.mjs",
+    "test:api": "node --test scripts/chatbot-api.test.mjs scripts/server-environment.test.mjs scripts/academic-api.test.mjs",
     "serve:ssr:DiscerIA": "node dist/DiscerIA/server/server.mjs"
   },
   "private": true,

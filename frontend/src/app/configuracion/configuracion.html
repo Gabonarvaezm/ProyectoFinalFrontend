@@ -65,10 +65,7 @@
   ></app-configuracion-logout-modal>
 
   <!-- 5. Mensaje Toast Flotante de Retroalimentación -->
-  @if (toastFeedback()) {
-    <div class="toast-feedback" role="status" aria-live="polite">
-      <i class="bi bi-check-circle-fill"></i>
-      <span>{{ toastFeedback() }}</span>
-    </div>
+  @if (toastFeedback(); as message) {
+    <app-action-toast [message]="message" tone="success" />
   }
 </div>

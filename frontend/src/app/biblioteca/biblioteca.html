@@ -149,9 +149,6 @@
 <!-- ═════════════════════════════════════════════════════════════════════════ -->
 <!-- 7. NOTIFICACIÓN TOAST FLOTANTE                                          -->
 <!-- ═════════════════════════════════════════════════════════════════════════ -->
-@if (toastFeedback()) {
-  <div class="toast-feedback" role="status" aria-live="polite">
-    <i class="bi bi-check-circle-fill toast-icon" aria-hidden="true"></i>
-    <span>{{ toastFeedback() }}</span>
-  </div>
-}
+@if (toastFeedback(); as message) {
+    <app-action-toast [message]="message" tone="success" />
+  }

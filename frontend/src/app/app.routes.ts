@@ -1,3 +1,5 @@
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
@@ -22,6 +24,7 @@ export const routes: Routes = [
   },
   {
     path: 'profesor',
+    canActivate: [roleGuard('professor')],
     loadComponent: () => import('./profesor/profesor').then((m) => m.Profesor),
   },
   {
@@ -31,26 +34,32 @@ export const routes: Routes = [
   },
   {
     path: 'estudiante',
+    canActivate: [roleGuard('student')],
     loadComponent: () => import('./estudiante/estudiante').then((m) => m.Estudiante),
   },
   {
     path: 'biblioteca',
+    canActivate: [authGuard],
     loadComponent: () => import('./biblioteca/biblioteca').then((m) => m.Biblioteca),
   },
   {
     path: 'tareas',
+    canActivate: [authGuard],
     loadComponent: () => import('./tarea/tarea').then((m) => m.Tarea),
   },
   {
     path: 'foro',
+    canActivate: [authGuard],
     loadComponent: () => import('./foro/foro').then((m) => m.Foro),
   },
   {
     path: 'chatbot',
+    canActivate: [authGuard],
     loadComponent: () => import('./chatbot/chatbot').then((m) => m.Chatbot),
   },
   {
     path: 'configuracion',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./configuracion/configuracion').then((m) => m.ConfiguracionComponent),
   },

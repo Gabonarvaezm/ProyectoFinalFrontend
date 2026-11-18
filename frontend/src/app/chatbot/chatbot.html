@@ -82,10 +82,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- 3. NOTIFICACIÓN TOAST FLOTANTE DE RETROALIMENTACIÓN                    -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  @if (toastMessage()) {
-    <div class="toast-feedback" role="status" aria-live="polite">
-      <i class="bi bi-info-circle-fill toast-icon" aria-hidden="true"></i>
-      <span>{{ toastMessage() }}</span>
-    </div>
+  @if (toastMessage(); as message) {
+    <app-action-toast [message]="message" tone="info" />
   }
 </div>

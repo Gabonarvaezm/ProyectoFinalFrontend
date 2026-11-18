@@ -24,6 +24,21 @@ describe('Biblioteca Component', () => {
     expect(component).toBeTruthy();
   });
 
+  it('debe mostrar la alerta compartida desde la campana de biblioteca en modo oscuro', () => {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    try {
+      const bell = fixture.nativeElement.querySelector('app-biblioteca-topbar [aria-label="Ver notificaciones académicas"]');
+      expect(bell).toBeTruthy();
+      bell.click();
+      fixture.detectChanges();
+      const toast = fixture.nativeElement.querySelector('app-action-toast[role="status"]');
+      expect(toast).toBeTruthy();
+      expect(toast.textContent.trim()).toBe(component.toastFeedback());
+    } finally {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  });
+
   it('debe inicializar el catálogo de libros y categorías', () => {
     expect(component.books().length).toBeGreaterThanOrEqual(8);
     expect(component.categories().length).toBeGreaterThanOrEqual(5);

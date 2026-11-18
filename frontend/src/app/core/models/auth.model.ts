@@ -1,5 +1,6 @@
 export const STORAGE_KEYS = {
   ACTIVE_SESSION: 'disceria_active_session',
+  AUTH_TOKEN: 'disceria_auth_token',
   REGISTERED_USER: 'disceria_registered_user',
   USER_EMAIL: 'disceria_user_email',
   REMEMBERED_EMAIL: 'disceria_remembered_email',

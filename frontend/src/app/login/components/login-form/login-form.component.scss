@@ -1,3 +1,5 @@
+@use '../../../../styles/auth-fields' as auth-fields;
+
 :host {
   display: block;
   width: 100%;
@@ -38,7 +40,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
-  background: var(--color-bg-alt);
+  background: var(--color-bg-muted);
   padding: var(--space-1);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
@@ -191,9 +193,11 @@
   }
 
   .form-input {
+    @include auth-fields.autofill;
     width: 100%;
+    box-sizing: border-box;
     height: 42px;
-    padding: var(--space-2) var(--space-3) var(--space-2) var(--space-10);
+    padding: var(--space-2) 2.75rem var(--space-2) var(--space-10);
     font-family: inherit;
     font-size: var(--font-size-sm);
     color: var(--color-slate-900);
@@ -201,10 +205,10 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     transition: all var(--duration-fast) ease;
-    box-sizing: border-box;
 
     &::placeholder {
-      color: var(--color-slate-400);
+      opacity: 1;
+      color: var(--color-text-muted);
     }
 
     &:hover:not(:disabled) {
@@ -214,18 +218,18 @@
     &:focus {
       outline: none;
       border-color: var(--color-primary-500);
-      box-shadow: var(--shadow-focus);
+      box-shadow: var(--focus-ring);
     }
 
     &:disabled {
-      background-color: var(--color-bg-alt);
+      background-color: var(--color-bg-muted);
       color: var(--color-slate-400);
       cursor: not-allowed;
     }
 
     &.is-invalid {
       border-color: var(--color-danger);
-      background-color: var(--color-danger-bg);
+      background-color: var(--color-auth-invalid-bg);
 
       &:focus {
         box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
@@ -309,8 +313,8 @@
   gap: var(--space-2);
   width: 100%;
   height: 44px;
-  background-color: var(--color-primary-600);
-  color: var(--color-text-inverse);
+  background-color: var(--color-auth-action-bg);
+  color: var(--color-white);
   font-family: inherit;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -322,7 +326,7 @@
   margin-top: var(--space-2);
 
   &:hover:not(:disabled) {
-    background-color: var(--color-primary-700);
+    background-color: var(--color-auth-action-hover);
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }

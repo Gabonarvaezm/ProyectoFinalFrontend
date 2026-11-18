@@ -1,3 +1,4 @@
+import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -27,6 +28,7 @@ import { BookService } from '../core/services/book.service';
 
 @Component({
   imports: [
+    ActionToastComponent,
     CommonModule,
     NgTemplateOutlet,
     BibliotecaHeaderComponent,
@@ -251,6 +253,7 @@ export class Biblioteca implements OnInit {
 
   public onRecommend(book: Book, event?: Event): void {
     event?.stopPropagation();
+    this.bookService.recommendBook(book);
     this.bookRecommended.emit(book);
     this.showToast(`"${book.title}" recomendado a los alumnos de tu cohorte.`);
   }

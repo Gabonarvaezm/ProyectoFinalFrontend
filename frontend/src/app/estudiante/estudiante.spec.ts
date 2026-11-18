@@ -1,9 +1,66 @@
+import { StudentNotification } from './models/estudiante.model';
+import { AcademicSyncService } from '../core/services/academic-sync.service';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Estudiante } from './estudiante';
 import { AuthService } from '../core/services/auth.service';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+
+const TEST_NOTIFICATIONS: StudentNotification[] = [
+    {
+      id: 'notif-1',
+      type: 'task',
+      title: 'Nueva Tarea Asignada: Biología Celular',
+      message: 'El Prof. García asignó la actividad "Reporte de Mitosis y Meiosis" para completar en el foro.',
+      authorName: 'Prof. García',
+      authorRole: 'professor',
+      authorInitials: 'PG',
+      timeAgo: 'Hace 30 min',
+      read: false,
+      subject: 'Ciencias',
+      actionRoute: '/foro',
+    },
+    {
+      id: 'notif-2',
+      type: 'forum_reply',
+      title: 'Respuesta Docente en Foro',
+      message: 'El Prof. Martínez respondió tu consulta sobre la regla LIATE en integración por partes.',
+      authorName: 'Prof. Martínez',
+      authorRole: 'professor',
+      authorInitials: 'PM',
+      timeAgo: 'Hace 2 horas',
+      read: false,
+      subject: 'Matemáticas',
+      actionRoute: '/foro',
+    },
+    {
+      id: 'notif-3',
+      type: 'teacher_announcement',
+      title: 'Nuevo Material en Biblioteca',
+      message: 'La docente publicó un compendio de ejercicios clave para el próximo examen de Ciencias.',
+      authorName: 'Prof. Laura Gómez',
+      authorRole: 'professor',
+      authorInitials: 'LG',
+      timeAgo: 'Ayer',
+      read: true,
+      subject: 'Ciencias',
+      actionRoute: '/biblioteca',
+    },
+    {
+      id: 'notif-4',
+      type: 'forum_reply',
+      title: 'Intervención de compañero en Historia',
+      message: 'Mateo Gómez aportó una síntesis sobre el impacto de la Revolución Industrial.',
+      authorName: 'Mateo Gómez',
+      authorRole: 'student',
+      authorInitials: 'MG',
+      timeAgo: 'Hace 5 horas',
+      read: true,
+      subject: 'Historia',
+      actionRoute: '/foro',
+    },
+  ];
 
 describe('Estudiante', () => {
   let component: Estudiante;
@@ -21,11 +78,26 @@ describe('Estudiante', () => {
     http = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(Estudiante);
     component = fixture.componentInstance;
+    component.notifications.set(TEST_NOTIFICATIONS.map((notice) => ({ ...notice })));
     await fixture.whenStable();
   });
 
   it('debe crearse correctamente', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('muestra los exámenes y comunicados publicados que recibe del servidor', async () => {
+    const sync = TestBed.inject(AcademicSyncService);
+    sync.snapshot.set({
+      books: [], posts: [], tareas: [], students: [], notifications: [],
+      exams: [{ id: 'shared-exam', title: 'Examen publicado de historia', topic: 'Independencia', subject: 'Historia', questionsCount: 5, durationMinutes: 20, difficulty: 'Media', instructions: 'Repasa el capítulo tres.', authorName: 'Docente de historia', createdAt: new Date().toISOString() }],
+      messages: [{ id: 'shared-message', subject: 'Material para mañana', message: 'Trae tu cuaderno de historia.', authorName: 'Docente de historia', createdAt: new Date().toISOString(), priority: 'normal', targetGroup: 'all', sendToForums: false }],
+    });
+    await fixture.whenStable();
+    const publications: HTMLElement = fixture.nativeElement.querySelector('app-estudiante-publications');
+    expect(publications.textContent).toContain('Examen publicado de historia');
+    expect(publications.textContent).toContain('Trae tu cuaderno de historia.');
+    expect(component.practiceExam().title).toBe('Examen publicado de historia');
   });
 
   it('debe inicializarse con el dashboard activo y el nombre del estudiante', () => {
@@ -144,13 +216,13 @@ describe('Estudiante', () => {
 
   it('debe redirigir al foro al seleccionar una notificación con actionRoute', () => {
     const router = TestBed.inject(Router);
-    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
 
     const targetNotif = component.notifications()[0]; // actionRoute: '/foro'
     component.openNotificationsDrawer();
     component.onNotificationSelected(targetNotif);
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/foro']);
+    expect(navigateSpy).toHaveBeenCalledWith('/foro');
     expect(component.isNotificationsDrawerOpen()).toBe(false);
   });
 

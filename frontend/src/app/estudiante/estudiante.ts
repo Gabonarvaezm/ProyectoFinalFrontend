@@ -1,3 +1,8 @@
+import { effect, viewChild } from '@angular/core';
+import { AcademicSyncService } from '../core/services/academic-sync.service';
+import { ForumService } from '../core/services/forum.service';
+import { EstudiantePublicationsComponent } from './components/estudiante-publications/estudiante-publications.component';
+import { ActionToastComponent } from '../shared/components/action-toast/action-toast.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChatbotService } from '../core/services/chatbot.service';
 import { isPlatformBrowser } from '@angular/common';
@@ -58,6 +63,8 @@ export type {
 
 @Component({
   imports: [
+    EstudiantePublicationsComponent,
+    ActionToastComponent,
     FormsModule,
     Biblioteca,
     ConfiguracionComponent,
@@ -77,6 +84,11 @@ export type {
 })
 export class Estudiante {
   private readonly authService = inject(AuthService);
+  private readonly academicSync = inject(AcademicSyncService);
+  private readonly forumService = inject(ForumService);
+  private readonly publications = viewChild(EstudiantePublicationsComponent);
+  readonly publishedExams = computed(() => this.academicSync.snapshot()?.exams ?? []);
+  readonly teacherMessages = computed(() => this.academicSync.snapshot()?.messages ?? []);
   private readonly chatbotService = inject(ChatbotService);
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
@@ -127,60 +139,7 @@ export class Estudiante {
   }
 
   // ── Notificaciones del Estudiante (Tareas, Avisos y Foros) ────────────────
-  public readonly notifications = signal<StudentNotification[]>([
-    {
-      id: 'notif-1',
-      type: 'task',
-      title: 'Nueva Tarea Asignada: Biología Celular',
-      message: 'El Prof. García asignó la actividad "Reporte de Mitosis y Meiosis" para completar en el foro.',
-      authorName: 'Prof. García',
-      authorRole: 'professor',
-      authorInitials: 'PG',
-      timeAgo: 'Hace 30 min',
-      read: false,
-      subject: 'Ciencias',
-      actionRoute: '/foro',
-    },
-    {
-      id: 'notif-2',
-      type: 'forum_reply',
-      title: 'Respuesta Docente en Foro',
-      message: 'El Prof. Martínez respondió tu consulta sobre la regla LIATE en integración por partes.',
-      authorName: 'Prof. Martínez',
-      authorRole: 'professor',
-      authorInitials: 'PM',
-      timeAgo: 'Hace 2 horas',
-      read: false,
-      subject: 'Matemáticas',
-      actionRoute: '/foro',
-    },
-    {
-      id: 'notif-3',
-      type: 'teacher_announcement',
-      title: 'Nuevo Material en Biblioteca',
-      message: 'La docente publicó un compendio de ejercicios clave para el próximo examen de Ciencias.',
-      authorName: 'Prof. Laura Gómez',
-      authorRole: 'professor',
-      authorInitials: 'LG',
-      timeAgo: 'Ayer',
-      read: true,
-      subject: 'Ciencias',
-      actionRoute: '/biblioteca',
-    },
-    {
-      id: 'notif-4',
-      type: 'forum_reply',
-      title: 'Intervención de compañero en Historia',
-      message: 'Mateo Gómez aportó una síntesis sobre el impacto de la Revolución Industrial.',
-      authorName: 'Mateo Gómez',
-      authorRole: 'student',
-      authorInitials: 'MG',
-      timeAgo: 'Hace 5 horas',
-      read: true,
-      subject: 'Historia',
-      actionRoute: '/foro',
-    },
-  ]);
+  public readonly notifications = signal<StudentNotification[]>([]);
 
   /** Conteo derivado de avisos y tareas no leídas */
   public readonly unreadNotificationsCount = computed(
@@ -260,7 +219,7 @@ export class Estudiante {
   });
 
   // ── Examen de Práctica ───────────────────────────────────────────────────
-  public readonly practiceExam = signal({
+  public readonly practiceExam = computed(() => this.publishedExams()[0] ?? {
     title: 'Examen de Práctica',
     topic: 'Funciones Lineales',
     questionsCount: 10,
@@ -285,38 +244,16 @@ export class Estudiante {
   );
 
   // ── Preguntas Recientes en Foros ─────────────────────────────────────────
-  public readonly forumQuestions = signal<ForumQuestion[]>([
-    {
-      id: 'q1',
-      title: '¿Cómo resuelvo integrales por partes?',
-      tagText: 'Respondido por Prof. Martínez',
-      tagClass: 'badge-teacher',
-      tagIcon: 'bi bi-check-circle-fill',
-      timeAgo: 'Hace 2 horas',
-      subject: 'Matemáticas',
-      authorName: 'Camila Torres',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-      avatarFallbackBg: '#eff6ff',
-      avatarFallbackColor: '#1d4ed8',
-      initials: 'CT',
-    },
-    {
-      id: 'q2',
-      title: 'Duda sobre las características del Barroco',
-      tagText: '2 respuestas de estudiantes',
-      tagClass: 'badge-students',
-      tagIcon: 'bi bi-chat-left-dots-fill',
-      timeAgo: 'Hace 5 horas',
-      subject: 'Historia',
-      authorName: 'Mateo Gómez',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-      avatarFallbackBg: '#fef3c7',
-      avatarFallbackColor: '#b45309',
-      initials: 'MG',
-    },
-  ]);
+  public readonly forumQuestions = computed<ForumQuestion[]>(() => this.forumService.posts().slice(0, 3).map((post) => ({
+    id: post.id, title: post.title,
+    tagText: post.isTeacherVerified ? 'Publicación docente' : `${post.repliesCount} respuestas`,
+    tagClass: post.isTeacherVerified ? 'badge-teacher' : 'badge-students',
+    tagIcon: post.isTeacherVerified ? 'bi bi-check-circle-fill' : 'bi bi-chat-left-dots-fill',
+    timeAgo: post.createdAt, subject: post.subject, authorName: post.author.name,
+    avatar: post.author.avatar ?? '', initials: post.author.initials,
+    avatarFallbackBg: 'var(--color-primary-50)', avatarFallbackColor: 'var(--color-primary)',
+  })));
 
-  // ── Panel Lateral Derecho: Asistente de Aprendizaje IA ────────────────────
   public readonly chatMessages = signal<ChatMessage[]>([
     {
       id: 'welcome',
@@ -343,6 +280,10 @@ export class Estudiante {
   public readonly avatarErrors = signal<Set<string>>(new Set());
 
   constructor() {
+    effect(() => {
+      const state = this.academicSync.snapshot();
+      if (state || this.academicSync.enabled()) this.notifications.set(state?.notifications ?? []);
+    });
     this.initializeUserData();
 
     this.destroyRef.onDestroy(() => {
@@ -439,23 +380,28 @@ export class Estudiante {
   }
 
   public onMarkNotificationAsRead(id: string): void {
+    this.academicSync.receipt(id, true);
     this.notifications.update((list) =>
       list.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
   }
 
   public onToggleNotificationRead(id: string): void {
+    const notice = this.notifications().find((item) => item.id === id);
+    if (notice) this.academicSync.receipt(id, !notice.read);
     this.notifications.update((list) =>
       list.map((n) => (n.id === id ? { ...n, read: !n.read } : n))
     );
   }
 
   public onMarkAllNotificationsAsRead(): void {
+    this.notifications().filter((notice) => !notice.read).forEach((notice) => this.academicSync.receipt(notice.id, true));
     this.notifications.update((list) => list.map((n) => ({ ...n, read: true })));
     this.showToast('Todas las notificaciones marcadas como leídas.');
   }
 
   public onDeleteNotification(id: string): void {
+    this.academicSync.receipt(id, true, true);
     this.notifications.update((list) => list.filter((n) => n.id !== id));
     this.showToast('Notificación eliminada de tu bandeja.');
   }
@@ -463,7 +409,8 @@ export class Estudiante {
   public onNotificationSelected(item: StudentNotification): void {
     if (item.actionRoute) {
       if (item.actionRoute.startsWith('/')) {
-        this.router.navigate([item.actionRoute]);
+        if (item.actionRoute === '/estudiante') this.activeNav.set('dashboard');
+        this.router.navigateByUrl(item.actionRoute);
       } else {
         this.selectNav(item.actionRoute);
       }
@@ -474,6 +421,8 @@ export class Estudiante {
   }
 
   public onStartExam(): void {
+    const exam = this.publishedExams()[0];
+    if (exam) { this.publications()?.openExam(exam.id); return; }
     this.showToast(`Iniciando ${this.practiceExam().title}: ${this.practiceExam().topic}`);
   }
 

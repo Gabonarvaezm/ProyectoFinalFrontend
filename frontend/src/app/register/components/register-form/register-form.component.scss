@@ -1,3 +1,5 @@
+@use '../../../../styles/auth-fields' as auth-fields;
+
 :host {
   display: block;
   width: 100%;
@@ -118,7 +120,9 @@
   }
 
   .form-input {
+    @include auth-fields.autofill;
     width: 100%;
+    box-sizing: border-box;
     height: 42px;
     padding: 0 2.6rem;
     font-size: var(--font-size-sm);
@@ -131,7 +135,8 @@
     transition: var(--transition-fast);
 
     &::placeholder {
-      color: var(--color-slate-400);
+      opacity: 1;
+      color: var(--color-text-muted);
     }
 
     &:focus {
@@ -146,7 +151,7 @@
 
     &.is-invalid {
       border-color: var(--color-danger);
-      background-color: #fffbfa;
+      background-color: var(--color-auth-invalid-bg);
 
       &:focus {
         box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
@@ -155,6 +160,7 @@
 
     &.form-select {
       cursor: pointer;
+      option { background-color: var(--color-bg-surface); color: var(--color-text-main); }
       padding-right: 1.5rem;
     }
   }
@@ -291,7 +297,7 @@
   width: 100%;
   height: 46px;
   margin-top: var(--space-2);
-  background-color: var(--color-primary-700);
+  background-color: var(--color-auth-action-bg);
   color: var(--color-white);
   border: none;
   border-radius: var(--radius-md);
@@ -307,7 +313,7 @@
   transition: var(--transition-fast);
 
   &:hover:not(:disabled) {
-    background-color: var(--color-primary-800);
+    background-color: var(--color-auth-action-hover);
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }
