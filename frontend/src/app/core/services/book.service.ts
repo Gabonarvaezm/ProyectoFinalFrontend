@@ -1,3 +1,5 @@
+import { AuthService } from './auth.service';
+import { LocalPersistenceService } from './local-persistence.service';
 import { effect } from '@angular/core';
 import { AcademicSyncService } from './academic-sync.service';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
@@ -14,13 +16,16 @@ import { STORAGE_KEYS } from '../models/auth.model';
   providedIn: 'root',
 })
 export class BookService {
+  private readonly storage = inject(LocalPersistenceService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly auth = inject(AuthService);
   private readonly sync = inject(AcademicSyncService);
 
   public readonly books = signal<Book[]>(this.loadInitialBooks());
   public readonly bookmarkedIds = signal<Set<string>>(this.loadInitialBookmarks());
 
   constructor() {
+    effect(() => { this.auth.currentUser(); this.bookmarkedIds.set(this.loadInitialBookmarks()); });
     effect(() => {
       const state = this.sync.snapshot();
       if (!state) {
@@ -32,9 +37,10 @@ export class BookService {
   }
 
   private loadInitialBooks(): Book[] {
+    if (this.sync.enabled()) return this.sync.snapshot()?.books ?? [];
     if (isPlatformBrowser(this.platformId)) {
       try {
-        const stored = localStorage.getItem(STORAGE_KEYS.BOOKS);
+        const stored = this.storage.readText(STORAGE_KEYS.BOOKS);
         if (stored) {
           const parsed = JSON.parse(stored) as Book[];
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -48,10 +54,12 @@ export class BookService {
     return INITIAL_BOOKS;
   }
 
+  private bookmarkKey(): string { return this.sync.enabled() ? `${STORAGE_KEYS.BOOKMARKS}:${this.auth.currentUser()?.id ?? 'guest'}` : STORAGE_KEYS.BOOKMARKS; }
+
   private loadInitialBookmarks(): Set<string> {
     if (isPlatformBrowser(this.platformId)) {
       try {
-        const stored = localStorage.getItem(STORAGE_KEYS.BOOKMARKS);
+        const stored = this.storage.readText(this.bookmarkKey());
         if (stored) {
           const parsed = JSON.parse(stored) as string[];
           if (Array.isArray(parsed)) {
@@ -62,13 +70,14 @@ export class BookService {
         console.warn('[BookService] Error al leer marcadores de localStorage:', err);
       }
     }
-    return new Set(['bk-1', 'bk-3']);
+    return this.sync.enabled() ? new Set() : new Set(['bk-1', 'bk-3']);
   }
 
   private persistBooks(): void {
+    if (this.sync.enabled()) return;
     if (isPlatformBrowser(this.platformId)) {
       try {
-        localStorage.setItem(STORAGE_KEYS.BOOKS, JSON.stringify(this.books()));
+        this.storage.writeText(STORAGE_KEYS.BOOKS, JSON.stringify(this.books()));
       } catch (err) {
         console.warn('[BookService] Error al persistir libros en localStorage:', err);
       }
@@ -78,8 +87,8 @@ export class BookService {
   private persistBookmarks(): void {
     if (isPlatformBrowser(this.platformId)) {
       try {
-        localStorage.setItem(
-          STORAGE_KEYS.BOOKMARKS,
+        this.storage.writeText(
+          this.bookmarkKey(),
           JSON.stringify(Array.from(this.bookmarkedIds()))
         );
       } catch (err) {

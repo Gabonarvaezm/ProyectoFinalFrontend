@@ -1,0 +1,15 @@
+import express from 'express';
+import { mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { randomUUID } from 'node:crypto';
+import { AcademicStore, createAcademicRouter } from '../src/server/academic-api.mjs';
+const directory = resolve('tmp/e2e');
+mkdirSync(directory, { recursive: true });
+const store = new AcademicStore(resolve(directory, `${randomUUID()}.sqlite`));
+const app = express();
+app.get('/api/academic/health', (_req, res) => res.json({ ready: true }));
+app.use('/api/academic', createAcademicRouter({ store }));
+app.use(express.static(resolve('dist/DiscerIA/browser')));
+app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(resolve('dist/DiscerIA/browser/index.html')));
+const server = app.listen(4310, '127.0.0.1', () => process.send?.('ready'));
+process.on('message', (message) => { if (message === 'stop') server.close(() => { store.close(); process.exit(0); }); });

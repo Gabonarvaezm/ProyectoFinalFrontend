@@ -1,0 +1,26 @@
+@if (exams().length || messages().length) {
+  <section aria-labelledby="teacher-publications-title">
+    <h2 id="teacher-publications-title">Publicaciones de tus docentes</h2>
+    @for (exam of exams(); track exam.id) {
+      <details #examDetails [attr.data-exam-id]="exam.id">
+        <summary>
+          <i class="bi bi-journal-check" aria-hidden="true"></i> {{ exam.title }}
+          <span>Examen · {{ exam.subject }}</span>
+        </summary>
+        <p>{{ exam.authorName }} · {{ exam.topic }}</p>
+        <p>{{ exam.questionsCount }} preguntas · {{ exam.durationMinutes }} minutos · Dificultad {{ exam.difficulty }}</p>
+        <p class="content">{{ exam.instructions || 'El docente aún no ha añadido instrucciones.' }}</p>
+      </details>
+    }
+    @for (message of messages(); track message.id) {
+      <details [class.urgent]="message.priority === 'urgent'">
+        <summary>
+          <i class="bi bi-megaphone" aria-hidden="true"></i> {{ message.subject }}
+          <span>{{ message.priority === 'urgent' ? 'Urgente' : 'Comunicado' }}</span>
+        </summary>
+        <p>{{ message.authorName }}</p>
+        <p class="content">{{ message.message }}</p>
+      </details>
+    }
+  </section>
+}

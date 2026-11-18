@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './core/services/theme.service';
 import { AcademicSyncService } from './core/services/academic-sync.service';
 import { AcademicSyncStatusComponent } from './shared/components/academic-sync-status/academic-sync-status.component';
+import { LocalPersistenceService } from './core/services/local-persistence.service';
 
 @Component({
   imports: [RouterOutlet, AcademicSyncStatusComponent],
@@ -12,6 +13,7 @@ import { AcademicSyncStatusComponent } from './shared/components/academic-sync-s
 })
 export class App {
   protected readonly academicSync = inject(AcademicSyncService);
+  protected readonly localStorageState = inject(LocalPersistenceService);
   constructor() {
     inject(ThemeService);
     this.academicSync.start();

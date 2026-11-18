@@ -1,4 +1,5 @@
 import { effect, viewChild } from '@angular/core';
+import { AcademicProgressComponent } from '../tarea/components/academic-progress.component';
 import { AcademicSyncService } from '../core/services/academic-sync.service';
 import { ForumService } from '../core/services/forum.service';
 import { EstudiantePublicationsComponent } from './components/estudiante-publications/estudiante-publications.component';
@@ -63,6 +64,7 @@ export type {
 
 @Component({
   imports: [
+    AcademicProgressComponent,
     EstudiantePublicationsComponent,
     ActionToastComponent,
     FormsModule,
@@ -85,6 +87,9 @@ export type {
 export class Estudiante {
   private readonly authService = inject(AuthService);
   private readonly academicSync = inject(AcademicSyncService);
+  readonly localDemo = this.academicSync.isLocalDemo;
+  readonly localTasks = computed(() => this.academicSync.snapshot()?.tareas ?? []);
+  viewTasks(): void { void this.router.navigate(['/tareas']); }
   private readonly forumService = inject(ForumService);
   private readonly publications = viewChild(EstudiantePublicationsComponent);
   readonly publishedExams = computed(() => this.academicSync.snapshot()?.exams ?? []);
@@ -310,31 +315,6 @@ export class Estudiante {
       return;
     }
 
-    // 2. Recuperación persistente SSR-safe desde localStorage
-    if (isPlatformBrowser(this.platformId)) {
-      try {
-        const storedUser = localStorage.getItem(STORAGE_KEYS.REGISTERED_USER);
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser) as {
-            fullName?: string;
-            email?: string;
-            institution?: string;
-            role?: string;
-          };
-          if (parsed?.fullName) {
-            this.studentName.set(parsed.fullName);
-          }
-          if (parsed?.email) {
-            this.studentEmail.set(parsed.email);
-          }
-          if (parsed?.institution) {
-            this.studentInstitution.set(parsed.institution);
-          }
-        }
-      } catch {
-        // En caso de error de lectura, mantiene los valores predeterminados
-      }
-    }
   }
 
   // ── Métodos de Interacción ───────────────────────────────────────────────

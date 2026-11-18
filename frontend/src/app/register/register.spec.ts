@@ -1,3 +1,4 @@
+import { ACADEMIC_MODE } from '../core/services/academic-mode';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -15,7 +16,7 @@ describe('Register Component (Smart Parent & Presentational Child Nodes)', () =>
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Register, RegisterHeroComponent, RegisterFormComponent],
-      providers: [provideRouter([]), provideNoopAnimations(), provideHttpClient(), provideHttpClientTesting()],
+      providers: [{ provide: ACADEMIC_MODE, useValue: 'server' }, provideRouter([]), provideNoopAnimations(), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     parentFixture = TestBed.createComponent(Register);

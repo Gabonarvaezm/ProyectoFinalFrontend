@@ -131,6 +131,7 @@
       </div>
     </div>
 
+    @if (!localDemo) {
     <!-- Contraseña -->
     <div class="form-group">
       <label for="password" class="form-label">
@@ -224,6 +225,7 @@
       </div>
     }
 
+    } @else { <p role="note">Crea un perfil local de demostración. Accederás con tu correo, sin contraseña. No utilices datos sensibles.</p> }
     <!-- Aceptar Términos y Condiciones -->
     <div class="terms-group">
       <label class="checkbox-label" for="acceptTerms">

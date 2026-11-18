@@ -1,19 +1,19 @@
 :host {
   display: block;
-  position: static;
-  width: 340px;
-  min-width: 300px;
+  width: 100%;
   max-width: 360px;
-  flex: 0 0 340px;
   margin: 0;
   padding: 0;
+
+  @media (max-width: 1024px) {
+    max-width: 100%;
+  }
 }
 
 .widgets-column {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  position: static;
   width: 100%;
 }
 
@@ -23,11 +23,12 @@
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
 }
 
 /* ── Tarjeta Asistente IA ── */
 .ai-assistant-widget {
-  border-color: #c7d2fe;
+  border-color: var(--color-ai-300);
   background: linear-gradient(180deg, var(--color-ai-50) 0%, var(--color-bg-surface) 40%);
 }
 
@@ -60,7 +61,7 @@
 
 .widget-subtitle {
   font-size: var(--font-size-xs);
-  color: var(--color-ai-600);
+  color: var(--color-forum-teacher-text);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -69,7 +70,7 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.05em;
-  color: var(--color-ai-700);
+  color: var(--color-forum-teacher-text);
   margin-bottom: var(--space-2);
 }
 
@@ -94,7 +95,7 @@
   gap: var(--space-1);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-ai-600);
+  color: var(--color-forum-teacher-text);
   background: transparent;
   border: none;
   padding: 0;
@@ -117,7 +118,7 @@
 
   .widget-icon {
     font-size: 0.95rem;
-    color: var(--color-slate-400);
+    color: var(--color-text-muted);
   }
 
   .widget-title-sm {
@@ -171,7 +172,7 @@
 
     .related-meta {
       font-size: var(--font-size-xs);
-      color: var(--color-slate-400);
+      color: var(--color-text-muted);
     }
   }
 }

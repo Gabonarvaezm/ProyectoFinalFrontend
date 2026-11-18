@@ -1,5 +1,13 @@
 <header class="config-header">
   <div class="header-titles">
+    @if (!isEmbedded()) {
+      <div class="header-nav-back">
+        <a [routerLink]="dashboardRoute()" class="btn-back" aria-label="Regresar al panel principal">
+          <i class="bi bi-arrow-left" aria-hidden="true"></i>
+          <span>Volver al Dashboard</span>
+        </a>
+      </div>
+    }
     <div class="title-with-badge">
       <h1 class="main-title">Configuración del Sistema</h1>
       <span
@@ -14,4 +22,3 @@
     </p>
   </div>
 </header>
-

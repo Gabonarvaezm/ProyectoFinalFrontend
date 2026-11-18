@@ -1,5 +1,7 @@
 <aside
   class="ai-assistant-panel"
+  [hidden]="!isOpen()"
+  [inert]="!isOpen()"
   [class.drawer-open]="isOpen()"
   role="region"
   aria-label="Asistente de Inteligencia Artificial"

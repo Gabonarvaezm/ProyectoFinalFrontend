@@ -5,7 +5,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <aside class="sidebar" aria-label="Navegación institucional de DiscerIA">
       <div class="sidebar-top">
-        <a routerLink="/" class="brand-link" aria-label="Ir a inicio de DiscerIA">
+        <a routerLink="/" class="brand-link">
           <div class="brand-icon">
             <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
           </div>
@@ -112,7 +112,7 @@
             aria-label="Ver avisos de tareas"
           >
             <i class="bi bi-bell" aria-hidden="true"></i>
-            <span class="notification-indicator" aria-hidden="true"></span>
+            @if (unreadNotices()) { <span class="notification-indicator" aria-hidden="true"></span> }
           </button>
 
           <a
@@ -128,7 +128,7 @@
             routerLink="/configuracion"
             class="user-profile-badge"
             [title]="userName() + (isProfessor() ? ' (Docente)' : ' (Estudiante)')"
-            aria-label="Perfil del usuario"
+            [attr.aria-label]="userInitials() + ': Perfil de ' + userName()"
           >
             <div class="user-avatar-initials" aria-hidden="true">{{ userInitials() }}</div>
           </a>
@@ -177,6 +177,17 @@
     </section>
 
     <!-- NODO HIJO 1: Filtros de Estado, Materia y Búsqueda -->
+    @if (noticesOpen()) {
+      <section class="empty-state-box" aria-labelledby="task-notices-title">
+        <h2 id="task-notices-title">Avisos de tareas</h2>
+        @for (notice of taskNotices(); track notice.id) {
+          <article><h3>{{ notice.title }}</h3><p>{{ notice.message }}</p>
+            @if (!notice.read) { <button type="button" class="btn-reset-filters" (click)="markNoticeRead(notice.id)">Marcar como leído</button> }
+          </article>
+        } @empty { <p>No tienes avisos de tareas.</p> }
+      </section>
+    }
+    <app-academic-progress [tareas]="tareas()" [professor]="isProfessor()" />
     <app-tarea-filters
       [selectedStatus]="selectedStatus()"
       [selectedSubject]="selectedSubject()"
@@ -244,6 +255,7 @@
   [isSubmitting]="isSubmitting()"
   (closeModal)="closeSubmitModal()"
   (tareaSubmitted)="handleSubmitTarea($event)"
+  (draftSaved)="handleDraft($event)"
 />
 
 <!-- Detalle de Tarea & Calificación Docente -->
@@ -254,9 +266,11 @@
   (closeModal)="closeDetailModal()"
   (deliverClicked)="closeDetailModal(); openSubmitModal($event)"
   (gradeSubmitted)="handleGradeTarea($event)"
+  (reviewRequested)="handleReview($event)"
+  (correctionRequested)="handleCorrection($event)"
 />
 
 <!-- Notificación Toast Flotante -->
 @if (toastMessage(); as message) {
-    <app-action-toast [message]="message" tone="success" />
+    <app-action-toast [message]="message" [tone]="toastTone()" />
   }

@@ -1,22 +1,23 @@
+import { DialogFocusDirective } from '../dialog-focus.directive';
+import { TaskFileComponent } from '../task-file.component';
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
+  signal,
+  computed,
   inject,
   input,
   output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { UpperCasePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GradeTareaDto, Tarea } from '../../models/tarea.model';
 
 @Component({
   selector: 'app-tarea-detail-modal',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [UpperCasePipe, ReactiveFormsModule, TaskFileComponent, DialogFocusDirective],
   templateUrl: './tarea-detail-modal.component.html',
   styleUrl: './tarea-detail-modal.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TareaDetailModalComponent {
   private readonly fb = inject(FormBuilder);
@@ -25,6 +26,25 @@ export class TareaDetailModalComponent {
   public readonly tarea = input<Tarea | null>(null);
   public readonly isProfessor = input<boolean>(false);
 
+  readonly selectedId = signal('');
+  readonly selectedSubmission = computed(() => {
+    const task = this.tarea();
+    return this.isProfessor() ? task?.submissions?.find((item) => item.id === this.selectedId()) ?? task?.mySubmission : task?.mySubmission;
+  });
+  readonly selectedTask = computed(() => {
+    const task = this.tarea();
+    const submission = this.selectedSubmission();
+    const recipient = task?.recipients?.find((item) => item.studentId === submission?.studentId);
+    return task ? { ...task, mySubmission: submission, status: recipient?.status ?? task.status } : null;
+  });
+  readonly reviewRequested = output<string>();
+  readonly correctionRequested = output<{ submissionId: string; feedback: string }>();
+  requestCorrection(): void {
+    const submission = this.selectedSubmission();
+    const feedback = String(this.gradeForm.value.feedback ?? '').trim();
+    if (submission && feedback) this.correctionRequested.emit({ submissionId: submission.id, feedback });
+    else this.gradeForm.controls['feedback'].markAsTouched();
+  }
   public readonly closeModal = output<void>();
   public readonly deliverClicked = output<Tarea>();
   public readonly gradeSubmitted = output<GradeTareaDto>();
@@ -36,7 +56,9 @@ export class TareaDetailModalComponent {
 
   constructor() {
     effect(() => {
-      const currentTarea = this.tarea();
+      const currentTarea = this.selectedTask();
+      this.gradeForm.controls['grade'].setValidators([Validators.required, Validators.min(0), Validators.max(currentTarea?.maxScore ?? 100)]);
+      this.gradeForm.controls['grade'].updateValueAndValidity();
       if (currentTarea?.mySubmission?.grade !== undefined) {
         this.gradeForm.patchValue({
           grade: currentTarea.mySubmission.grade,
@@ -52,7 +74,7 @@ export class TareaDetailModalComponent {
   }
 
   public onSubmitGrade(): void {
-    if (this.gradeForm.invalid || !this.tarea() || !this.tarea()?.mySubmission) {
+    if (this.gradeForm.invalid || !this.tarea() || !this.selectedSubmission()) {
       this.gradeForm.markAllAsTouched();
       return;
     }
@@ -60,7 +82,8 @@ export class TareaDetailModalComponent {
     const val = this.gradeForm.value;
     this.gradeSubmitted.emit({
       tareaId: this.tarea()!.id,
-      submissionId: this.tarea()!.mySubmission!.id,
+      submissionId: this.selectedSubmission()!.id,
+      revision: this.selectedSubmission()!.revision,
       grade: Number(val.grade),
       feedback: val.feedback.trim(),
     });

@@ -3,13 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "node scripts/start.mjs",
+    "start": "ng serve",
     "start:api": "node --watch scripts/serve-api.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:api": "node --test scripts/chatbot-api.test.mjs scripts/server-environment.test.mjs scripts/academic-api.test.mjs",
-    "serve:ssr:DiscerIA": "node dist/DiscerIA/server/server.mjs"
+    "serve:ssr:DiscerIA": "node dist/DiscerIA/server/server.mjs",
+    "test:e2e": "node scripts/run-academic-e2e.mjs",
+    "start:server": "node scripts/start.mjs --configuration server",
+    "test:e2e:local": "node scripts/run-local-e2e.mjs"
   },
   "private": true,
   "packageManager": "npm@11.13.0",
@@ -33,6 +36,8 @@
     "@angular/build": "^22.2.2",
     "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.2.0",
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
     "@types/express": "^5.0.1",
     "@types/node": "^22.12.0",
     "jsdom": "^30.0.0",

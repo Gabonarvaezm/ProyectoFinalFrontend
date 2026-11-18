@@ -189,7 +189,7 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
-  background: var(--color-primary-700);
+  background: var(--color-auth-action-bg);
   color: var(--color-white);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -199,7 +199,7 @@
   transition: var(--transition-fast);
 
   &:hover {
-    background-color: var(--color-primary-800);
+    background-color: var(--color-auth-action-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
   }
@@ -238,32 +238,36 @@
     }
   }
 
-  @media (max-width: 1280px) {
+  @media (max-width: 1024px) {
     flex-direction: column;
     padding: var(--space-4);
     gap: var(--space-6);
   }
 }
 
-
 .feed-column {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   flex: 1 1 0%;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
   position: static;
 }
 
 app-foro-ai-widget {
   display: block;
-  position: static;
+  position: sticky;
+  top: calc(var(--header-height, 70px) + var(--space-6));
   width: 340px;
-  min-width: 300px;
+  min-width: 320px;
   max-width: 360px;
   flex: 0 0 340px;
 
-  @media (max-width: 1280px) {
+  @media (max-width: 1024px) {
+    position: static;
     width: 100%;
     min-width: 100%;
     max-width: 100%;
@@ -272,14 +276,43 @@ app-foro-ai-widget {
 }
 
 .feed-header {
-  margin-bottom: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+
+  .feed-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+    border: 1px solid var(--color-primary-200);
+    margin-bottom: var(--space-2);
+  }
 
   .forum-title {
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-extrabold);
     color: var(--color-slate-900);
     letter-spacing: -0.025em;
-    margin: 0 0 var(--space-1);
+    margin: 0 0 var(--space-2);
     line-height: var(--line-height-tight);
   }
 
@@ -288,13 +321,46 @@ app-foro-ai-widget {
     color: var(--color-text-secondary);
     margin: 0;
     line-height: var(--line-height-base);
+    max-width: 680px;
+  }
+
+  .btn-new-topic {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.75rem 1.25rem;
+    background: var(--color-auth-action-bg);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+    transition: var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-auth-action-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
   }
 }
 
 .posts-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 .empty-state-card {
@@ -332,7 +398,7 @@ app-foro-ai-widget {
     align-items: center;
     gap: var(--space-2);
     padding: 0.625rem 1.25rem;
-    background-color: var(--color-primary-700);
+    background-color: var(--color-auth-action-bg);
     color: var(--color-white);
     border-radius: var(--radius-md);
     font-weight: var(--font-weight-semibold);
@@ -342,7 +408,7 @@ app-foro-ai-widget {
     transition: var(--transition-fast);
 
     &:hover {
-      background-color: var(--color-primary-800);
+      background-color: var(--color-auth-action-hover);
     }
   }
 }

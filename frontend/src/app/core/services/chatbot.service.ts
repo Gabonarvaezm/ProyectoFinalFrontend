@@ -1,3 +1,4 @@
+import { LocalPersistenceService } from './local-persistence.service';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
@@ -9,6 +10,7 @@ import { STORAGE_KEYS } from '../models/auth.model';
 @Injectable({ providedIn: 'root' })
 export class ChatbotService {
   private readonly http = inject(HttpClient);
+  private readonly storage = inject(LocalPersistenceService);
   private readonly platformId = inject(PLATFORM_ID);
 
   public readonly sessions = signal<ChatSession[]>(this.loadStoredSessions());
@@ -47,7 +49,7 @@ export class ChatbotService {
   public loadStoredSessions(): ChatSession[] {
     if (isPlatformBrowser(this.platformId)) {
       try {
-        const stored = localStorage.getItem(STORAGE_KEYS.CHAT_SESSIONS);
+        const stored = this.storage.readText(STORAGE_KEYS.CHAT_SESSIONS);
         if (stored) {
           const parsed = JSON.parse(stored) as ChatSession[];
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -90,7 +92,7 @@ export class ChatbotService {
   public persistSessions(sessions: ChatSession[]): void {
     if (isPlatformBrowser(this.platformId)) {
       try {
-        localStorage.setItem(STORAGE_KEYS.CHAT_SESSIONS, JSON.stringify(sessions));
+        this.storage.writeText(STORAGE_KEYS.CHAT_SESSIONS, JSON.stringify(sessions));
       } catch (err) {
         console.warn('[ChatbotService] Error al persistir sesiones:', err);
       }

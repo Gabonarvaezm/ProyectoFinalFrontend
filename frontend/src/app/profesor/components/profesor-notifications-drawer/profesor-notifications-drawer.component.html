@@ -1,5 +1,7 @@
 <aside
   class="notifications-drawer"
+  [hidden]="!isOpen()"
+  [inert]="!isOpen()"
   [class.drawer-open]="isOpen()"
   role="region"
   aria-label="Panel lateral de notificaciones académicas"

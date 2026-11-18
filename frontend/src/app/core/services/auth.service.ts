@@ -1,7 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Injectable, computed, inject, PLATFORM_ID, signal } from '@angular/core';
-import { Observable, throwError, tap, catchError, switchMap } from 'rxjs';
+import { Injectable, computed, inject, PLATFORM_ID, DestroyRef, signal } from '@angular/core';
+import { Observable, throwError, tap, catchError, defer } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { ACADEMIC_MODE } from './academic-mode';
+import { LocalAcademicRepository } from './local-academic.repository';
+import { LocalPersistenceService } from './local-persistence.service';
 import { AUTH_ROUTES } from '../constants/auth.constants';
 import {
   AuthResponse,
@@ -45,172 +48,95 @@ export const MOCK_USERS: MockAccount[] = [
   },
 ];
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly http = inject(HttpClient);
-  private readonly _sessionToken = signal<string | null>(this.loadToken());
-  public readonly sessionToken = this._sessionToken.asReadonly();
-  private readonly _currentUser = signal<User | null>(this.loadActiveSession());
+  private readonly mode = inject(ACADEMIC_MODE);
+  private readonly local = inject(LocalAcademicRepository);
+  private readonly storage = inject(LocalPersistenceService);
+  readonly isLocalDemo = this.mode === 'local';
+  private readonly restored = this.restore();
+  private readonly _sessionToken = signal<string | null>(this.restored?.token ?? null);
+  private readonly _currentUser = signal<User | null>(this.restored?.user ?? null);
+  readonly sessionToken = this._sessionToken.asReadonly();
+  readonly currentUser = this._currentUser.asReadonly();
+  readonly isAuthenticated = computed(() => this.currentUser() !== null);
+  readonly isProfessor = computed(() => this.currentUser()?.role === 'professor');
+  readonly isStudent = computed(() => this.currentUser()?.role === 'student');
+  readonly dashboardRoute = computed(() => this.isProfessor() ? AUTH_ROUTES.PROFESSOR : AUTH_ROUTES.STUDENT);
 
-  public readonly currentUser = this._currentUser.asReadonly();
-  public readonly isAuthenticated = computed(() => this._currentUser() !== null);
-  public readonly isProfessor = computed(() => this._currentUser()?.role === 'professor');
-  public readonly isStudent = computed(() => this._currentUser()?.role === 'student');
-  public readonly dashboardRoute = computed(() =>
-    this.isProfessor() ? AUTH_ROUTES.PROFESSOR : AUTH_ROUTES.STUDENT
-  );
-
-  /**
-   * Carga la sesión activa almacenada previamente en localStorage
-   */
-  private loadActiveSession(): User | null {
-    if (isPlatformBrowser(this.platformId)) {
-      try {
-        const storedSession = localStorage.getItem(STORAGE_KEYS.ACTIVE_SESSION);
-        if (storedSession) {
-          return JSON.parse(storedSession) as User;
-        }
-      } catch (err) {
-        console.warn('[AuthService] No se pudo restaurar la sesión:', err);
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Autenticación con credenciales institucionales.
-   * El servidor valida la contraseña y determina el rol de la cuenta registrada.
-   */
-  public login(credentials: LoginCredentials): Observable<AuthResponse> {
-    const { email, password } = credentials;
-
-    if (!email || !password) {
-      return throwError(() => new Error('Credenciales incompletas.'));
-    }
-
-    const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail.includes('@') || password.length < 6) {
-      return throwError(
-        () => new Error('Credenciales no válidas o contraseña inferior a 6 caracteres.')
-      );
-    }
-
-    const registeredData = this.getRegisteredUserData(trimmedEmail);
-    const request = () => this.http.post<AuthResponse>('/api/academic/login', { email: trimmedEmail, password });
-    return request().pipe(
-      catchError((error: unknown) => {
-        if (!(error instanceof HttpErrorResponse) || error.status !== 401 || !registeredData) return throwError(() => this.toError(error));
-        return this.http.post('/api/academic/register', { ...registeredData, password }).pipe(
-          catchError(() => throwError(() => this.toError(error))),
-          switchMap(() => request())
-        );
-      }),
-      tap((res) => {
-        this._sessionToken.set(res.token);
-        if (isPlatformBrowser(this.platformId)) localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, res.token);
-      }),
-      tap((res) => {
-        this._currentUser.set(res.user);
-        if (isPlatformBrowser(this.platformId)) {
-          // Persistencia de la sesión activa en LocalStorage
-          try {
-            localStorage.setItem(STORAGE_KEYS.ACTIVE_SESSION, JSON.stringify(res.user));
-            if (credentials.rememberMe) {
-              localStorage.setItem(STORAGE_KEYS.USER_EMAIL, trimmedEmail);
-            }
-          } catch (e) {
-            console.warn('[AuthService] Error al persistir sesión en localStorage:', e);
+  constructor() {
+    if (this.isLocalDemo && isPlatformBrowser(this.platformId)) {
+      const changed = (event: StorageEvent) => {
+        if (event.key === STORAGE_KEYS.LOCAL_SESSION || event.key === STORAGE_KEYS.LOCAL_ACADEMIC || event.key === null) {
+          const session = this.restore();
+          if (session?.user.id !== this.currentUser()?.id) {
+            this._currentUser.set(session?.user ?? null); this._sessionToken.set(session?.token ?? null);
           }
         }
-      })
-    );
-  }
-
-  /**
-   * Cierre de sesión y limpieza reactiva en LocalStorage
-   */
-  public logout(): void {
-    this._currentUser.set(null);
-    this._sessionToken.set(null);
-    if (isPlatformBrowser(this.platformId)) {
-      try {
-        localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
-        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.USER_EMAIL);
-      } catch (e) {
-        console.warn('[AuthService] Error al limpiar storage en logout:', e);
-      }
+      };
+      window.addEventListener('storage', changed);
+      inject(DestroyRef).onDestroy(() => window.removeEventListener('storage', changed));
     }
   }
-
-  /**
-   * Verifica si el usuario autenticado posee un rol determinado
-   */
-  public hasRole(role: 'student' | 'professor' | 'admin'): boolean {
-    const user = this._currentUser();
-    return !!user && (user.role === role || user.role === 'admin');
-  }
-
-  /**
-   * Retorna el rol actual del usuario autenticado
-   */
-  public getCurrentRole(): 'student' | 'professor' | 'admin' | null {
-    return this._currentUser()?.role ?? null;
-  }
-
-  /**
-   * Lee de forma segura los datos del usuario registrado desde localStorage
-   */
-  public getRegisteredUserData(email: string): RegisteredUserData | null {
+  private restore(): AuthResponse | null {
     if (!isPlatformBrowser(this.platformId)) return null;
-
     try {
-      const stored = localStorage.getItem(STORAGE_KEYS.REGISTERED_USER);
-      if (!stored) return null;
-
-      const data = JSON.parse(stored) as RegisteredUserData;
-      if (data?.email && data.email.toLowerCase() === email.trim().toLowerCase()) {
-        return data;
-      }
-    } catch (e) {
-      console.warn('[AuthService] Error al leer usuario registrado de storage:', e);
+      if (this.isLocalDemo) return this.local.session();
+      const token = this.storage.readText(STORAGE_KEYS.AUTH_TOKEN);
+      const user = this.storage.read<User | null>(STORAGE_KEYS.ACTIVE_SESSION, null);
+      return token && !token.startsWith('local-') && user ? { token, user } : null;
+    } catch (error: unknown) {
+      // The storage service exposes a persistent visible error; never substitute another account.
+      console.error('[AuthService] No se pudo restaurar la sesión.', error); return null;
     }
-
-    return null;
   }
-
-  /**
-   * Obtiene el rol del usuario registrado para un correo específico
-   */
-  public getRegisteredUserRole(email: string): string | null {
-    const data = this.getRegisteredUserData(email);
-    if (data?.role) return data.role;
-
-    const mock = MOCK_USERS.find((m) => m.user.email.toLowerCase() === email.trim().toLowerCase());
-    return mock?.user.role ?? null;
+  login(credentials: LoginCredentials): Observable<AuthResponse> {
+    const email = credentials.email.trim().toLowerCase();
+    if (!email.includes('@')) return throwError(() => new Error('Correo no válido.'));
+    const request = this.isLocalDemo ? defer(() => [this.local.login(email)])
+      : !credentials.password || credentials.password.length < 6 ? throwError(() => new Error('Credenciales incompletas.'))
+      : this.http.post<AuthResponse>('/api/academic/login', { email, password: credentials.password });
+    return request.pipe(tap((res) => {
+      if (!this.isLocalDemo && isPlatformBrowser(this.platformId)) {
+        this.storage.writeText(STORAGE_KEYS.AUTH_TOKEN, res.token);
+        this.storage.write(STORAGE_KEYS.ACTIVE_SESSION, res.user);
+      }
+      if (credentials.rememberMe && isPlatformBrowser(this.platformId)) this.storage.writeText(STORAGE_KEYS.USER_EMAIL, email);
+      this._currentUser.set(res.user); this._sessionToken.set(res.token);
+    }), catchError((error: unknown) => throwError(() => this.toError(error))));
   }
-
-  public register(data: RegisteredUserData & { password: string }): Observable<{ user: User }> {
+  register(data: RegisteredUserData & { password: string }): Observable<{ user: User }> {
+    if (this.isLocalDemo) return defer(() => [{ user: this.local.register(data) }]);
     return this.http.post<{ user: User }>('/api/academic/register', data).pipe(
-      tap(({ user }) => {
-        if (isPlatformBrowser(this.platformId)) localStorage.setItem(STORAGE_KEYS.REGISTERED_USER, JSON.stringify(user));
-      }),
-      catchError((error: unknown) => throwError(() => this.toError(error)))
-    );
+      tap(({ user }) => { if (isPlatformBrowser(this.platformId)) this.storage.write(STORAGE_KEYS.REGISTERED_USER, user); }),
+      catchError((error: unknown) => throwError(() => this.toError(error))));
   }
-
-  private loadToken(): string | null {
+  logout(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      if (this.isLocalDemo) this.local.logout();
+      else { this.storage.remove(STORAGE_KEYS.ACTIVE_SESSION); this.storage.remove(STORAGE_KEYS.AUTH_TOKEN); }
+      this.storage.remove(STORAGE_KEYS.USER_EMAIL);
+    }
+    this._currentUser.set(null); this._sessionToken.set(null);
+  }
+  hasRole(role: User['role']): boolean { return this.currentUser()?.role === role || this.currentUser()?.role === 'admin'; }
+  getCurrentRole(): User['role'] | null { return this.currentUser()?.role ?? null; }
+  getRegisteredUserData(email: string): RegisteredUserData | null {
     if (!isPlatformBrowser(this.platformId)) return null;
-    try { return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN); } catch { return null; }
+    if (this.isLocalDemo) {
+      const user = this.local.profile(email);
+      return user ? { ...user, institution: user.institution ?? '' } : null;
+    }
+    const user = this.storage.read<RegisteredUserData | null>(STORAGE_KEYS.REGISTERED_USER, null);
+    return user?.email.toLowerCase() === email.trim().toLowerCase() ? user : null;
   }
-
+  getRegisteredUserRole(email: string): string | null { return this.getRegisteredUserData(email)?.role ?? MOCK_USERS.find((m) => m.user.email === email.trim().toLowerCase())?.user.role ?? null; }
   private toError(error: unknown): Error {
     if (error instanceof Error && !(error instanceof HttpErrorResponse)) return error;
     const detail: unknown = error instanceof HttpErrorResponse ? error.error : null;
     return new Error(typeof detail === 'object' && detail !== null && 'error' in detail && typeof detail.error === 'string'
-      ? detail.error : 'No se pudo conectar con el servidor. Intenta de nuevo.');
+      ? detail.error : 'No se pudo conectar con el servidor. Revisa la configuración del modo servidor.');
   }
 }

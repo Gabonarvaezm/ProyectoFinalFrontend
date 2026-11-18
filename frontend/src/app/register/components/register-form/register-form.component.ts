@@ -1,5 +1,5 @@
+import { ACADEMIC_MODE } from '../../../core/services/academic-mode';
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   inject,
@@ -44,14 +44,13 @@ const FIELD_REQUIRED_MESSAGES: Readonly<Record<string, string>> = {
 
 @Component({
   selector: 'app-register-form',
-  standalone: true,
   imports: [ReactiveFormsModule, RouterLink, LottieComponent],
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.scss',
   animations: [fadeInUp, fadeInOut],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterFormComponent {
+  readonly localDemo = inject(ACADEMIC_MODE) === 'local';
   private readonly fb = inject(FormBuilder);
 
   // Inputs desde el componente padre
@@ -128,6 +127,14 @@ export class RegisterFormComponent {
     },
     { validators: this.passwordMatchValidator }
   );
+
+  constructor() {
+    if (this.localDemo) {
+      this.registerForm.clearValidators();
+      for (const field of ['password', 'confirmPassword']) { this.registerForm.controls[field].clearValidators(); this.registerForm.controls[field].updateValueAndValidity(); }
+      this.registerForm.updateValueAndValidity();
+    }
+  }
 
   // Conexión reactiva a Signal para fortaleza de clave
   private readonly passwordSignal = toSignal(

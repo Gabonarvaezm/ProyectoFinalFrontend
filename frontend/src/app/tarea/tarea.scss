@@ -173,7 +173,7 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
-  background: var(--color-primary-700);
+  background: var(--color-auth-action-bg);
   color: var(--color-white);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -183,7 +183,7 @@
   transition: var(--transition-fast);
 
   &:hover {
-    background-color: var(--color-primary-800);
+    background-color: var(--color-auth-action-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
   }
@@ -395,7 +395,7 @@
   gap: var(--space-2);
   padding: 0.75rem 1.4rem;
   border-radius: var(--radius-md);
-  background: var(--color-primary-700);
+  background: var(--color-auth-action-bg);
   color: var(--color-white);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
@@ -406,7 +406,7 @@
   transition: var(--transition-fast);
 
   &:hover {
-    background: var(--color-primary-800);
+    background: var(--color-auth-action-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
   }
@@ -458,7 +458,7 @@
     margin-top: var(--space-3);
     padding: 0.65rem 1.25rem;
     border-radius: var(--radius-md);
-    background-color: var(--color-primary-700);
+    background-color: var(--color-auth-action-bg);
     color: var(--color-white);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
@@ -470,7 +470,7 @@
     transition: var(--transition-fast);
 
     &:hover {
-      background-color: var(--color-primary-800);
+      background-color: var(--color-auth-action-hover);
     }
   }
 }

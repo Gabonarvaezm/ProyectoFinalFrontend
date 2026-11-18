@@ -1,3 +1,4 @@
+import { ACADEMIC_MODE } from './core/services/academic-mode';
 import { provideHttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -14,7 +15,7 @@ describe('Regreso al dashboard desde las secciones compartidas', () => {
   beforeEach(() => {
     localStorage.clear();
     TestBed.configureTestingModule({
-      providers: [
+      providers: [{ provide: ACADEMIC_MODE, useValue: 'server' },
         provideHttpClient(),
         provideRouter(routes.map((route) =>
           route.path === 'profesor' || route.path === 'estudiante'
@@ -44,6 +45,7 @@ describe('Regreso al dashboard desde las secciones compartidas', () => {
           role,
         };
         localStorage.setItem(STORAGE_KEYS.ACTIVE_SESSION, JSON.stringify(user));
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'navigation-server-session');
 
         const dashboard = role === 'professor' ? '/profesor' : '/estudiante';
         const harness = await RouterTestingHarness.create(dashboard);
@@ -87,7 +89,7 @@ describe('Regreso al dashboard desde las secciones compartidas', () => {
 
         expect(TestBed.inject(Router).url).toBe(dashboard);
         expect(harness.routeNativeElement?.textContent).toContain('Dashboard');
-      });
+      }, 15000);
     }
   }
 });

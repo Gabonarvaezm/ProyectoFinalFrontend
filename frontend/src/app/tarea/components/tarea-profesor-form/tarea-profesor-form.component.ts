@@ -1,23 +1,25 @@
+import { DialogFocusDirective } from '../dialog-focus.directive';
+import { TaskFileComponent } from '../task-file.component';
+import { AcademicFile } from '../../models/tarea.model';
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
+  signal,
+  effect,
   input,
   output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CreateTareaDto, TareaPriority } from '../../models/tarea.model';
 
 @Component({
   selector: 'app-tarea-profesor-form',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TaskFileComponent, DialogFocusDirective],
   templateUrl: './tarea-profesor-form.component.html',
   styleUrl: './tarea-profesor-form.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TareaProfesorFormComponent {
+  readonly file = signal<AcademicFile | undefined>(undefined);
   private readonly fb = inject(FormBuilder);
 
   public readonly isOpen = input<boolean>(false);
@@ -41,7 +43,20 @@ export class TareaProfesorFormComponent {
     maxScore: [100, [Validators.required, Validators.min(10), Validators.max(100)]],
     priority: ['alta' as TareaPriority, [Validators.required]],
     attachmentName: [''],
+    instructions: [''],
+    criteria: [''],
+    recipients: [''],
   });
+
+  constructor() {
+    effect(() => {
+      if (this.isOpen()) {
+        this.file.set(undefined);
+        this.form.reset({ title: '', description: '', subject: 'Ciencias', dueDate: this.getDefaultDueDate(),
+          maxScore: 100, priority: 'alta', instructions: '', criteria: '', recipients: '', attachmentName: '' });
+      }
+    });
+  }
 
   private getDefaultDueDate(): string {
     const nextWeek = new Date();
@@ -57,6 +72,10 @@ export class TareaProfesorFormComponent {
 
     const val = this.form.value;
     const dto: CreateTareaDto = {
+      material: this.file(),
+      instructions: val.instructions?.trim(),
+      criteria: val.criteria?.trim(),
+      recipientEmails: val.recipients?.trim() ? val.recipients.split(',').map((email: string) => email.trim().toLowerCase()).filter(Boolean) : undefined,
       title: val.title.trim(),
       description: val.description.trim(),
       subject: val.subject,
@@ -67,15 +86,7 @@ export class TareaProfesorFormComponent {
     };
 
     this.tareaCreated.emit(dto);
-    this.form.reset({
-      title: '',
-      description: '',
-      subject: 'Ciencias',
-      dueDate: this.getDefaultDueDate(),
-      maxScore: 100,
-      priority: 'alta',
-      attachmentName: '',
-    });
+
   }
 
   public onClose(): void {

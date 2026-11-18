@@ -1,2 +1,5 @@
+@if (academicSync.isLocalDemo) {
+  <p class="demo-mode-note" role="note">Demostración local: perfiles sin contraseña, solo en este navegador y origen. No ofrece seguridad de producción ni sincronización entre dispositivos.</p>
+}
 <router-outlet></router-outlet>
-<app-academic-sync-status [error]="academicSync.error()" [saving]="academicSync.saving()" (retry)="academicSync.retry()" (discard)="academicSync.discardFailed()" />
+<app-academic-sync-status [localDemo]="academicSync.isLocalDemo" [error]="academicSync.error() || localStorageState.error()" [saving]="academicSync.saving()" (retry)="academicSync.retry()" (discard)="academicSync.discardFailed()" />

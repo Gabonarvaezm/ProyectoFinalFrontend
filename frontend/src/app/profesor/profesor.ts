@@ -64,6 +64,8 @@ import {
   templateUrl: './profesor.html',
 })
 export class Profesor {
+  openTasks(): void { void this.router.navigate(['/tareas']); }
+  readonly teacherInitials = computed(() => (this.currentUser()?.fullName ?? 'Docente').split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase());
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly chatbotService = inject(ChatbotService);

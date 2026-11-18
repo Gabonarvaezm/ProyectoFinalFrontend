@@ -3,6 +3,7 @@
 
   <div
     class="modal-dialog"
+    appDialogFocus (dismissed)="onClose()"
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-profesor-title"
@@ -128,23 +129,10 @@
         }
       </div>
 
-      <!-- Archivo adjunto / Material complementario -->
-      <div class="form-group">
-        <label for="prof-attachment" class="form-label">
-          Nombre de Documento Guía o Rúbrica (Opcional)
-        </label>
-        <div class="input-with-icon">
-          <i class="bi bi-paperclip input-icon" aria-hidden="true"></i>
-          <input
-            id="prof-attachment"
-            type="text"
-            formControlName="attachmentName"
-            class="form-control input-padded"
-            placeholder="Ej: rubrica_evaluacion_informe.pdf"
-          />
-        </div>
-      </div>
-
+      <div class="form-group"><label for="task-instructions">Instrucciones</label><textarea id="task-instructions" class="form-control" formControlName="instructions"></textarea></div>
+      <div class="form-group"><label for="task-criteria">Criterios de evaluación</label><textarea id="task-criteria" class="form-control" formControlName="criteria"></textarea></div>
+      <div class="form-group"><label for="task-recipients">Correos de estudiantes separados por coma (vacío: estudiantes actuales de tu institución)</label><input id="task-recipients" class="form-control" formControlName="recipients" /></div>
+      <app-task-file [editable]="true" [file]="file()" (changed)="file.set($event)" />
       <footer class="modal-footer">
         <button type="button" class="btn-secondary" (click)="onClose()">
           Cancelar

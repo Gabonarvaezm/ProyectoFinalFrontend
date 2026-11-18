@@ -2,15 +2,20 @@
 // DiscerIA — Modelos del Módulo de Tareas Académicas
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type TareaStatus = 'pendiente' | 'entregada' | 'calificada' | 'vencida';
+export type TareaStatus = 'pendiente' | 'en_progreso' | 'entregada' | 'en_revision' | 'calificada' | 'requiere_correccion' | 'vencida';
 export type TareaPriority = 'alta' | 'media' | 'baja';
 
 export interface TareaSubmission {
+  history?: { content: string; grade?: number; feedback?: string; submittedAt?: string; updatedAt?: string }[];
+  attachment?: AcademicFile;
+  status?: TareaStatus;
+  revision?: number;
+  updatedAt?: string;
   id: string;
   tareaId: string;
   studentId: string;
   studentName: string;
-  submittedAt: string;
+  submittedAt?: string;
   content: string;
   attachmentUrl?: string;
   comments?: string;
@@ -20,6 +25,12 @@ export interface TareaSubmission {
 }
 
 export interface Tarea {
+  material?: AcademicFile;
+  instructions?: string;
+  criteria?: string;
+  recipientEmails?: string[];
+  submissions?: TareaSubmission[];
+  recipients?: { studentId: string; studentName: string; email: string; status: TareaStatus; submission?: TareaSubmission }[];
   id: string;
   title: string;
   description: string;
@@ -36,6 +47,10 @@ export interface Tarea {
 }
 
 export interface CreateTareaDto {
+  material?: AcademicFile;
+  instructions?: string;
+  criteria?: string;
+  recipientEmails?: string[];
   title: string;
   description: string;
   subject: string;
@@ -46,6 +61,8 @@ export interface CreateTareaDto {
 }
 
 export interface SubmitTareaDto {
+  attachment?: AcademicFile;
+  revision?: number;
   tareaId: string;
   content: string;
   attachmentUrl?: string;
@@ -53,6 +70,7 @@ export interface SubmitTareaDto {
 }
 
 export interface GradeTareaDto {
+  revision?: number;
   tareaId: string;
   submissionId: string;
   grade: number;
@@ -65,3 +83,5 @@ export interface TareaFilterPayload {
   searchQuery: string;
 }
 
+
+export interface AcademicFile { name: string; mime: string; base64: string; }

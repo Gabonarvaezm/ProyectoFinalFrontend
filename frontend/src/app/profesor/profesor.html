@@ -11,6 +11,8 @@
   <div class="main-wrapper">
     <!-- Barra superior de búsqueda y perfil (NODO HIJO PRESENTACIONAL) -->
     <app-profesor-header
+      [teacherName]="currentUser()?.fullName || 'Docente'"
+      [teacherInitials]="teacherInitials()"
       [(searchQuery)]="searchQuery"
       [notificationsCount]="unreadNotificationsCount()"
       [isAiDrawerOpen]="isAiDrawerOpen()"
@@ -37,10 +39,11 @@
       } @else {
       <!-- Banner de Bienvenida -->
       <section class="welcome-card" aria-label="Bienvenida al docente">
-        <h1 class="welcome-title">¡Hola, Prof. García!</h1>
+        <h1 class="welcome-title">¡Hola, {{ currentUser()?.fullName || 'Docente' }}!</h1>
         <p class="welcome-subtitle">
-          Tus alumnos han avanzado un <strong class="stat-highlight">12%</strong> más esta semana.
+          Consulta el rendimiento de tus estudiantes y las entregas registradas.
         </p>
+        <button type="button" class="btn btn-primary" (click)="openTasks()">Gestionar tareas</button>
       </section>
 
       <!-- Tarjetas de Métricas (NODO HIJO PRESENTACIONAL) -->

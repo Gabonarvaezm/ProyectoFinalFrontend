@@ -1,20 +1,24 @@
 # DiscerIA
 
-## Contenidos compartidos entre docentes y estudiantes
+## Modo local de desarrollo y demostración (predeterminado)
 
-El registro, el inicio de sesión, la biblioteca, el foro, las tareas, los exámenes publicados y los comunicados utilizan `/api/academic`. El servidor conserva las cuentas y los contenidos en `frontend/data/academic.sqlite`, con SQLite incluido en Node.js 24. La carpeta de datos está excluida de Git y debe conservarse al reiniciar o actualizar el servidor.
+Desde frontend, ejecuta `npm start` o `ng serve`. Solo se inicia Angular en http://localhost:4200. No necesitas iniciar una API en el puerto 3001 para registrar perfiles, iniciar/cerrar sesión, usar Biblioteca y Foro, asignar tareas, guardar borradores, entregar, revisar y calificar.
 
-Ejecuta `npm start` desde `frontend` para iniciar Angular y la API. Todos los usuarios deben acceder a la misma aplicación y al mismo servidor; cada navegador puede tener su propia sesión. Los paneles consultan novedades cada cuatro segundos, sin recargar la página. No hace falta contratar otro servicio para las pruebas locales.
+El modo local utiliza localStorage a través de repositorios y un servicio de persistencia centralizados. Los perfiles de demostración acceden con su correo, sin contraseña. Puedes registrar varios perfiles o usar profesor@universidad.edu y estudiante@universidad.edu. El selector visual de rol no cambia el rol registrado de una cuenta.
 
-Al actualizar desde la versión anterior, vuelve a iniciar sesión. Las cuentas de demostración siguen siendo `profesor@universidad.edu` y `estudiante@universidad.edu`, ambas con contraseña `password123`. Las cuentas nuevas se registran en el servidor. Un perfil de registro antiguo que aún exista en el navegador puede migrarse al primer inicio de sesión.
+Profesor y estudiante deben utilizar el mismo navegador y el mismo origen (protocolo, host y puerto). Alterna perfiles cerrando sesión. No hay sincronización entre dispositivos ni seguridad frente a la edición del almacenamiento del navegador. No introduzcas contraseñas reales ni información sensible.
 
-Las publicaciones antiguas de biblioteca, foro y tareas que aún estén guardadas en el navegador del profesor se importan una vez al iniciar sesión. Los exámenes antiguos que solo incrementaban un contador y los mensajes que nunca se conservaron como contenido no pueden reconstruirse: deben volver a publicarse.
+Los adjuntos PDF/PNG/JPEG/TXT se conservan localmente, hasta 180 KB por archivo y dentro de la cuota disponible. Si una escritura falla, se informa el error y se conserva la versión previamente guardada. Los datos de una API o de otra URL no se importan automáticamente en este modo.
 
-Los exámenes muestran los datos que recoge el formulario docente: tema, cantidad de preguntas, dificultad, duración e instrucciones. El formulario actual no incorpora un editor de preguntas ni de respuestas; publicar un examen no genera automáticamente ese contenido.
+Ver [documentación del modo local](docs/MODO-LOCAL.md) para arquitectura, claves, pruebas y limitaciones.
 
-Los comunicados respetan el grupo seleccionado, incluso al compartirlos en el foro. Cada alumno conserva su propio estado de lectura y eliminación de avisos. Los envíos pendientes se conservan por cuenta y se reintentan al recuperar la conexión. La API comprueba el rol del usuario y no permite que un estudiante publique recursos exclusivos del docente.
+## Modo servidor (opcional)
 
-Para desplegar la web, el alojamiento debe ejecutar el servidor Node de producción y conservar la base de datos. Subir solamente los archivos estáticos de Angular no habilita la comunicación entre usuarios.
+`npm run start:server` inicia Angular con la configuración server y la API Node en 3001. `ng serve --configuration server` utiliza la API, que puede iniciarse aparte con `npm run start:api`. El modo se configura mediante environment.academicMode y el token ACADEMIC_MODE. No se selecciona como reacción a errores de conexión: cada modo tiene su repositorio explícito.
+
+`npm run build` conserva la compilación de producción para servidor; `npm run serve:ssr:DiscerIA` ejecuta esa compilación con `/api/academic` y `/api/chat`. El servidor guarda cuentas y contenidos en data/academic.sqlite, que debe conservarse entre despliegues. Las cuentas de demostración del servidor mantienen la contraseña password123. En el modo local no se usa ni almacena esa contraseña.
+
+El flujo SQLite y sus controles de acceso permanecen disponibles. Los datos locales y los del servidor son independientes. El modo servidor requiere un backend disponible y comunica los fallos de conexión.
 
 ## Asistente académico con OpenRouter
 
@@ -30,7 +34,7 @@ Desde `frontend`, con Node.js 24:
 npm start
 ```
 
-Este comando inicia Angular en `http://localhost:4200` y la API local en `127.0.0.1:3001`. El proxy de Angular comunica ambas aplicaciones. En PowerShell con restricciones para scripts, utiliza `npm.cmd start`.
+Este comando inicia solo Angular en `http://localhost:4200`. Para usar la IA, inicia además `npm run start:api`; el proxy comunica `/api/chat` con esa API. Las funciones académicas locales continúan sin utilizar `/api/academic`. En PowerShell con restricciones para scripts, utiliza `npm.cmd start`.
 
 Para iniciarlas por separado, usa `npm run start:api` y `npx ng serve` en terminales distintas. Para producción, ejecuta `npm run build` y `npm run serve:ssr:DiscerIA`; el servidor de producción incluye `/api/chat` y carga las variables de `.env` o del entorno del despliegue.
 
@@ -94,10 +98,12 @@ ng test
 For end-to-end (e2e) testing, run:
 
 ```bash
-ng e2e
+npm run test:e2e:local
+# Backend conservado (requiere npm run build primero):
+npm run test:e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Las suites utilizan Microsoft Edge y Playwright. La suite local inicia ng serve en 4311 sin iniciar una API y comprueba que no existan peticiones académicas.
 
 ## Additional Resources
 

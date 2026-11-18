@@ -27,7 +27,7 @@ async function withSchool(run) {
   finally { await new Promise((done) => server.close(done)); store.close(); }
 }
 
-const student = (email) => ({ fullName: email.split('@')[0], email, institution: 'Colegio', role: 'student', password: 'school123' });
+const student = (email) => ({ fullName: email.split('@')[0], email, institution: 'Universidad Tecnológica Nacional', role: 'student', password: 'school123' });
 
 test('publica biblioteca, foro, exámenes y mensajes entre sesiones distintas de profesor y estudiantes', async () => {
   await withSchool(async ({ request }) => {
@@ -123,4 +123,144 @@ test('conserva publicaciones y cuentas después de reiniciar el almacenamiento',
     assert.ok(basename(directory).startsWith('disceria-school-'));
     rmSync(directory, { recursive: true, force: true });
   }
+});
+
+
+test('ciclo real: asignación privada, borrador, conflictos, entrega, revisión, corrección y nota', async () => {
+  await withSchool(async ({ request }) => {
+    const teacher = (await request('/login', { email: 'profesor@universidad.edu', password: 'password123' })).body;
+    await request('/register', student('draft@example.com'));
+    await request('/register', student('excluded@example.com'));
+    const learner = (await request('/login', { email: 'draft@example.com', password: 'school123' })).body;
+    const excluded = (await request('/login', { email: 'excluded@example.com', password: 'school123' })).body;
+    const event = (type, payload, account = teacher) => request('/events', { id: randomUUID(), type, payload }, account.token);
+    const task = { id: 'lifecycle', title: 'Informe', description: 'Explica el experimento', subject: 'Ciencias', dueDate: '2099-12-01', maxScore: 20, recipientEmails: [learner.user.email] };
+    const file = { name: 'respuesta.txt', mime: 'text/plain', base64: Buffer.from('Evidencia persistente').toString('base64') };
+    assert.equal((await event('tarea.publish', { ...task, material: file })).status, 200);
+    assert.ok(!(await request('/state', undefined, excluded.token)).body.tareas.some((t) => t.id === task.id));
+    assert.equal((await event('tarea.draft', { tareaId: task.id, content: 'Intrusión' }, excluded)).status, 403);
+    const getTask = async (account = learner) => (await request('/state', undefined, account.token)).body.tareas.find((t) => t.id === task.id);
+    assert.equal((await event('tarea.draft', { tareaId: task.id, content: 'Avance', attachment: file, grade: 20 }, learner)).status, 200);
+    let mine = await getTask();
+    assert.equal(mine.status, 'en_progreso');
+    assert.equal(mine.mySubmission.grade, undefined);
+    assert.equal(mine.mySubmission.submittedAt, undefined);
+    assert.equal((await getTask(teacher)).submissionsCount, 0);
+    assert.equal((await getTask(teacher)).recipients.length, 1);
+    assert.equal((await event('tarea.grade', { submissionId: mine.mySubmission.id, grade: 10, feedback: 'Borrador' })).status, 409);
+    assert.equal((await event('tarea.draft', { tareaId: task.id, content: 'Obsoleto', revision: 0 }, learner)).status, 409);
+    const session2 = (await request('/login', { email: learner.user.email, password: 'school123' })).body;
+    assert.equal((await getTask(session2)).mySubmission.attachment.base64, file.base64);
+    assert.equal((await event('tarea.submit', { tareaId: task.id, content: 'Respuesta final', revision: mine.mySubmission.revision, grade: 20 }, learner)).status, 200);
+    mine = await getTask();
+    assert.equal(mine.status, 'entregada');
+    assert.equal(mine.mySubmission.grade, undefined);
+    assert.equal((await getTask(teacher)).submissionsCount, 1);
+    assert.equal((await event('tarea.draft', { tareaId: task.id, content: 'Cambio', revision: mine.mySubmission.revision }, learner)).status, 409);
+    assert.equal((await event('tarea.grade', { submissionId: mine.mySubmission.id, grade: 20, feedback: 'Fraude' }, learner)).status, 403);
+    assert.equal((await event('tarea.review', { submissionId: mine.mySubmission.id })).status, 200);
+    assert.equal((await getTask()).status, 'en_revision');
+    assert.equal((await event('tarea.correction', { submissionId: mine.mySubmission.id, feedback: 'Amplía las conclusiones' })).status, 200);
+    mine = await getTask();
+    assert.equal(mine.status, 'requiere_correccion');
+    assert.equal((await event('tarea.submit', { tareaId: task.id, content: 'Respuesta corregida', attachment: file, revision: mine.mySubmission.revision }, learner)).status, 200);
+    mine = await getTask();
+    assert.equal((await event('tarea.grade', { submissionId: mine.mySubmission.id, grade: 21, feedback: 'Fuera de escala' })).status, 400);
+    assert.equal((await event('tarea.grade', { submissionId: mine.mySubmission.id, grade: 18, feedback: 'Conclusiones correctas' })).status, 200);
+    mine = await getTask(session2);
+    assert.equal(mine.status, 'calificada');
+    assert.equal(mine.mySubmission.grade, 18);
+    assert.equal(mine.mySubmission.feedback, 'Conclusiones correctas');
+    assert.equal((await getTask(teacher)).submissions[0].attachment.base64, file.base64);
+    assert.equal((await event('tarea.submit', { tareaId: task.id, content: 'Borrar nota', revision: mine.mySubmission.revision }, learner)).status, 409);
+  });
+});
+
+test('vence sin entrega, rechaza archivos falsos y aísla instituciones y docentes', async () => {
+  await withSchool(async ({ request }) => {
+    const teacher = (await request('/login', { email: 'profesor@universidad.edu', password: 'password123' })).body;
+    const learner = (await request('/login', { email: 'estudiante@universidad.edu', password: 'password123' })).body;
+    await request('/register', { ...student('other@example.com'), role: 'professor' });
+    const other = (await request('/login', { email: 'other@example.com', password: 'school123' })).body;
+    const event = (type, payload, account = teacher) => request('/events', { type, payload }, account.token);
+    const task = { id: 'overdue', title: 'Vencida', description: 'Sin entrega', dueDate: '2020-01-01', maxScore: 10 };
+    assert.equal((await event('tarea.publish', task)).status, 200);
+    const state = (await request('/state', undefined, learner.token)).body;
+    assert.equal(state.tareas.find((t) => t.id === task.id).status, 'vencida');
+    assert.equal((await event('tarea.submit', { tareaId: task.id, content: 'Tarde' }, learner)).status, 409);
+    assert.ok(!(await request('/state', undefined, other.token)).body.tareas.some((t) => t.id === task.id));
+    assert.equal((await event('tarea.publish', { ...task, material: { name: 'fake.pdf', mime: 'application/pdf', base64: Buffer.from('not pdf').toString('base64') } })).status, 400);
+    await request('/register', { ...student('outside@example.com'), institution: 'Otra institución' });
+    assert.equal((await event('tarea.publish', { ...task, recipientEmails: ['outside@example.com'] })).status, 400);
+  });
+});
+
+
+test('recupera borrador, adjuntos y calificación después de reiniciar SQLite', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'disceria-school-'));
+  const path = join(directory, 'school.sqlite');
+  let store;
+  try {
+    store = new AcademicStore(path);
+    const teacher = store.login({ email: 'profesor@universidad.edu', password: 'password123' }).user;
+    const learner = store.login({ email: 'estudiante@universidad.edu', password: 'password123' }).user;
+    const attachment = { name: 'evidencia.txt', mime: 'text/plain', base64: Buffer.from('Respuesta persistente').toString('base64') };
+    store.mutate(teacher, { type: 'tarea.publish', payload: { id: 'disk-task', title: 'Persistencia', description: 'Informe persistente', dueDate: '2099-01-01', maxScore: 10 } });
+    store.mutate(learner, { type: 'tarea.draft', payload: { tareaId: 'disk-task', content: 'Avance almacenado', attachment } });
+    store.close(); store = new AcademicStore(path);
+    let task = store.snapshot(learner).tareas.find((t) => t.id === 'disk-task');
+    assert.equal(task.status, 'en_progreso');
+    assert.equal(task.mySubmission.attachment.base64, attachment.base64);
+    store.mutate(learner, { type: 'tarea.submit', payload: { tareaId: task.id, content: 'Respuesta final persistente', attachment, revision: task.mySubmission.revision } });
+    task = store.snapshot(teacher).tareas.find((t) => t.id === 'disk-task');
+    store.mutate(teacher, { type: 'tarea.grade', payload: { submissionId: task.mySubmission.id, grade: 8, feedback: 'Buen análisis persistente' } });
+    store.close(); store = new AcademicStore(path);
+    const session = store.login({ email: 'estudiante@universidad.edu', password: 'password123' });
+    task = store.snapshot(store.authenticate('Bearer ' + session.token)).tareas.find((t) => t.id === 'disk-task');
+    assert.equal(task.status, 'calificada');
+    assert.equal(task.mySubmission.grade, 8);
+    assert.equal(task.mySubmission.feedback, 'Buen análisis persistente');
+    assert.equal(task.mySubmission.attachment.base64, attachment.base64);
+  } finally {
+    store?.close();
+    assert.equal(dirname(resolve(directory)), resolve(tmpdir()));
+    assert.ok(basename(directory).startsWith('disceria-school-'));
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+
+test('dos alumnos asignados conservan entregas privadas y el docente califica cada una por separado', async () => {
+  await withSchool(async ({ request }) => {
+    const teacher = (await request('/login', { email: 'profesor@universidad.edu', password: 'password123' })).body;
+    const first = (await request('/login', { email: 'estudiante@universidad.edu', password: 'password123' })).body;
+    await request('/register', student('second@example.com'));
+    const second = (await request('/login', { email: 'second@example.com', password: 'school123' })).body;
+    await request('/register', { ...student('teacher2@example.com'), role: 'professor' });
+    const teacher2 = (await request('/login', { email: 'teacher2@example.com', password: 'school123' })).body;
+    const event = (account, type, payload) => request('/events', { type, payload }, account.token);
+    assert.equal((await event(teacher, 'tarea.publish', { id: 'multi', title: 'Individual', description: 'Entregas distintas', maxScore: 10, dueDate: '2099-12-01', recipientEmails: [first.user.email, second.user.email] })).status, 200);
+    for (const [account, content] of [[first, 'Respuesta confidencial A'], [second, 'Respuesta confidencial B']]) {
+      assert.equal((await event(account, 'tarea.submit', { tareaId: 'multi', content })).status, 200);
+    }
+    const get = async (account) => (await request('/state', undefined, account.token)).body.tareas.find((t) => t.id === 'multi');
+    const task = await get(teacher);
+    assert.equal(task.submissionsCount, 2);
+    assert.equal(task.recipients.length, 2);
+    assert.equal(task.submissions.length, 2);
+    const a = task.submissions.find((item) => item.studentId === first.user.id);
+    const b = task.submissions.find((item) => item.studentId === second.user.id);
+    assert.equal((await get(first)).mySubmission.content, 'Respuesta confidencial A');
+    assert.equal((await get(second)).mySubmission.content, 'Respuesta confidencial B');
+    assert.equal((await get(first)).submissions, undefined);
+    assert.equal((await get(first)).recipients, undefined);
+    assert.equal((await get(first)).recipientEmails, undefined);
+    assert.equal((await event(teacher2, 'tarea.grade', { submissionId: a.id, grade: 10, feedback: 'Intrusión' })).status, 404);
+    assert.equal((await event(teacher2, 'tarea.delete', { id: 'multi' })).status, 403);
+    assert.equal((await event(teacher, 'tarea.grade', { submissionId: a.id, grade: 9, feedback: 'Buen trabajo A', revision: a.revision })).status, 200);
+    assert.equal((await event(teacher, 'tarea.grade', { submissionId: a.id, grade: 2, feedback: 'Nota obsoleta', revision: a.revision })).status, 409);
+    assert.equal((await event(teacher, 'tarea.grade', { submissionId: b.id, grade: 7, feedback: 'Buen trabajo B', revision: b.revision })).status, 200);
+    assert.equal((await get(first)).mySubmission.grade, 9);
+    assert.equal((await get(second)).mySubmission.grade, 7);
+  });
 });

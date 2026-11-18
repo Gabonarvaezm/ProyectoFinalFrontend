@@ -42,16 +42,21 @@
       <section class="welcome-section" aria-label="Bienvenida al estudiante">
         <h1 class="welcome-title">¡Hola, {{ studentName() }}!</h1>
         <p class="welcome-subtitle">
-          Tienes un <strong>85% de progreso</strong> en Biología esta semana. ¡Sigue así!
+          Consulta tus actividades, entregas y resultados académicos.
         </p>
       </section>
 
       <!-- Tarjeta Destacada: Continuar Aprendiendo (NODO HIJO PRESENTACIONAL) -->
       <app-estudiante-publications [exams]="publishedExams()" [messages]="teacherMessages()" />
+      @if (localDemo) {
+        <app-academic-progress [tareas]="localTasks()" />
+        <button type="button" class="btn btn-primary" (click)="viewTasks()">Abrir mis tareas</button>
+      } @else {
       <app-estudiante-continue-course
         [course]="currentCourse()"
         (continueClicked)="onContinueCourse()"
       />
+      }
 
       <!-- Sección Intermedia: Layout Biblioteca + Progreso | Examen -->
       <div class="middle-grid">
@@ -66,12 +71,14 @@
           />
 
           <!-- NODO HIJO: Gráfico de Progreso Semanal (interactivo) -->
+          @if (!localDemo) {
           <app-estudiante-weekly-progress
             [items]="weeklyProgress()"
             [highlightedId]="highlightedSubjectId()"
             (barClicked)="onProgressBarSelected($event)"
             (clearClicked)="onClearSubjectHighlight()"
           />
+          }
         </div>
 
         <!-- Columna Derecha: Examen de Práctica -->

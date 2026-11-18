@@ -1,3 +1,5 @@
+import { AuthService } from './auth.service';
+import { LocalPersistenceService } from './local-persistence.service';
 import { effect } from '@angular/core';
 import { AcademicSyncService } from './academic-sync.service';
 import { isPlatformBrowser } from '@angular/common';
@@ -24,7 +26,9 @@ import {
   providedIn: 'root',
 })
 export class ProfesorService {
+  private readonly storage = inject(LocalPersistenceService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly auth = inject(AuthService);
   private readonly sync = inject(AcademicSyncService);
 
   // ── Estado Reactivo Principal con Signals ─────────────────────────────────
@@ -82,11 +86,20 @@ export class ProfesorService {
     effect(() => {
       const state = this.sync.snapshot();
       if (!state) {
-        if (this.sync.enabled()) { this._students.set([]); this._assignmentsCount.set(0); }
+        if (this.sync.enabled()) { this._students.set([]); this._assignmentsCount.set(0); this._recentActivities.set([]); this._notifications.set([]); }
         return;
       }
       this._students.set(state.students);
       this._assignmentsCount.set(state.exams.length);
+      if (this.sync.isLocalDemo) {
+        this._recentActivities.set(this.storage.read<RecentActivity[]>(`${STORAGE_KEYS.ACTIVITIES}:${this.auth.currentUser()?.id ?? 'guest'}`, []));
+        const key = `${STORAGE_KEYS.NOTIFICATIONS}:${this.auth.currentUser()?.id ?? 'guest'}`;
+        const personal = this.storage.read<TeacherNotification[]>(key, []);
+        const incoming: TeacherNotification[] = state.notifications.map((notice) => ({ ...notice,
+          type: notice.authorRole === 'student' ? 'student_reply' : 'academic_alert',
+          timestamp: '', category: notice.subject ?? 'Actividad académica' }));
+        this._notifications.set([...incoming, ...personal.filter((item) => !incoming.some((notice) => notice.id === item.id))]);
+      }
     });
   }
 
@@ -209,6 +222,9 @@ export class ProfesorService {
     };
 
     this._recentActivities.update((prev) => [newAct, ...prev.slice(0, 5)]);
+    if (this.sync.isLocalDemo && this.sync.enabled()) {
+      this.storage.write(`${STORAGE_KEYS.ACTIVITIES}:${this.auth.currentUser()?.id ?? 'guest'}`, this._recentActivities());
+    }
   }
 
   // ── Métodos de Negocio: Exámenes y Mensajes a la Clase ───────────────────
@@ -402,6 +418,7 @@ export class ProfesorService {
   // ── Inicialización y Persistencia Segura (SSR Safe) ───────────────────────
 
   private initializeData(): void {
+    if (this.sync.enabled()) return;
     const initialSeed: StudentProgress[] = [...INITIAL_STUDENTS_SEED];
     const initialActivities: RecentActivity[] = [...INITIAL_ACTIVITIES_SEED];
     const initialNotifications: TeacherNotification[] = [...INITIAL_NOTIFICATIONS_SEED];
@@ -414,7 +431,7 @@ export class ProfesorService {
     }
 
     // Carga de estudiantes desde localStorage si existe
-    const storedStudents = localStorage.getItem(STORAGE_KEYS.STUDENTS);
+    const storedStudents = this.storage.readText(STORAGE_KEYS.STUDENTS);
     let loadedStudents: StudentProgress[] = initialSeed;
 
     if (storedStudents) {
@@ -429,7 +446,7 @@ export class ProfesorService {
     }
 
     // Si algún usuario se registró previamente en la app con rol 'student', sincronizarlo
-    const registeredUserRaw = localStorage.getItem(STORAGE_KEYS.REGISTERED_USER);
+    const registeredUserRaw = this.storage.readText(STORAGE_KEYS.REGISTERED_USER);
     if (registeredUserRaw) {
       try {
         const regUser = JSON.parse(registeredUserRaw);
@@ -456,7 +473,7 @@ export class ProfesorService {
 
     // Carga de notificaciones desde localStorage si existe
     let loadedNotifications: TeacherNotification[] = initialNotifications;
-    const storedNotifications = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    const storedNotifications = this.storage.readText(STORAGE_KEYS.NOTIFICATIONS);
     if (storedNotifications) {
       try {
         const parsedNotifs = JSON.parse(storedNotifications);
@@ -474,9 +491,10 @@ export class ProfesorService {
   }
 
   private persistStudents(): void {
+    if (this.sync.enabled()) return;
     if (!isPlatformBrowser(this.platformId)) return;
     try {
-      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this._students()));
+      this.storage.writeText(STORAGE_KEYS.STUDENTS, JSON.stringify(this._students()));
     } catch (e) {
       console.warn('[ProfesorService] No se pudo persistir estudiantes:', e);
     }
@@ -484,10 +502,16 @@ export class ProfesorService {
 
   private persistNotifications(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    try {
-      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(this._notifications()));
-    } catch (e) {
-      console.warn('[ProfesorService] No se pudo persistir notificaciones:', e);
+    if (this.sync.isLocalDemo && this.sync.enabled()) {
+      const incoming = this.sync.snapshot()?.notifications ?? [];
+      for (const notice of incoming) {
+        const updated = this._notifications().find((item) => item.id === notice.id);
+        if (!updated || updated.read !== notice.read) this.sync.receipt(notice.id, updated?.read ?? notice.read, !updated);
+      }
+      const personal = this._notifications().filter((item) => !incoming.some((notice) => notice.id === item.id));
+      this.storage.write(`${STORAGE_KEYS.NOTIFICATIONS}:${this.auth.currentUser()?.id ?? 'guest'}`, personal);
+      return;
     }
+    this.storage.write(STORAGE_KEYS.NOTIFICATIONS, this._notifications());
   }
 }

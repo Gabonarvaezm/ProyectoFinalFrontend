@@ -161,19 +161,19 @@
     }
 
     &.topic-strength {
-      background-color: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #166534;
+      background-color: var(--color-success-bg);
+      border: 1px solid var(--color-success-border);
+      color: var(--color-success);
 
-      i { color: #16a34a; }
+      i { color: var(--color-success); }
     }
 
     &.topic-weakness {
-      background-color: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #991b1b;
+      background-color: var(--color-danger-bg);
+      border: 1px solid var(--color-danger-border);
+      color: var(--color-danger);
 
-      i { color: #dc2626; }
+      i { color: var(--color-danger); }
     }
   }
 }
@@ -271,7 +271,8 @@
     .student-score {
       font-weight: var(--font-weight-bold);
       color: var(--color-danger);
-      background-color: #fee2e2;
+      background-color: var(--color-danger-bg);
+      border: 1px solid var(--color-danger-border);
       padding: 0.15rem 0.5rem;
       border-radius: var(--radius-full);
     }
@@ -308,9 +309,9 @@
     align-items: center;
     gap: var(--space-2);
     padding: 0.625rem 1rem;
-    background-color: #fff7ed;
-    color: #c2410c;
-    border: 1px solid #ffedd5;
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning-border);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
@@ -318,7 +319,7 @@
     transition: var(--transition-fast);
 
     &:hover {
-      background-color: #ffedd5;
+      background-color: var(--color-warning-border);
     }
   }
 

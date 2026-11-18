@@ -1,14 +1,17 @@
+import { LocalPersistenceService } from './local-persistence.service';
+import { STORAGE_KEYS } from '../models/auth.model';
 import { isPlatformBrowser } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID, signal, computed } from '@angular/core';
 
 export type AppTheme = 'light' | 'dark';
 
-export const THEME_STORAGE_KEY = 'disceria_theme_preference';
+export const THEME_STORAGE_KEY = STORAGE_KEYS.THEME;
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
+  private readonly storage = inject(LocalPersistenceService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
@@ -28,13 +31,7 @@ export class ThemeService {
     this._currentTheme.set(theme);
     this.applyThemeToDocument(theme);
 
-    if (this.isBrowser) {
-      try {
-        localStorage.setItem(THEME_STORAGE_KEY, theme);
-      } catch (e) {
-        console.warn('[ThemeService] No se pudo guardar la preferencia de tema:', e);
-      }
-    }
+    if (this.isBrowser) this.storage.writeText(THEME_STORAGE_KEY, theme);
   }
 
   /**
@@ -55,7 +52,7 @@ export class ThemeService {
     }
 
     try {
-      const stored = localStorage.getItem(THEME_STORAGE_KEY) as AppTheme | null;
+      const stored = this.storage.readText(THEME_STORAGE_KEY) as AppTheme | null;
       if (stored === 'light' || stored === 'dark') {
         return stored;
       }
@@ -63,15 +60,15 @@ export class ThemeService {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return 'dark';
       }
-    } catch {
-      // Ignorar errores en entornos con storage bloqueado
+    } catch (error: unknown) {
+      console.error('[ThemeService] No se pudo restaurar la apariencia.', error);
     }
 
     return 'light';
   }
 
   /**
-   * Aplica el atributo data-theme al elemento <html>
+   * Aplica el atributo data-theme al elemento <html> y al <body>
    */
   private applyThemeToDocument(theme: AppTheme): void {
     if (!this.isBrowser) return;
@@ -80,8 +77,12 @@ export class ThemeService {
     docEl.setAttribute('data-theme', theme);
     if (theme === 'dark') {
       docEl.classList.add('dark-theme');
+      document.body?.classList.add('dark-theme');
+      document.body?.setAttribute('data-theme', 'dark');
     } else {
       docEl.classList.remove('dark-theme');
+      document.body?.classList.remove('dark-theme');
+      document.body?.setAttribute('data-theme', 'light');
     }
   }
 }

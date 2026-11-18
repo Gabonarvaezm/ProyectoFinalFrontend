@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
   inject,
@@ -21,9 +20,10 @@ import {
   imports: [ReactiveFormsModule],
   templateUrl: './foro-post-card.component.html',
   styleUrl: './foro-post-card.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForoPostCardComponent {
+  readonly failedAvatars = signal<ReadonlySet<string>>(new Set());
+  avatarFailed(url: string): void { this.failedAvatars.update((urls) => new Set([...urls, url])); }
   private readonly fb = inject(FormBuilder);
 
   public readonly post = input.required<ForumPost>();
