@@ -1,5 +1,24 @@
 # DiscerIA
 
+La aplicación utiliza **Angular + Supabase** para autenticación, datos compartidos, archivos privados y la función del chatbot. La producción se despliega como sitio estático en **Vercel**.
+
+Consulta [DEPLOY_SUPABASE.md](DEPLOY_SUPABASE.md) para aplicar el SQL, configurar Auth y la IA y publicar. La URL y la clave pública actuales ya están conectadas; los pasos del panel de Supabase requieren la cuenta del propietario.
+
+```powershell
+npm install
+npm start
+```
+
+Verificaciones: `npm test -- --watch=false`, `npm run test:supabase`, `npm run build`, `npm run check:supabase`.
+
+---
+
+## Documentación de los modos anteriores (local y Node/SQLite)
+
+Estos modos se conservan como herramientas de desarrollo mediante `npm run start:local` y `npm run start:server`. Las instrucciones históricas de abajo no son el despliegue de producción en Vercel.
+
+# DiscerIA
+
 ## Modo local de desarrollo y demostración (predeterminado)
 
 Desde frontend, ejecuta `npm start` o `ng serve`. Solo se inicia Angular en http://localhost:4200. No necesitas iniciar una API en el puerto 3001 para registrar perfiles, iniciar/cerrar sesión, usar Biblioteca y Foro, asignar tareas, guardar borradores, entregar, revisar y calificar.

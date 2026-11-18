@@ -86,4 +86,4 @@ export interface TareaFilterPayload {
 }
 
 
-export interface AcademicFile { name: string; mime: string; base64: string; }
+export interface AcademicFile { name: string; mime: string; base64: string; storagePath?: string; }

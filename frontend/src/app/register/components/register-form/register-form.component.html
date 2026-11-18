@@ -131,6 +131,10 @@
       </div>
     </div>
 
+    @if (supabaseMode) {
+      <p>El acceso de profesor requiere autorización de la institución. Elegir ese rol no concede permisos docentes automáticamente.</p>
+    }
+
     @if (!localDemo) {
     <!-- Contraseña -->
     <div class="form-group">

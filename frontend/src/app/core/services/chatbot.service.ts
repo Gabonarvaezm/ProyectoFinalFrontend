@@ -1,14 +1,18 @@
+import { SupabaseClientService } from './supabase-client.service';
+import { ACADEMIC_MODE } from './academic-mode';
 import { LocalPersistenceService } from './local-persistence.service';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { Observable, catchError, map, throwError, defer } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ChatSession, ChatbotAcademicMode, ChatbotMessage } from '../../chatbot/models/chatbot.model';
 import { STORAGE_KEYS } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class ChatbotService {
+  private readonly mode = inject(ACADEMIC_MODE);
+  private readonly supabase = inject(SupabaseClientService);
   private readonly http = inject(HttpClient);
   private readonly storage = inject(LocalPersistenceService);
   private readonly platformId = inject(PLATFORM_ID);
@@ -28,15 +32,29 @@ export class ChatbotService {
         content: message.text,
       }));
 
-    return this.http.post<{ text: string }>(environment.ai.endpoint, {
-      query: query.trim(), mode, history: messages,
-    }).pipe(map((response) => ({
+    const body = { query: query.trim(), mode, history: messages };
+    const response = this.mode === 'supabase' ? defer(async () => {
+      const { data, error } = await this.supabase.client.functions.invoke('academic-chat', { body });
+      if (error) {
+        let message = 'No se pudo conectar con la IA. Comprueba que academic-chat esté desplegada en Supabase.';
+        if ('context' in error && error.context instanceof Response) {
+          try { const detail: unknown = await error.context.json();
+            if (detail && typeof detail === 'object' && 'error' in detail && typeof detail.error === 'string') message = detail.error;
+          } catch { /* Keep the actionable connection message. */ }
+        }
+        throw new Error(message);
+      }
+      if (!data || typeof data.text !== 'string') throw new Error('La IA devolvió una respuesta vacía.');
+      return { text: data.text as string };
+    }) : this.http.post<{ text: string }>(environment.ai.endpoint, body);
+    return response.pipe(map((response) => ({
       id: `ai-${Date.now()}`,
       sender: 'ai' as const,
       text: response.text,
       timestamp: new Date(),
       mode,
     })), catchError((error: unknown) => {
+      if (this.mode === 'supabase' && error instanceof Error) return throwError(() => error);
       const detail: unknown = error instanceof HttpErrorResponse ? error.error : null;
       const message = typeof detail === 'object' && detail !== null &&
         'error' in detail && typeof detail.error === 'string'

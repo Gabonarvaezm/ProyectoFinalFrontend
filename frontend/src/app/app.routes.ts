@@ -4,6 +4,10 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+    path: 'recuperar-contrasena',
+    loadComponent: () => import('./login/password-recovery.component').then(m => m.PasswordRecoveryComponent),
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./pagina-principal/pagina-principal').then((m) => m.PaginaPrincipal),

@@ -14,22 +14,25 @@ export const roleGuard = (allowedRole: 'student' | 'professor' | 'admin'): CanAc
     const authService = inject(AuthService);
     const router = inject(Router);
 
-    const currentUser = authService.currentUser();
+    const resolve = () => {
+      const currentUser = authService.currentUser();
 
-    if (!currentUser) {
-      return router.createUrlTree([AUTH_ROUTES.LOGIN]);
-    }
+      if (!currentUser) {
+        return router.createUrlTree([AUTH_ROUTES.LOGIN]);
+      }
 
-    if (currentUser.role === allowedRole || currentUser.role === 'admin') {
-      return true;
-    }
+      if (currentUser.role === allowedRole || currentUser.role === 'admin') {
+        return true;
+      }
 
-    // Redirigir al dashboard correspondiente a su rol si intenta acceder a otra vista
-    if (currentUser.role === 'professor') {
-      return router.createUrlTree([AUTH_ROUTES.PROFESSOR_DASHBOARD]);
-    }
+      // Redirigir al dashboard correspondiente a su rol si intenta acceder a otra vista
+      if (currentUser.role === 'professor') {
+        return router.createUrlTree([AUTH_ROUTES.PROFESSOR_DASHBOARD]);
+      }
 
-    return router.createUrlTree([AUTH_ROUTES.STUDENT_DASHBOARD]);
+      return router.createUrlTree([AUTH_ROUTES.STUDENT_DASHBOARD]);
+    };
+    return authService.isSupabase ? authService.whenReady().then(resolve) : resolve();
   };
 };
 

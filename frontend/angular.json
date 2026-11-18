@@ -64,7 +64,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "750kB",
                   "maximumError": "1MB"
                 },
                 {
@@ -73,7 +73,9 @@
                   "maximumError": "50kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "outputMode": "static",
+              "ssr": false
             },
             "development": {
               "optimization": false,
@@ -87,6 +89,16 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.server.ts"
+                }
+              ]
+            },
+            "local": {
+              "optimization": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
                 }
               ]
             }
@@ -107,12 +119,18 @@
             },
             "server": {
               "buildTarget": "DiscerIA:build:server"
+            },
+            "local": {
+              "buildTarget": "DiscerIA:build:local"
             }
           },
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "providersFile": "src/test-providers.ts"
+          }
         }
       }
     }

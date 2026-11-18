@@ -1,4 +1,5 @@
-import { Component, input, output, signal } from '@angular/core';
+import { SupabaseFilesRepository } from '../../core/services/supabase-files.repository';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { AcademicFile } from '../models/tarea.model';
 
 @Component({
@@ -18,6 +19,7 @@ import { AcademicFile } from '../models/tarea.model';
   styles: [`:host { display:block; margin-block:1rem; color:var(--color-text-main); } label { display:grid; gap:.5rem; } button { margin:.4rem; padding:.5rem; color:var(--color-primary); background:var(--color-bg-surface); border:1px solid var(--color-border); border-radius:.5rem; }`],
 })
 export class TaskFileComponent {
+  private readonly remoteFiles = inject(SupabaseFilesRepository);
   readonly editable = input(false);
   readonly file = input<AcademicFile>();
   readonly changed = output<AcademicFile | undefined>();
@@ -33,11 +35,15 @@ export class TaskFileComponent {
     let binary = ''; for (const byte of bytes) binary += String.fromCharCode(byte);
     this.changed.emit({ name: file.name, mime: file.type, base64: btoa(binary) });
   }
-  download(): void {
+  async download(): Promise<void> {
+    this.error.set('');
+    try {
     const file = this.file(); if (!file) return;
-    const bytes = Uint8Array.from(atob(file.base64), (char) => char.charCodeAt(0));
-    const url = URL.createObjectURL(new Blob([bytes], { type: file.mime }));
+    const blob = file.storagePath ? await this.remoteFiles.download(file.storagePath)
+      : new Blob([Uint8Array.from(atob(file.base64), (char) => char.charCodeAt(0))], { type: file.mime });
+    const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a'); anchor.href = url; anchor.download = file.name; anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error: unknown) { this.error.set(error instanceof Error ? error.message : 'No se pudo descargar el archivo.'); }
   }
 }

@@ -1,3 +1,4 @@
+import { supabaseConfig } from '../../../../environments/supabase.config';
 import { ACADEMIC_MODE } from '../../../core/services/academic-mode';
 import {
   Component,
@@ -51,6 +52,7 @@ const FIELD_REQUIRED_MESSAGES: Readonly<Record<string, string>> = {
 })
 export class RegisterFormComponent {
   readonly localDemo = inject(ACADEMIC_MODE) === 'local';
+  readonly supabaseMode = inject(ACADEMIC_MODE) === 'supabase';
   private readonly fb = inject(FormBuilder);
 
   // Inputs desde el componente padre
@@ -110,7 +112,7 @@ export class RegisterFormComponent {
         ],
       ],
       institution: [
-        '',
+        this.supabaseMode ? supabaseConfig.institution : '',
         [Validators.required, Validators.minLength(3)],
       ],
       role: ['student', [Validators.required]],
