@@ -9,13 +9,13 @@ import {
   input,
   output,
 } from '@angular/core';
-import { UpperCasePipe } from '@angular/common';
+import { DecimalPipe, UpperCasePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GradeTareaDto, Tarea } from '../../models/tarea.model';
 
 @Component({
   selector: 'app-tarea-detail-modal',
-  imports: [UpperCasePipe, ReactiveFormsModule, TaskFileComponent, DialogFocusDirective],
+  imports: [DecimalPipe, UpperCasePipe, ReactiveFormsModule, TaskFileComponent, DialogFocusDirective],
   templateUrl: './tarea-detail-modal.component.html',
   styleUrl: './tarea-detail-modal.component.scss',
 })
@@ -58,7 +58,7 @@ export class TareaDetailModalComponent {
   public readonly gradeSubmitted = output<GradeTareaDto>();
 
   public readonly gradeForm: FormGroup = this.fb.group({
-    grade: [95, [Validators.required, Validators.min(0), Validators.max(100)]],
+    grade: [null, [Validators.required, Validators.min(1), Validators.max(5), Validators.pattern(/^\d(?:\.\d)?$/)]],
     feedback: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
   });
 
@@ -78,16 +78,14 @@ export class TareaDetailModalComponent {
       const version = JSON.stringify([this.isOpen(), currentTarea?.id, submission?.id, submission?.revision, submission?.grade, submission?.feedback]);
       if (version === formVersion) return;
       formVersion = version;
-      this.gradeForm.controls['grade'].setValidators([Validators.required, Validators.min(0), Validators.max(currentTarea?.maxScore ?? 100)]);
-      this.gradeForm.controls['grade'].updateValueAndValidity();
       if (currentTarea?.mySubmission?.grade !== undefined) {
         this.gradeForm.patchValue({
-          grade: currentTarea.mySubmission.grade,
+          grade: currentTarea.mySubmission.gradeScale === 5 ? currentTarea.mySubmission.grade : null,
           feedback: currentTarea.mySubmission.feedback || '',
         });
       } else {
         this.gradeForm.reset({
-          grade: 95,
+          grade: null,
           feedback: '',
         });
       }

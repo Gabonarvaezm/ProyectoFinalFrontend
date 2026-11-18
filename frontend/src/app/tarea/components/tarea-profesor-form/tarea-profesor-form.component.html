@@ -93,21 +93,25 @@
 
         <div class="form-group">
           <label for="prof-maxScore" class="form-label">
-            Puntaje Máximo <span class="required">*</span>
+            Nota máxima <span class="required">*</span>
           </label>
           <input
             id="prof-maxScore"
             type="number"
             formControlName="maxScore"
             class="form-control"
-            min="10"
-            max="100"
+            min="5"
+            max="5"
+            readonly
+            aria-describedby="grading-scale"
           />
           @if (form.get('maxScore')?.touched && (form.get('maxScore')?.errors?.['min'] || form.get('maxScore')?.errors?.['max'])) {
-            <span class="error-msg">El puntaje debe estar entre 10 y 100.</span>
+            <span class="error-msg">La nota máxima es 5.0.</span>
           }
         </div>
       </div>
+
+      <p id="grading-scale">Las entregas se califican de 1.0 a 5.0.</p>
 
       <!-- Descripción y consigna -->
       <div class="form-group">

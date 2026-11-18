@@ -54,15 +54,42 @@ describe('TareaDetailModalComponent', () => {
     component.gradeSubmitted.subscribe((dto) => (graded = dto));
 
     component.gradeForm.patchValue({
-      grade: 96,
+      grade: 4.6,
       feedback: 'Gran trabajo histórico y pertinencia de argumentos.',
     });
 
     component.onSubmitGrade();
 
     expect(graded).toBeDefined();
-    expect(graded!.grade).toBe(96);
+    expect(graded!.grade).toBe(4.6);
     expect(graded!.tareaId).toBe(mockTarea.id);
+  });
+
+  it('rechaza notas fuera de 1.0 a 5.0 y más de un decimal', () => {
+    fixture.componentRef.setInput('isProfessor', true);
+    fixture.detectChanges();
+    const graded = vi.fn();
+    component.gradeSubmitted.subscribe(graded);
+    for (const grade of [null, 0, 0.9, 5.1, 4.55]) {
+      component.gradeForm.setValue({ grade, feedback: 'Comentarios sobre la entrega.' });
+      component.onSubmitGrade();
+    }
+    expect(graded).not.toHaveBeenCalled();
+    for (const grade of [1, 4.5, 5]) {
+      component.gradeForm.setValue({ grade, feedback: 'Comentarios sobre la entrega.' });
+      component.onSubmitGrade();
+    }
+    expect(graded).toHaveBeenCalledTimes(3);
+  });
+
+  it('muestra al estudiante la nota decimal y los comentarios sin ofrecer edición', () => {
+    fixture.componentRef.setInput('tarea', { ...mockTarea, status: 'calificada',
+      mySubmission: { ...mockTarea.mySubmission!, grade: 4, gradeScale: 5, feedback: 'Buen análisis de las fuentes.' } });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.score-number').textContent).toContain('4.0');
+    expect(fixture.nativeElement.querySelector('.score-max').textContent).toContain('/ 5');
+    expect(fixture.nativeElement.querySelector('.feedback-body').textContent).toContain('Buen análisis');
+    expect(fixture.nativeElement.querySelector('.grade-form')).toBeNull();
   });
 
   it('debe emitir deliverClicked si el estudiante pulsa realizar entrega ahora', () => {
@@ -98,7 +125,7 @@ describe('TareaDetailModalComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Avance real sin enviar');
     expect(fixture.nativeElement.querySelector('.grade-form')).toBeNull();
     const spy = vi.fn(); component.gradeSubmitted.subscribe(spy);
-    component.gradeForm.setValue({ grade: 90, feedback: 'No puede calificar borradores.' });
+    component.gradeForm.setValue({ grade: 4.0, feedback: 'No puede calificar borradores.' });
     component.onSubmitGrade(); expect(spy).not.toHaveBeenCalled();
   });
 
@@ -116,9 +143,9 @@ describe('TareaDetailModalComponent', () => {
 
   it('no borra una nota en edición por un refresco idéntico del repositorio', () => {
     fixture.componentRef.setInput('isProfessor', true); fixture.detectChanges();
-    component.gradeForm.patchValue({ grade: 75, feedback: 'Comentario que estoy redactando.' });
+    component.gradeForm.patchValue({ grade: 3.5, feedback: 'Comentario que estoy redactando.' });
     fixture.componentRef.setInput('tarea', structuredClone(mockTarea)); fixture.detectChanges();
-    expect(component.gradeForm.value.grade).toBe(75);
+    expect(component.gradeForm.value.grade).toBe(3.5);
     expect(component.gradeForm.value.feedback).toBe('Comentario que estoy redactando.');
   });
 

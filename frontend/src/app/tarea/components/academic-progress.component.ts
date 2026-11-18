@@ -24,9 +24,9 @@ import { Tarea } from '../models/tarea.model';
         <thead><tr><th>Estudiante</th><th>Tarea / asignatura</th><th>Estado</th><th>Nota</th><th>Última actividad</th><th>Atención</th><th>Consulta</th></tr></thead>
         <tbody>@for (row of rows(); track row.key) {
           <tr><td>{{ row.name }}</td><td>{{ row.task.title }} / {{ row.task.subject }}</td><td>{{ row.status.replaceAll('_', ' ') }}</td>
-          <td>{{ row.submission?.grade !== undefined ? row.submission!.grade + ' / ' + row.task.maxScore : 'Sin calificar' }}</td>
+          <td>{{ row.submission?.grade !== undefined ? row.submission!.grade!.toFixed(1) + ' / ' + (row.submission!.gradeScale ?? row.task.maxScore) : 'Sin calificar' }}</td>
           <td>{{ row.submission?.gradedAt || row.submission?.updatedAt || row.submission?.submittedAt || 'Sin actividad guardada' }}</td>
-          <td>{{ row.status === 'vencida' || row.status === 'requiere_correccion' || (row.submission?.grade !== undefined && row.submission!.grade! / row.task.maxScore < 0.5) ? 'Requiere atención' : '—' }}</td>
+          <td>{{ row.status === 'vencida' || row.status === 'requiere_correccion' || (row.submission?.grade !== undefined && row.submission!.grade! / (row.submission!.gradeScale ?? row.task.maxScore) < 0.5) ? 'Requiere atención' : '—' }}</td>
           <td><button type="button" (click)="inspect.emit({ tarea: row.task, studentId: row.studentId })" [attr.aria-label]="actionLabel(row.status) + ': ' + row.name + ' — ' + row.task.title">{{ actionLabel(row.status) }}</button></td></tr>
         } @empty { <tr><td colspan="7">Sin asignaciones para estos filtros.</td></tr> }</tbody>
       </table></div>
@@ -68,6 +68,6 @@ export class AcademicProgressComponent {
   readonly completion = computed(() => this.rows().length ? (100 * this.delivered().length / this.rows().length).toFixed(1) + '%' : 'Sin datos');
   readonly average = computed(() => {
     const grades = this.rows().filter((row) => row.submission?.grade !== undefined);
-    return grades.length ? (grades.reduce((total, row) => total + row.submission!.grade! / row.task.maxScore * 100, 0) / grades.length).toFixed(1) + ' / 100' : 'Sin calificaciones';
+    return grades.length ? (grades.reduce((total, row) => total + row.submission!.grade! / (row.submission!.gradeScale ?? row.task.maxScore) * 100, 0) / grades.length).toFixed(1) + ' / 100' : 'Sin calificaciones';
   });
 }

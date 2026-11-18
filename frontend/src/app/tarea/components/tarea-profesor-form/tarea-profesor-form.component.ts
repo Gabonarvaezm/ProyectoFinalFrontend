@@ -40,7 +40,7 @@ export class TareaProfesorFormComponent {
     description: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
     subject: ['Ciencias', [Validators.required]],
     dueDate: [this.getDefaultDueDate(), [Validators.required]],
-    maxScore: [100, [Validators.required, Validators.min(10), Validators.max(100)]],
+    maxScore: [5, [Validators.required, Validators.min(5), Validators.max(5)]],
     priority: ['alta' as TareaPriority, [Validators.required]],
     attachmentName: [''],
     instructions: [''],
@@ -53,7 +53,7 @@ export class TareaProfesorFormComponent {
       if (this.isOpen()) {
         this.file.set(undefined);
         this.form.reset({ title: '', description: '', subject: 'Ciencias', dueDate: this.getDefaultDueDate(),
-          maxScore: 100, priority: 'alta', instructions: '', criteria: '', recipients: '', attachmentName: '' });
+          maxScore: 5, priority: 'alta', instructions: '', criteria: '', recipients: '', attachmentName: '' });
       }
     });
   }

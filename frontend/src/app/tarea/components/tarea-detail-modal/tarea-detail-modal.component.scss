@@ -343,7 +343,15 @@
 }
 
 .form-group-score {
-  width: 120px;
+  flex: 0 1 180px;
+
+  p {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+  }
+
+  .grade-error { color: var(--color-danger); }
 }
 
 .form-group-feedback {

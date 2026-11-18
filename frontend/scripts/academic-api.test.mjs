@@ -102,8 +102,15 @@ test('protege las publicaciones docentes, las sesiones y las entregas de cada al
     const submitted = (await request('/state', undefined, teacher.token)).body.tareas.find((t) => t.id === task.id);
     assert.equal(submitted.mySubmission.studentId, learner.user.id);
     assert.equal(submitted.submissionsCount, 1);
-    await request('/events', { type: 'tarea.grade', payload: { submissionId: submitted.mySubmission.id, grade: 95, feedback: 'Buen trabajo' } }, teacher.token);
-    assert.equal((await request('/state', undefined, learner.token)).body.tareas.find((t) => t.id === task.id).mySubmission.grade, 95);
+    for (const grade of [0, 0.9, 5.1, 4.55]) {
+      assert.equal((await request('/events', { type: 'tarea.grade', payload: { submissionId: submitted.mySubmission.id, grade, feedback: 'Nota inválida' } }, teacher.token)).status, 400);
+    }
+    await request('/events', { type: 'tarea.grade', payload: { submissionId: submitted.mySubmission.id, grade: 4.5, feedback: 'Buen trabajo' } }, teacher.token);
+    const gradedState = (await request('/state', undefined, learner.token)).body;
+    const grade = gradedState.tareas.find((t) => t.id === task.id).mySubmission;
+    assert.equal(grade.grade, 4.5);
+    assert.equal(grade.gradeScale, 5);
+    assert.ok(gradedState.notifications.some((notice) => JSON.stringify(notice).includes('4.5 / 5.0')));
   });
 });
 
@@ -166,10 +173,10 @@ test('ciclo real: asignación privada, borrador, conflictos, entrega, revisión,
     assert.equal((await event('tarea.submit', { tareaId: task.id, content: 'Respuesta corregida', attachment: file, revision: mine.mySubmission.revision }, learner)).status, 200);
     mine = await getTask();
     assert.equal((await event('tarea.grade', { submissionId: mine.mySubmission.id, grade: 21, feedback: 'Fuera de escala' })).status, 400);
-    assert.equal((await event('tarea.grade', { submissionId: mine.mySubmission.id, grade: 18, feedback: 'Conclusiones correctas' })).status, 200);
+    assert.equal((await event('tarea.grade', { submissionId: mine.mySubmission.id, grade: 4.5, feedback: 'Conclusiones correctas' })).status, 200);
     mine = await getTask(session2);
     assert.equal(mine.status, 'calificada');
-    assert.equal(mine.mySubmission.grade, 18);
+    assert.equal(mine.mySubmission.grade, 4.5);
     assert.equal(mine.mySubmission.feedback, 'Conclusiones correctas');
     assert.equal((await getTask(teacher)).submissions[0].attachment.base64, file.base64);
     assert.equal((await event('tarea.submit', { tareaId: task.id, content: 'Borrar nota', revision: mine.mySubmission.revision }, learner)).status, 409);
@@ -213,12 +220,12 @@ test('recupera borrador, adjuntos y calificación después de reiniciar SQLite',
     assert.equal(task.mySubmission.attachment.base64, attachment.base64);
     store.mutate(learner, { type: 'tarea.submit', payload: { tareaId: task.id, content: 'Respuesta final persistente', attachment, revision: task.mySubmission.revision } });
     task = store.snapshot(teacher).tareas.find((t) => t.id === 'disk-task');
-    store.mutate(teacher, { type: 'tarea.grade', payload: { submissionId: task.mySubmission.id, grade: 8, feedback: 'Buen análisis persistente' } });
+    store.mutate(teacher, { type: 'tarea.grade', payload: { submissionId: task.mySubmission.id, grade: 4.0, feedback: 'Buen análisis persistente' } });
     store.close(); store = new AcademicStore(path);
     const session = store.login({ email: 'estudiante@universidad.edu', password: 'password123' });
     task = store.snapshot(store.authenticate('Bearer ' + session.token)).tareas.find((t) => t.id === 'disk-task');
     assert.equal(task.status, 'calificada');
-    assert.equal(task.mySubmission.grade, 8);
+    assert.equal(task.mySubmission.grade, 4.0);
     assert.equal(task.mySubmission.feedback, 'Buen análisis persistente');
     assert.equal(task.mySubmission.attachment.base64, attachment.base64);
   } finally {
@@ -257,10 +264,10 @@ test('dos alumnos asignados conservan entregas privadas y el docente califica ca
     assert.equal((await get(first)).recipientEmails, undefined);
     assert.equal((await event(teacher2, 'tarea.grade', { submissionId: a.id, grade: 10, feedback: 'Intrusión' })).status, 404);
     assert.equal((await event(teacher2, 'tarea.delete', { id: 'multi' })).status, 403);
-    assert.equal((await event(teacher, 'tarea.grade', { submissionId: a.id, grade: 9, feedback: 'Buen trabajo A', revision: a.revision })).status, 200);
+    assert.equal((await event(teacher, 'tarea.grade', { submissionId: a.id, grade: 4.5, feedback: 'Buen trabajo A', revision: a.revision })).status, 200);
     assert.equal((await event(teacher, 'tarea.grade', { submissionId: a.id, grade: 2, feedback: 'Nota obsoleta', revision: a.revision })).status, 409);
-    assert.equal((await event(teacher, 'tarea.grade', { submissionId: b.id, grade: 7, feedback: 'Buen trabajo B', revision: b.revision })).status, 200);
-    assert.equal((await get(first)).mySubmission.grade, 9);
-    assert.equal((await get(second)).mySubmission.grade, 7);
+    assert.equal((await event(teacher, 'tarea.grade', { submissionId: b.id, grade: 3.5, feedback: 'Buen trabajo B', revision: b.revision })).status, 200);
+    assert.equal((await get(first)).mySubmission.grade, 4.5);
+    assert.equal((await get(second)).mySubmission.grade, 3.5);
   });
 });

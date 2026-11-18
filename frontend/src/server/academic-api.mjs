@@ -255,7 +255,7 @@ export class AcademicStore {
           revision: (saved?.revision ?? 0) + 1, updatedAt: new Date().toISOString(),
           status: type === 'tarea.submit' ? 'entregada' : saved?.status === 'requiere_correccion' ? 'requiere_correccion' : 'en_progreso',
           submittedAt: type === 'tarea.submit' ? new Date().toISOString() : undefined,
-          history: saved ? [...(saved.history || []), saved && { content: saved.content, grade: saved.grade, feedback: saved.feedback, submittedAt: saved.submittedAt, updatedAt: saved.updatedAt }] : []
+          history: saved ? [...(saved.history || []), saved && { content: saved.content, grade: saved.grade, gradeScale: saved.gradeScale, feedback: saved.feedback, submittedAt: saved.submittedAt, updatedAt: saved.updatedAt }] : []
         }, user.id, [user.email, teacher.email]);
       } else if (['tarea.grade', 'tarea.review', 'tarea.correction'].includes(type)) {
         const row = this.db.prepare("SELECT * FROM documents WHERE kind='submission' AND id=?").get(text(p.submissionId, 300));
@@ -266,15 +266,16 @@ export class AcademicStore {
         if (!task || task.owner !== user.id) reject(403, 'No puedes gestionar esta entrega.');
         if (!submission.submittedAt || submission.status === 'requiere_correccion') reject(409, 'Solo puedes revisar entregas definitivas.');
         if (type === 'tarea.review' && submission.grade !== undefined) reject(409, 'La entrega ya está calificada. Solicita una corrección para reabrirla.');
-        if (type === 'tarea.grade' && (!Number.isFinite(p.grade) || p.grade < 0 || p.grade > JSON.parse(task.payload).maxScore)) reject(400, 'La calificación no es válida.');
+        if (type === 'tarea.grade' && (!Number.isFinite(p.grade) || p.grade < 1 || p.grade > 5 || Math.abs(p.grade * 10 - Math.round(p.grade * 10)) > 1e-8)) reject(400, 'La calificación no es válida.');
         if (type !== 'tarea.review') text(p.feedback, 2000);
         this.put('submission', { ...submission, status: type === 'tarea.grade' ? 'calificada' : type === 'tarea.review' ? 'en_revision' : 'requiere_correccion',
           grade: type === 'tarea.grade' ? p.grade : undefined,
+          gradeScale: type === 'tarea.grade' ? 5 : undefined,
           feedback: type === 'tarea.review' ? submission.feedback : p.feedback,
           gradedAt: type === 'tarea.grade' ? new Date().toISOString() : undefined,
           revision: (submission.revision ?? 0) + 1 }, row.owner, row.audience);
         const student = JSON.parse(this.db.prepare('SELECT profile FROM users WHERE id=?').get(submission.studentId).profile);
-        this.notice(user, [student.email], 'task', type === 'tarea.grade' ? 'Tu tarea ha sido calificada' : type === 'tarea.review' ? 'Tu tarea está en revisión' : 'Tu tarea requiere corrección', p.feedback || 'Consulta el estado de tu entrega.', '/tareas', submission.tareaId);
+        this.notice(user, [student.email], 'task', type === 'tarea.grade' ? 'Tu tarea ha sido calificada' : type === 'tarea.review' ? 'Tu tarea está en revisión' : 'Tu tarea requiere corrección', type === 'tarea.grade' ? `Nota: ${p.grade.toFixed(1)} / 5.0. ${p.feedback}` : p.feedback || 'Consulta el estado de tu entrega.', '/tareas', submission.tareaId);
       } else if (type === 'notice.receipt') {
         const row = this.db.prepare('SELECT * FROM notices WHERE id=?').get(text(p.id, 200));
         if (!row || !canRead(row, user)) reject(404, 'La notificación no existe.');

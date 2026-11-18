@@ -127,7 +127,7 @@ export class LocalAcademicRepository {
       const progress = db.students.find((item) => item.email === student.email && item.ownerId === user.id);
       const assignments = tareas.flatMap((task) => (task.recipients ?? []).filter((r) => r.studentId === student.id).map((r) => ({ ...r, maxScore: task.maxScore, subject: task.subject })));
       const grades = assignments.filter((item) => item.submission?.grade !== undefined);
-      const score = grades.length ? Math.round(grades.reduce((sum, item) => sum + item.submission!.grade! / item.maxScore * 100, 0) / grades.length) : 0;
+      const score = grades.length ? Math.round(grades.reduce((sum, item) => sum + item.submission!.grade! / (item.submission!.gradeScale ?? item.maxScore) * 100, 0) / grades.length) : 0;
       const attention = assignments.some((item) => ['vencida', 'requiere_correccion'].includes(item.status)) || (grades.length > 0 && score < 50);
       return { studentName: student.fullName, topic: assignments[0]?.subject ?? 'Sin asignar', score,
         status: attention ? 'needs-attention' : 'active', statusLabel: attention ? 'Requiere atención' : 'Activo',
@@ -198,7 +198,7 @@ export class LocalAcademicRepository {
         status: type === 'tarea.submit' ? 'entregada' : previous?.status === 'requiere_correccion' ? 'requiere_correccion' : 'en_progreso',
         submittedAt: type === 'tarea.submit' ? new Date().toISOString() : undefined, updatedAt: new Date().toISOString(), revision: (previous?.revision ?? 0) + 1,
         feedback: type === 'tarea.draft' ? previous?.feedback : undefined,
-        history: previous ? [...(previous.history ?? []), { content: previous.content, grade: previous.grade, feedback: previous.feedback, submittedAt: previous.submittedAt, updatedAt: previous.updatedAt,
+        history: previous ? [...(previous.history ?? []), { content: previous.content, grade: previous.grade, gradeScale: previous.gradeScale, feedback: previous.feedback, submittedAt: previous.submittedAt, updatedAt: previous.updatedAt,
           ...(previous.submittedAt ? { attachment: previous.attachment, attachmentUrl: previous.attachmentUrl } : {}) }] : [] };
       db.submissions = [submission, ...db.submissions.filter((item) => item.id !== submission.id)];
       if (type === 'tarea.submit') {
@@ -212,13 +212,13 @@ export class LocalAcademicRepository {
       if (p['revision'] !== undefined && p['revision'] !== (submission.revision ?? 0)) throw new Error('La entrega cambió. Recarga antes de calificar.');
       if (!submission.submittedAt || submission.status === 'requiere_correccion') throw new Error('Solo puedes revisar entregas definitivas.');
       if (type === 'tarea.review' && submission.grade !== undefined) throw new Error('La entrega ya está calificada.');
-      if (type === 'tarea.grade' && (typeof p['grade'] !== 'number' || !Number.isFinite(p['grade']) || p['grade'] < 0 || p['grade'] > task.maxScore)) throw new Error('La calificación no es válida.');
+      if (type === 'tarea.grade' && (typeof p['grade'] !== 'number' || !Number.isFinite(p['grade']) || p['grade'] < 1 || p['grade'] > 5 || Math.abs(p['grade'] * 10 - Math.round(p['grade'] * 10)) > 1e-8)) throw new Error('La calificación no es válida.');
       const feedback = type === 'tarea.review' ? submission.feedback : required(p['feedback'], 2000);
-      if (submission.grade !== undefined) submission.history = [...(submission.history ?? []), { content: submission.content, grade: submission.grade, feedback: submission.feedback, submittedAt: submission.submittedAt, updatedAt: submission.gradedAt }];
+      if (submission.grade !== undefined) submission.history = [...(submission.history ?? []), { content: submission.content, grade: submission.grade, gradeScale: submission.gradeScale, feedback: submission.feedback, submittedAt: submission.submittedAt, updatedAt: submission.gradedAt }];
       Object.assign(submission, { status: type === 'tarea.grade' ? 'calificada' : type === 'tarea.review' ? 'en_revision' : 'requiere_correccion',
-        grade: type === 'tarea.grade' ? p['grade'] : undefined, feedback, gradedAt: type === 'tarea.grade' ? new Date().toISOString() : undefined, revision: (submission.revision ?? 0) + 1 });
+        grade: type === 'tarea.grade' ? p['grade'] : undefined, gradeScale: type === 'tarea.grade' ? 5 : undefined, feedback, gradedAt: type === 'tarea.grade' ? new Date().toISOString() : undefined, revision: (submission.revision ?? 0) + 1 });
       const student = db.users.find((item) => item.id === submission.studentId)!;
-      notice([student.email], type === 'tarea.grade' ? 'Tu tarea ha sido calificada' : type === 'tarea.review' ? 'Tu tarea está en revisión' : 'Tu tarea requiere corrección', feedback ?? 'Consulta el estado de tu entrega.', '/tareas', task.id);
+      notice([student.email], type === 'tarea.grade' ? 'Tu tarea ha sido calificada' : type === 'tarea.review' ? 'Tu tarea está en revisión' : 'Tu tarea requiere corrección', type === 'tarea.grade' ? `Nota: ${Number(p['grade']).toFixed(1)} / 5.0. ${feedback}` : feedback ?? 'Consulta el estado de tu entrega.', '/tareas', task.id);
     } else if (type === 'book.publish') {
       const book = p as unknown as Book;
       required(book.id, 200); required(book.title, 150); required(book.description);

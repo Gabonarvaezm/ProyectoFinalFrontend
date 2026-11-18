@@ -39,6 +39,27 @@ describe('Tarea Component (Smart Parent & Presentational Child Nodes)', () => {
     expect(component.dashboardRoute()).toBe('/estudiante');
   });
 
+  for (const role of ['student', 'professor'] as const) {
+    it(`conserva el menú principal al abrir Tareas como ${role}`, () => {
+      fixture.componentRef.setInput('userRole', role);
+      fixture.detectChanges();
+
+      const links = Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLAnchorElement>('.sidebar-nav a'),
+      );
+      expect(links.map((link) => link.textContent?.trim())).toEqual([
+        'Dashboard', 'Biblioteca', 'Foros',
+      ]);
+      expect(links.map((link) => link.getAttribute('href'))).toEqual([
+        role === 'professor' ? '/profesor' : '/estudiante', '/biblioteca', '/foro',
+      ]);
+
+      fixture.componentRef.setInput('isEmbedded', true);
+      fixture.detectChanges();
+      expect((fixture.nativeElement as HTMLElement).querySelector('.sidebar')).toBeNull();
+    });
+  }
+
   it('debe reconocer el rol de profesor cuando se pasa userRole="professor"', () => {
     const profFixture = TestBed.createComponent(Tarea);
     profFixture.componentRef.setInput('userRole', 'professor');

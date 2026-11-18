@@ -41,7 +41,7 @@ describe('TareaProfesorFormComponent', () => {
       description: 'Resolución de integrales dobles y triples en coordenadas cilíndricas.',
       subject: 'Matemáticas',
       dueDate: '2026-12-15',
-      maxScore: 100,
+      maxScore: 5,
       priority: 'alta',
       attachmentName: 'guia_calculo.pdf',
     });
@@ -52,7 +52,7 @@ describe('TareaProfesorFormComponent', () => {
     expect(result).toBeDefined();
     expect(result!.title).toBe('Taller de Cálculo Multivariable');
     expect(result!.subject).toBe('Matemáticas');
-    expect(result!.maxScore).toBe(100);
+    expect(result!.maxScore).toBe(5);
   });
 
   it('debe emitir closeModal al presionar el botón de cerrar', () => {
